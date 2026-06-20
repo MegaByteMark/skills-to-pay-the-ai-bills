@@ -64,6 +64,14 @@ Operational Workflow:
 
 ---
 
-### SECTION 6 CHECKPOINT: Technical Delta & Drift Analysis
-#### 6.1 Discovered vs. Stated Discrepancies (Interface vs. Implementation Drift)
-#### 6.2 Gaps, Security Exposures, and Untracked Assets
+### SECTION 6 CHECKPOINT: Test Surface Architecture Blueprint
+#### 6.1 Target Test Surface Mapping
+*(Note: Map the optimal surfaces for verification based on module depth. Identify the highest-leverage interfaces and seams where testing provides maximum capability per unit of test code, explicitly specifying where mock/fake adapters should be injected.)*
+
+---
+
+### SECTION 7 CHECKPOINT: Technical Delta & Drift Analysis
+#### 7.1 Discovered Architectural Pattern & Recommendation
+*(Note: Identify and name the dominant architectural style present in the codebase. Evaluate its alignment with the principles of depth, leverage, locality, and testability. If structural friction is discovered, provide an expert recommendation for an architectural pattern that would explicitly benefit the project's maintenance and lifecycle goals.)*
+
+#### 7.2 Gaps, Security Exposures, and Untracked Assets
