@@ -1,17 +1,20 @@
 ---
-name        interview-me
-description  Relentlessly stress-test a system design, migration plan, or codebase architecture before building. Walk down each decision tree branch one-by-one, providing an expert recommendation with every question, and extracting answers from the codebase automatically whenever possible.
+name: interview-me
+description: Relentlessly stress-test a system design, migration plan, or codebase architecture before building. Walk down each decision tree branch one-by-one, providing an expert recommendation with every question, and extracting answers from the codebase automatically whenever possible.
+dependencies:
+  - design-vocab # Ensures consistent architectural taxonomy during the discovery process
 ---
 
 Operational Protocol:
-1. Interview the user relentlessly about every aspect of their system architecture, operational governance, lifecycle risks, and business intent until a completely bulletproof, shared understanding is achieved.
-2. Ask questions ONE AT A TIME. Waiting for feedback on each question before continuing is a strict requirement to avoid cognitive overload.
-3. For EVERY question asked, you must provide your own calculated, recommended answer or best-practice standard as a baseline for the user to react to.
-4. If a question can be answered by exploring the codebase (e.g., framework versions, package manifests, database schemas, directory layouts), explore the codebase instead of asking the user.
-5. Cover the following structural branches thoroughly:
-   - Business Domain & Persona Ownership
-   - System Topology & Companion App Ecosystem Boundaries
-   - Automated Tech Stack Lifecycle (Industry support/EOL lookups as of 2026)
-   - DevOps Pipeline & Governance (GitFlow, Ticketing Statuses, Release gates)
-   - Operations, Support Tiering, SLAs, and Outage Protocols
-   - Data Layer Isolation & Security Boundaries
+1. Context Pre-Parsing: Before asking the first question, silently parse any available repository manifests, configuration files, and schemas to automatically resolve technical details. Focus the manual interview exclusively on human-centric, strategic, and operational gaps to prevent cognitive fatigue.
+2. Incremental Execution: Ask questions ONE AT A TIME. Waiting for feedback on each question before continuing is a strict requirement to avoid cognitive overload.
+3. Baseline Recommendations: For EVERY question asked, provide your own calculated, recommended answer or best-practice standard as a baseline for the user to react to.
+4. Vocabulary Compliance: Strictly adhere to the taxonomy defined in the `design-vocab` skill. Frame all architectural questions using Module, Interface, Implementation, Depth, Seam, and Adapter. The terms component, service, unit, API, signature, and boundary are explicitly prohibited.
+
+Structural Branches to Cover:
+  - Business Domain & Persona Ownership: Mapping roles, system owners, and authentication scopes.
+  - Module Topology & Solution Ecosystem: Mapping physical modules, critical interfaces, and external companion app integrations via explicit seams.
+  - Automated Tech Stack Lifecycle: Evaluating implementation dependencies and library support windows against official 2026 EOL horizons.
+  - DevOps Pipeline & Governance: Explicitly auditing workflow rules, ticket state transitions, and delivery verification gates.
+  - Operations & Incident Infrastructure: Documenting support tiering, SLAs, knowledge location targets, and breach protocols.
+  - Data Layer Isolation & Security Models: Defining data dictionaries, storage schema alterations, and multi-tenancy isolation.
