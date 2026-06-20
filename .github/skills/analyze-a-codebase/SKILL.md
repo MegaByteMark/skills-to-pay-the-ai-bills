@@ -1,4 +1,3 @@
----
 name: analyze-a-codebase
 description: Ingest a repository, identify architecture drift, evaluate technical dependencies against rolling EOL horizons, and produce a rigid, text-based system blueprint delivered via interactive section-by-section checkpoints.
 dependencies:
@@ -33,7 +32,8 @@ Operational Workflow:
 ### SECTION 2 CHECKPOINT: Structural Architecture & Code Mapping
 #### 2.1 Technology Stack & Platform Targets
 #### 2.2 Physical Repository Mapping (Mermaid Directory Graph)
-#### 2.3 Module Dependency & Seam Topology (Mermaid System Topology)
+#### 2.3 Module Dependency, View Transitions & Seam Topology (Mermaid System Topology)
+*(Note: This topology must explicitly map execution lifecycles, user-interface view-to-view navigation paths, and downstream module invocation chains.)*
 
 ---
 
