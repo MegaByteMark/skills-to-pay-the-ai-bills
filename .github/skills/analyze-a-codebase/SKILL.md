@@ -2,14 +2,16 @@
 name: analyze-a-codebase
 description: Ingest a repository, identify architecture drift, evaluate technical dependencies against rolling EOL horizons, and produce a rigid, text-based system blueprint delivered via interactive section-by-section checkpoints.
 dependencies:
-  - design-vocab  # Architectural taxonomy contract (Modules, Seams, etc.)
-  - agent-markup  # Machine-readable token contract ([Risk: Level], [Policy], etc.)
-  - interview-me  # Enforces upfront context alignment, automated manifest extraction, and single-question iteration
+  - design-vocab        # Architectural taxonomy contract (Modules, Seams, etc.)
+  - agent-markup        # Machine-readable token contract ([Risk: Level], [Policy], etc.)
+  - gather-requirements # Enforces upfront FDS requirement extraction via interview-me
 ---
 
 Operational Workflow:
-1. PHASE 1 (Upfront Context Alignment): Trigger the `interview-me` skill to dynamically extract the project's human, operational, lifecycle, and ecosystem landscape. If a codebase or directory structure is already provided, silently parse dependency manifests first so that the interview exclusively targets human-centric and operational gaps, preventing cognitive fatigue.
-2. PHASE 2 (Ingestion & Delta Analysis): Map the physical repository against the context gathered during the interview phase. Actively extract library, framework, and language versions from manifest files (e.g., package.json, .csproj, go.mod, Gemfile, Prisma schemas) and independently evaluate their official vendor support timelines and EOL (End of Life) statuses relative to the current calendar year.
+1. PHASE 1 (Upfront Contract Verification & Guardrail Gate): Check for the existence of `docs/requirements/functional-requirements.md`.
+     - IF the file does not exist or is empty: Hand off execution immediately to the `gather-requirements` skill to drive the technical interview and generate the FDS contract.
+     - ELSE: Proceed directly to Phase 2, utilizing the FDS as the absolute behavioral baseline.
+2. PHASE 2 (Ingestion & Delta Analysis): Map the physical repository structures, boundaries, and dependencies. Actively extract library, framework, and language versions from manifest files (e.g., package.json, .csproj, go.mod, Gemfile, Prisma schemas) and independently evaluate their official vendor support timelines and EOL (End of Life) statuses relative to the current calendar year.
 3. PHASE 3 (Deterministic Output via Incremental Checkpoints): Output the final blueprint strictly matching the "Rationalized Schema Structure" below. You must deliver this blueprint ONE major section at a time. After rendering a section, PAUSE execution, explain your key findings/clarifications, and ask the user to verify. Do not proceed to generate the next section until the current section is approved or corrected.
 
 [Operational Directives]
