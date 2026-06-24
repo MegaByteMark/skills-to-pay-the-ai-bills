@@ -1,3 +1,4 @@
+---
 name: design-vocab
 description: Enforce a rigid, shared architectural vocabulary across all skills to eliminate semantic drift during code design, analysis, and restructuring.
 references:

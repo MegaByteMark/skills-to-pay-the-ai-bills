@@ -4,17 +4,18 @@ description: Ingests the Functional Design Specification (FDS), system blueprint
 dependencies:
   - design-vocab  # Enforces Interface, Implementation, Module, and Seam terminology
   - agent-markup  # Pulls token rules for tagging operational or risk levels
-  - interview-me  # Enforces single-question interaction for hosting ambiguities
+  - interview-me  # Enforces single-question interaction for hosting ambiguities and gate resolution
 ---
 
 Operational Workflow:
-1. PHASE 1 (Contract Ingestion & Dual Guardrail Gate): Check for the existence of both foundational contracts.
-     - IF `docs/requirements/functional-requirements.md` is missing or empty: Abort execution immediately. Inform the user that the FDS is missing and explicitly prompt them to run the `gather-requirements` skill first.
-     - IF `docs/architecture/system-blueprint.md` is missing or empty: Abort execution immediately. Inform the user that the system blueprint is missing and explicitly prompt them to run the `analyze-a-codebase` skill first.
+1. PHASE 1 (Contract Ingestion & Tiered Gate): Check for the existence of both foundational contracts. Documentation must never be generated from an inferred or simulated baseline — shipping a guide built on a non-existent spec is worse than shipping none — so the ephemeral tier is deliberately NOT offered here.
+     - IF `docs/requirements/functional-requirements.md` is missing or empty, OR `docs/architecture/system-blueprint.md` is missing or empty: do NOT silently abort. Trigger `interview-me` for ONE decision naming exactly which contract is absent and presenting the available tiers:
+         - GENERATE (recommended): hand off to `gather-requirements` (for the FDS) and/or `analyze-a-codebase` (for the blueprint) to generate and persist the missing contract(s), then proceed.
+         - ABORT: stop and inform the user that documentation cannot be generated without verified contracts.
      - ELSE: Ingest the complete behavioral context from the FDS and the structural mappings from the system blueprint.
 2. PHASE 2 (Target Context & Environment Validation): 
      - Identify the requested token archetype from the user's prompt (`[Doc: QuickStart]`, `[Doc: Technical]`, `[Doc: Troubleshooting]`, or `[Doc: Installation]`).
-     - IF `[Doc: Installation]` is selected, scan the repository for deployment assets (e.g., Dockerfiles, Terraform, cloud configs). If multiple valid deployment pathways exist or the target hosting environment is ambiguous, trigger the `interview-me` skill to ask exactly ONE highly specific question to clarify the target infrastructure before proceeding.
+     - IF `[Doc: Installation]` is selected, scan the repository for deployment assets (e.g., Dockerfiles, Terraform, cloud configs). If multiple valid deployment pathways exist or the target hosting environment is ambiguous, trigger the `interview-me` skill to ask exactly ONE highly specific question to clarify the target infrastructure before proceeding. Honor the `interview-me` advancement contract: keep discussing the clarification and do not proceed to Phase 3 until the user issues the literal `move-next` command.
 3. PHASE 3 (Deterministic Content Generation): Generate pristine, technical, table-heavy documentation written directly to the appropriate domain path under the `docs/` tree.
 
 [Operational Directives]
