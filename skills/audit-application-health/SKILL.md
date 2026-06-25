@@ -7,11 +7,13 @@ dependencies:
   - audit-test-coverage               # Contract-gated leaf
   - design-vocab                      # Technical register vocabulary
   - agent-markup                      # [Risk: Level], [Confidence: Level], [Remediation: Effort], [Data: Classification]
+  - resolve-repository-platform       # Resolves host/tooling ONCE up front so leaves never re-prompt
   - interview-me                      # Single-question gate resolution if contracts are missing
 ---
 
 Operational Workflow:
-1. PHASE 1 (Central Gate Resolution): Resolve contract availability ONCE, up front, so the leaf skills never re-prompt mid-run.
+1. PHASE 1 (Central Gate Resolution): Resolve contract availability AND hosting platform ONCE, up front, so the leaf skills never re-prompt mid-run.
+     - Run the `resolve-repository-platform` protocol once and carry the resolved platform/tooling (or git-only fallback) into every leaf, so no leaf fires its own platform gate.
      - Check for `docs/architecture/system-blueprint.md` and `docs/requirements/functional-requirements.md`.
      - IF either is missing: trigger `interview-me` for ONE decision — "Generate the missing contract(s) before auditing?"
          - YES: hand off to `analyze-a-codebase` / `gather-requirements` to generate and persist the contract(s), then proceed with all three leaves.
@@ -37,7 +39,7 @@ Operational Workflow:
 ================================================================================
 
 # Application Health Audit (`[Scope: Health]`)
-**Run:** [YYYYMMDD-rNN]  |  **Coverage:** [leaves executed]  |  **Excluded:** [sections skipped + reason, e.g. "Test Coverage — contracts not generated"]
+**Run:** [YYYYMMDD-rNN]  |  **Platform:** [GitHub | GitLab | Bitbucket | Self-hosted | None]  |  **Coverage:** [leaves executed]  |  **Excluded:** [sections skipped + reason, e.g. "Test Coverage — contracts not generated"]
 
 ---
 
