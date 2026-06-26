@@ -33,6 +33,11 @@ Token Taxonomy & Allowed Values:
     Description: Estimates the implementation cost to resolve a finding, enabling risk-vs-effort prioritisation in remediation roadmaps.
     Allowed Values: [Low, Medium, High]
 
+  [Competency: Level]:
+    Description: Declares a human's demonstrated ability in a single skill area, calibrated against observed work — not self-report. Shared across every skill that teaches, assesses, or hands work to a human so the same baseline travels with the person.
+    Allowed Values: [Not-Ready, Paired, Guided, Solo]
+    Note: Ordered weakest-to-strongest. Solo = wrote comparable work unaided; Guided = succeeds with a full spec/acceptance criteria; Paired = succeeds only with a worked scaffold and step-by-step prompts; Not-Ready = cannot currently do it OR cannot explain what it does. A claim from self-report is provisional until corroborated by observed work; pair with [Confidence: Level] to express calibration certainty. Owned/persisted by the competency-profile skill.
+
   [Inferred: Unverified]:
     Description: Marks output derived from an ephemeral, in-context baseline that was reconstructed rather than read from a persisted contract. Signals reduced fidelity to downstream readers and automation.
     Allowed Values: [true]
