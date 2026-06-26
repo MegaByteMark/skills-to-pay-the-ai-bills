@@ -120,6 +120,19 @@ No slash commands — invoke it with a target concept, e.g. *"teach-a-skill: Typ
 
 > The point isn't to slow you down — it's to make sure that when you ship code, you can still read, debug, and defend it.
 
+### Make your agent proactive (optional)
+
+Skills auto-discover, so nothing below is required. But the behavioral overlays (`vibe-code-antidote`, `programming-tutor`) are opt-in by nature — if you want your agent to *offer* them without being asked, drop a snippet like this into your own project's `AGENTS.md` (or `CLAUDE.md`):
+
+```markdown
+## Skill usage
+- When I'm building something non-trivial, proactively offer the `vibe-code-antidote`
+  skill so I keep writing some of the code myself and stay sharp.
+- If you detect I don't understand part of the implementation, use `teach-a-skill`
+  to close that one gap before continuing.
+- If I ask to learn a language or topic from scratch, use `programming-tutor`.
+```
+
 ---
 
 ## How skills compose
