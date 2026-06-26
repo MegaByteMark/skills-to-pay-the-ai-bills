@@ -17,6 +17,7 @@ Token Taxonomy & Allowed Values:
   [Policy]:
     Description: Specifies the enforcement stance of a development rule or verification gate.
     Allowed Values: [Enforced, Advisory, Audit-Only]
+    Note: Written bare as [Policy] as a schema/column marker; written in instance shorthand as [Policy: Enforced] etc. when tagging a concrete rule inline (parallel to [Risk: High]).
 
   [Data: Classification]:
     Description: Classifies the sensitivity tier of data handled at a code path, store, or seam. Drives PII inventory and data-protection findings.
