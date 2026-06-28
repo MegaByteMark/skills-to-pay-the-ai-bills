@@ -54,7 +54,8 @@ Grouping is by convention only (the files stay flat for discovery).
 - **interview-me** — relentless one-question-at-a-time design interrogation with a recommendation on every question.
 - **gather-requirements** — drives `interview-me` to produce a complete Functional Design Specification (FDS).
 
-### Codebase analysis & documentation
+### Architecture, analysis & documentation
+- **clean-architecture** — *prescriptive counterpart to `analyze-a-codebase`*; scaffolds and enforces a layered, dependency-inverted structure (Domain → Application → Interface Adapters → Infrastructure), mapping each artifact to a strict path and HALTing on inward-dependency violations. Speaks `design-vocab`.
 - **analyze-a-codebase** — ingests a repo and produces a structured system blueprint.
 - **document-a-codebase** — generates user / technical / installation docs from the FDS, blueprint, and code.
 
