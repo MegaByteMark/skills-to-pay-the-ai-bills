@@ -1,5 +1,9 @@
 ---
 name: clean-architecture
+description: 'Reference skill for implementing strong clean architecture design principles across any codebase.'
+user-invocable: true
+dependencies:
+  - design-vocab
 ---
 
 ## 🛠 Agent Skill: Clean Architecture
