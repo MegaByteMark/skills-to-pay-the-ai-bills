@@ -17,6 +17,7 @@ Operational Workflow:
 2. PHASE 1 (Context Ingestion):
      - Spec path: ingest entities, attributes, validation limits, and `[Data: Classification]` tags from the FDS or user spec. Extract the candidate nouns to seed the Unnormalised Form (UNF).
      - Brownfield path (Brownfield Ingestion): silently parse the authoritative schema sources — `schema.sql`/DDL dumps, migration directories, ORM models (Prisma `schema.prisma`, EF migrations, ActiveRecord/`schema.rb`, Django models, SQLAlchemy, TypeORM/Sequelize entities) — and reconstruct the as-built UNF. Where the schema is ambiguous, resolve via the interview rather than guessing.
+     - Relationship Recovery (Brownfield only): do NOT assume relationships are declared. When a foreign-key constraint is absent, or a key column is ambiguously named (e.g. `FKID`, bare `Id`, `TypeId` that never names its parent), hunt the application layer for the implied join — ORM associations, `JOIN`/`WHERE` clauses, repository/query code — to recover the true parent table. Tag every recovered relationship with `[Confidence: Level]`: `Confirmed` only with a declared FK constraint; `Probable` when a code join corroborates it; `Possible` for a name- or convention-only guess (phrased as "requires verification", never asserted). Route genuine ambiguity through the interview rather than inventing an edge.
 3. PHASE 2 (Normalisation via Incremental Stage Checkpoints): Drive the `interview-me` skill through the Normalisation Stage Ladder ONE stage at a time. Before the first stage, announce the checkpoint protocol: you will present your analysis and your recommended decomposition for each normal form, keep discussing — answering follow-ups and revising — and the user must issue the literal `move-next` command to lock the stage and advance. For every stage, state which dependencies/repeating groups/anomalies you found and the exact tables you propose to split or merge, with a baseline recommendation. Answering a question is NOT permission to advance.
 4. PHASE 3 (Anti-Pattern Sweep): Scan the candidate model against the Anti-Pattern Error Register below and record every match in §6 — never silently normalise one away.
 5. PHASE 4 (ERD & Data Dictionary Generation): Compile the verified, normalised model into `docs/architecture/data-model.md`, matching the Output Schema below. Render the ERD as a valid Mermaid `erDiagram` and document every entity, attribute, key, and relationship.
@@ -60,6 +61,7 @@ When the model runs in `amend` mode, the existing `docs/architecture/data-model.
 | Polymorphic Associations | `parent_id`+`parent_type` blocks DB-level FKs | Separate FK columns / join tables per relation |
 | Comma-Separated Lists | Multi-valued attribute violates 1NF | Extract into a proper junction table |
 | Missing Foreign Keys | Referential integrity left to the app layer | Enforce FK constraints at the database level |
+| Ambiguous / Untargeted FK Naming | `FKID`, bare `Id`, or `TypeId` that never names its parent table — relationship is unreadable from the schema | Rename to `parent_table_id`; declare the FK so the target is explicit |
 | Entity-Attribute-Value (EAV) | Generic `entity_id`/`attribute`/`value` destroys typing & performance | Model explicit, typed columns/tables |
 | Naive Soft Deletes | `is_deleted` flag breaks `UNIQUE` constraints (e.g. re-registering an email) | Partial unique indexes or archive tables that account for deletion |
 | God Tables | Entities sprawling past ~30 columns | Split into 1-to-1 related tables |
@@ -116,9 +118,11 @@ erDiagram
 | *Customer* | *email* | *text, format-validated* | *UK* | *No* | *—* | *PII* | *Unique even across soft-deletes* |
 
 ## 4. Relationship Register
-| Relationship | Parent | Child | Cardinality | Foreign Key | On Delete | Junction Table |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| *Customer→Order* | *Customer* | *Order* | *1:N* | *order.customer_id* | *Restrict* | *—* |
+*(`Source / Confidence`: declared-FK `[Confidence: Confirmed]`, code-inferred `[Confidence: Probable]`, name/convention guess `[Confidence: Possible]`, or interview-confirmed.)*
+| Relationship | Parent | Child | Cardinality | Foreign Key | On Delete | Junction Table | Source / Confidence |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| *Customer→Order* | *Customer* | *Order* | *1:N* | *order.customer_id* | *Restrict* | *—* | *declared-FK [Confidence: Confirmed]* |
+| *Invoice→Customer* | *Customer* | *Invoice* | *1:N* | *invoice.FKID (untargeted)* | *unknown* | *—* | *code-inferred [Confidence: Probable]* |
 
 ## 5. Normalisation Ledger
 *(Record the decision taken at each stage so the model's structure is defensible.)*
