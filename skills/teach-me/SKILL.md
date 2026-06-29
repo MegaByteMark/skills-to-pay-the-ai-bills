@@ -1,5 +1,5 @@
 ---
-name: programming-tutor
+name: teach-me
 description: 'Adaptive 1-on-1 programming tutor for broad language fluency. Orchestrates an end-to-end language course: intake, full syllabus construction, sequencing, and cross-topic spaced repetition — delegating each single-concept lesson to the teach-a-skill leaf and tracking mastery against the shared competency baseline. Use for personalized language learning, diagnostic skill checks, daily guided practice, progress tracking, and mastery-based coding challenges.'
 argument-hint: 'Target language, learner background, environment, and goals'
 user-invocable: true

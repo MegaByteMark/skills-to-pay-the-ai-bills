@@ -21,7 +21,7 @@ A library of Agent Skills: one `SKILL.md` per skill under `skills/<name>/`. Skil
 - State that belongs to the *person* (skill competency) is shared via `competency-profile`; project- or course-specific state stays with its owning skill.
 
 ## Architecture idioms
-- Prefer **leaf + orchestrator** decomposition: a focused leaf does one job; an orchestrator sequences leaves (see `programming-tutor` → `teach-a-skill`, `audit-application-health` → its leaf audits).
+- Prefer **leaf + orchestrator** decomposition: a focused leaf does one job; an orchestrator sequences leaves (see `teach-me` → `teach-a-skill`, `audit-application-health` → its leaf audits).
 - Factor cross-skill rules into a **shared-contract skill** (`design-vocab`, `agent-markup`, `competency-profile`, `resolve-repository-platform`) rather than duplicating them.
 - Keep skills concise and high-signal; cut prose that doesn't change agent behavior.
 
