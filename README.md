@@ -59,6 +59,11 @@ Grouping is by convention only (the files stay flat for discovery).
 - **analyze-a-codebase** — ingests a repo and produces a structured system blueprint.
 - **document-a-codebase** — generates user / technical / installation docs from the FDS, blueprint, and code.
 
+### Code-quality enforcement
+*Standalone review overlays — load whichever fits the codebase and task. Both audit only supplied code and calibrate every finding with `[Confidence: Level]` to curb false positives.*
+- **dry-kiss** — enforces DRY / KISS / YAGNI to block duplication, over-engineering, and gratuitous cleverness.
+- **solid-principles** — enforces SOLID OOP design; HALTs on God classes, tight coupling, and brittle inheritance with a `[Risk: Level]` tag.
+
 ### Audit & remediation
 - **audit-application-health** — *orchestrator*; runs the three leaf audits and synthesises one client-facing health report.
   - **audit-security-and-governance** — security + GDPR/data-protection scan.
