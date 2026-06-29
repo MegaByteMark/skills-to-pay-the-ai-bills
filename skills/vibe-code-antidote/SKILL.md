@@ -1,13 +1,13 @@
 ---
 name: vibe-code-antidote
-description: 'Session overlay that fights skill atrophy from "vibe coding" by handing the human self-contained slices of a real build at randomized, safe moments. Calibrates capability and comprehension first, briefs each handoff so they are never dropped into code they do not understand, reviews their submission like a peer, and escalates to the teach-a-skill leaf (or programming-tutor for a full course) when a genuine skill or comprehension gap is detected. Reads and updates the shared competency baseline so calibration carries across skills.'
+description: 'Session overlay that fights skill atrophy from "vibe coding" by handing the human self-contained slices of a real build at randomized, safe moments. Calibrates capability and comprehension first, briefs each handoff so they are never dropped into code they do not understand, reviews their submission like a peer, and escalates to the teach-a-skill leaf (or teach-me for a full course) when a genuine skill or comprehension gap is detected. Reads and updates the shared competency baseline so calibration carries across skills.'
 argument-hint: 'Optional: intensity (light/normal/intense), areas to focus or avoid, and any deadline pressure'
 user-invocable: true
 dependencies:
   - design-vocab        # Module / Interface / Implementation / Depth / Seam / Adapter taxonomy for briefing handoffs
   - agent-markup        # [Risk: Level] (handoff blast radius), [Confidence: Level] (certainty), [Remediation: Effort] (task size), [Competency: Level] (human skill baseline)
   - competency-profile  # Shared out-of-tree human skill baseline — read for the Capability Gate, updated from observed handoffs
-  - teach-a-skill       # Escalation target: closes the one gap that blocked a handoff (programming-tutor is the full-course alternative)
+  - teach-a-skill       # Escalation target: closes the one gap that blocked a handoff (teach-me is the full-course alternative)
 ---
 
 # Role
@@ -18,7 +18,7 @@ This skill is an OVERLAY on whatever build is already happening. It does not own
 # State (two stores, both OUT of the workspace)
 Never write either store inside the project tree, never commit it, never let it touch `git status`.
 
-**1. Human skill baseline → `competency-profile` (shared, per-user, global).** A user's skill in an area is a fact about the *person*, not this project — so it is NOT kept here. Read it at session start for the Capability Gate; write demonstrated levels back through its merge protocol after every handoff. This is the SAME baseline `programming-tutor` and `teach-a-skill` use, so a build day and a study evening share one truth. Use the `[Competency: Level]` enumeration.
+**1. Human skill baseline → `competency-profile` (shared, per-user, global).** A user's skill in an area is a fact about the *person*, not this project — so it is NOT kept here. Read it at session start for the Capability Gate; write demonstrated levels back through its merge protocol after every handoff. This is the SAME baseline `teach-me` and `teach-a-skill` use, so a build day and a study evening share one truth. Use the `[Competency: Level]` enumeration.
 
 **2. Per-project local state → out-of-tree, namespaced per project.** What is genuinely project-specific stays local: the user's *codebase comprehension* (their mental model of THIS software), the handoff ledger, escalation flags, and session settings. Resolve a path in order: (1) agent state store, e.g. `${XDG_STATE_HOME:-$HOME/.local/state}/vibe-antidote/<project-key>.md`; (2) fallback `${TMPDIR:-/tmp}/vibe-antidote/<project-key>.md`, where `<project-key>` is a slug/short-hash of the absolute project path. State both resolved paths on first activation. Treat temp storage as best-effort; if cleared, fall back to cold intake. In chat-only runtimes use agent memory or emit paste-back snapshots on pause — never substitute a workspace file.
 
@@ -61,7 +61,7 @@ The human must never be dropped into the middle of a build task they do not trul
 Trigger when EITHER holds: **capability gap** (repeated Not-Ready areas, or a pattern of bail-outs/take-overs) OR **comprehension gap** (Gate 2 failures / Weak mental model). Then:
 1. **Warn plainly, no shaming**, citing specific evidence (e.g. spots where the code isn't something they could currently maintain solo).
 2. **Name the stakes:** code you can't read is code you can't debug, review, or defend later.
-3. **Hand the specific gap to `teach-a-skill`** — pass the concept, a target `[Competency: Level]` (usually `Guided`), the environment, and the baseline for that area. It closes that one gap and writes the result back to the shared baseline, so a later handoff in the same area can now pass the gates. For a broad, multi-topic gap (the user wants to learn the whole language/stack), recommend `programming-tutor` instead.
+3. **Hand the specific gap to `teach-a-skill`** — pass the concept, a target `[Competency: Level]` (usually `Guided`), the environment, and the baseline for that area. It closes that one gap and writes the result back to the shared baseline, so a later handoff in the same area can now pass the gates. For a broad, multi-topic gap (the user wants to learn the whole language/stack), recommend `teach-me` instead.
 4. **Record** it in Escalation Flags.
 5. **Offer a graceful path:** `/pause-antidote` to keep building unobstructed, drop to **Paired** micro-handoffs to push through, or run `teach-a-skill` now. Respect the choice; never lecture twice.
 
@@ -100,5 +100,5 @@ Promote toward Solo after unaided wins (sparser briefs, more edge cases); demote
 - **Never force a handoff** to hit cadence or prove a point; a failed gate or absent candidate means keep building.
 - **Never gatekeep a deadline** — suppress handoffs under deadline pressure and resume after.
 - **Gates and guardrails always beat the random roll.**
-- **Close gaps via `teach-a-skill`, never improvise a course.** Hand the one blocking gap to the leaf; recommend `programming-tutor` only for a deliberate full-language course.
+- **Close gaps via `teach-a-skill`, never improvise a course.** Hand the one blocking gap to the leaf; recommend `teach-me` only for a deliberate full-language course.
 - **Vocabulary & markup compliance:** `design-vocab` terms (Module, Interface, Implementation, Depth, Seam, Adapter); bracket tokens restricted to `agent-markup` (`[Risk: Level]`, `[Confidence: Level]`, `[Remediation: Effort]`, `[Competency: Level]`).

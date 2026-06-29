@@ -20,7 +20,7 @@ Each skill is a folder containing a `SKILL.md`. Copy or symlink the folders you 
 cp -R skills/* ~/.agents/skills/
 
 # …or symlink a single skill (handy while iterating)
-ln -s "$PWD/skills/programming-tutor" ~/.config/opencode/skills/programming-tutor
+ln -s "$PWD/skills/teach-me" ~/.config/opencode/skills/teach-me
 ```
 
 Rules that matter for discovery:
@@ -72,7 +72,7 @@ Grouping is by convention only (the files stay flat for discovery).
 - **remediate-test-coverage** — closes gaps found by the coverage audit, writing the minimum sufficient tests.
 
 ### Learning & skill-retention
-- **programming-tutor** — *orchestrator*; an end-to-end language course (intake, syllabus, sequencing, spaced repetition) that delegates each lesson to `teach-a-skill`.
+- **teach-me** — *orchestrator*; an end-to-end language course (intake, syllabus, sequencing, spaced repetition) that delegates each lesson to `teach-a-skill`.
 - **teach-a-skill** — *leaf*; closes **one** knowledge gap to a target competency. Promptable by an agent or a human.
 - **vibe-code-antidote** — a session overlay that hands you self-contained slices of a real build at random to fight skill atrophy, escalating to `teach-a-skill` when it detects a gap.
 
@@ -85,7 +85,7 @@ Grouping is by convention only (the files stay flat for discovery).
 
 Type these mid-session once the relevant skill is active.
 
-### programming-tutor
+### teach-me
 | Command | Effect |
 | :-- | :-- |
 | `/syllabus` | Reprint the full syllabus + progress dashboard |
@@ -128,7 +128,7 @@ No slash commands — invoke it with a target concept, e.g. *"teach-a-skill: Typ
 
 ### Make your agent proactive (optional)
 
-Skills auto-discover, so nothing below is required. But the behavioral overlays (`vibe-code-antidote`, `programming-tutor`) are opt-in by nature — if you want your agent to *offer* them without being asked, drop a snippet like this into your own project's `AGENTS.md` (or `CLAUDE.md`):
+Skills auto-discover, so nothing below is required. But the behavioral overlays (`vibe-code-antidote`, `teach-me`) are opt-in by nature — if you want your agent to *offer* them without being asked, drop a snippet like this into your own project's `AGENTS.md` (or `CLAUDE.md`):
 
 ```markdown
 ## Skill usage
@@ -136,7 +136,7 @@ Skills auto-discover, so nothing below is required. But the behavioral overlays 
   skill so I keep writing some of the code myself and stay sharp.
 - If you detect I don't understand part of the implementation, use `teach-a-skill`
   to close that one gap before continuing.
-- If I ask to learn a language or topic from scratch, use `programming-tutor`.
+- If I ask to learn a language or topic from scratch, use `teach-me`.
 ```
 
 ---
@@ -150,7 +150,7 @@ audit-application-health ──> audit-security-and-governance
                          ├──> audit-blueprint-implementation
                          └──> audit-test-coverage  <── remediate-test-coverage
 
-programming-tutor ──> teach-a-skill ──┐
+teach-me          ──> teach-a-skill ──┐
 vibe-code-antidote ───────────────────┼──> competency-profile  (shared baseline)
                                        └──> agent-markup / design-vocab  (shared contracts)
 ```
