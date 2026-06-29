@@ -52,7 +52,7 @@ Grouping is by convention only (the files stay flat for discovery).
 
 ### Requirements & discovery
 - **interview-me** — relentless one-question-at-a-time design interrogation with a recommendation on every question.
-- **gather-requirements** — drives `interview-me` to produce a complete Functional Design Specification (FDS).
+- **gather-requirements** — drives `interview-me` across two streams: a **product stream** producing a Product Requirements Document (PRD) of vision, personas, Epics and MoSCoW-prioritised user stories that seed the backlog, then a **functional stream** producing the Functional Design Specification (FDS), with every FDS requirement traced back to its originating PRD Epic/story.
 
 ### Architecture, analysis & documentation
 - **clean-architecture** — *prescriptive counterpart to `analyze-a-codebase`*; scaffolds and enforces a layered, dependency-inverted structure (Domain → Application → Interface Adapters → Infrastructure), mapping each artifact to a strict path and HALTing on inward-dependency violations. Speaks `design-vocab`.
