@@ -9,8 +9,6 @@ dependencies:
 argument-hint: "[spec | existing-db] [3nf | bcnf] [create | amend]  # input source, target normal form (default 3nf), and whether to create fresh or amend an existing model (mode auto-detected from existing files when omitted)"
 ---
 
-This skill turns raw data requirements into a structurally sound relational model. It either designs forward from a specification or reverse-engineers and audits an existing database, then walks the formal normal forms to eliminate redundancy and protect integrity, and finally persists a Mermaid ERD and a documented data dictionary as the canonical description of the persistence layer.
-
 Operational Workflow:
 1. PHASE 0 (Source & Mode Selection): Resolve the **input source** and the **mode** before any modelling.
      - Source `spec` (default): model forward from requirements. Prefer the FDS at `docs/requirements/functional-requirements.md` (its entities, Data Invariants, and Validation Schema Matrix are the seed). If no FDS exists, accept the user's direct prose/spec, and announce that the model will proceed without FDS traceability.
@@ -20,12 +18,12 @@ Operational Workflow:
      - Spec path: ingest entities, attributes, validation limits, and `[Data: Classification]` tags from the FDS or user spec. Extract the candidate nouns to seed the Unnormalised Form (UNF).
      - Brownfield path (Brownfield Ingestion): silently parse the authoritative schema sources — `schema.sql`/DDL dumps, migration directories, ORM models (Prisma `schema.prisma`, EF migrations, ActiveRecord/`schema.rb`, Django models, SQLAlchemy, TypeORM/Sequelize entities) — and reconstruct the as-built UNF. Where the schema is ambiguous, resolve via the interview rather than guessing.
 3. PHASE 2 (Normalisation via Incremental Stage Checkpoints): Drive the `interview-me` skill through the Normalisation Stage Ladder ONE stage at a time. Before the first stage, announce the checkpoint protocol: you will present your analysis and your recommended decomposition for each normal form, keep discussing — answering follow-ups and revising — and the user must issue the literal `move-next` command to lock the stage and advance. For every stage, state which dependencies/repeating groups/anomalies you found and the exact tables you propose to split or merge, with a baseline recommendation. Answering a question is NOT permission to advance.
-4. PHASE 3 (Anti-Pattern Sweep): Scan the candidate model against the Anti-Pattern Error Register below. Every detected instance is a design error requiring urgent remediation — tag it `[Risk: High]` (or `[Risk: Critical]` where it threatens integrity or leaks `Special-Category` data), calibrate with `[Confidence: Level]`, and estimate `[Remediation: Effort]`. Do not silently normalise these away without recording them in the findings section.
+4. PHASE 3 (Anti-Pattern Sweep): Scan the candidate model against the Anti-Pattern Error Register below and record every match in §6 — never silently normalise one away.
 5. PHASE 4 (ERD & Data Dictionary Generation): Compile the verified, normalised model into `docs/architecture/data-model.md`, matching the Output Schema below. Render the ERD as a valid Mermaid `erDiagram` and document every entity, attribute, key, and relationship.
 
 [Operational Directives]
 - Execution Protocol: Use `interview-me` mechanics for every normalisation stage and ambiguity. Ask exactly ONE highly specific question at a time and provide a baseline recommendation on each. Honor the advancement contract: never advance a stage until the user issues the literal `move-next` command.
-- Target Normal Form: Default target is **3NF** — for the vast majority of applications a model is "fully normalised" and ready for an ERD at 3NF. Offer **BCNF** when overlapping composite candidate keys are present, or when the user requests it via the argument. Identify 4NF/5NF/6NF concerns ONLY as advisory callouts (multi-valued dependencies, join dependencies, temporal splits); do NOT auto-fragment to them, because over-decomposition harms query performance — recommend them only with an explicit justification.
+- Target Normal Form: Default target is **3NF** — sufficient for the vast majority of applications. Offer **BCNF** when overlapping composite candidate keys exist or the user requests it. Treat 4NF/5NF/6NF as advisory only (see Stage 5); never auto-fragment to them, as over-decomposition harms query performance.
 - Brownfield Honesty: When auditing an existing database, never present a clean target ERD without first surfacing the as-built defects you found. The value is the delta between what exists and what should exist.
 - Output Location Contract: The model must be written to exactly `docs/architecture/data-model.md` relative to the repository root. Git is the version store — do NOT create parallel `-vN` files or copies.
 - Vocabulary Compliance: Describe the surrounding persistence layer using `design-vocab` (Module, Interface, Implementation, Seam, Adapter). Standard relational terms (entity, table, attribute, primary/foreign key, junction table, cardinality) are literal domain vocabulary and are permitted; the prohibited synonyms (component, service, API, boundary) are not.
@@ -52,7 +50,7 @@ When the model runs in `amend` mode, the existing `docs/architecture/data-model.
 ================================================================================
 [Anti-Pattern Error Register] — always flag detected instances as urgent
 ================================================================================
-*(Every match is a design error. Tag inline with `[Risk: High]`/`[Risk: Critical]`, `[Confidence: Level]`, and `[Remediation: Effort]`, and record it in the Anti-Pattern Findings section. Never ship a model that silently contains these.)*
+*(Every match is a design error. Tag inline with `[Risk: High]` — or `[Risk: Critical]` where it threatens integrity or leaks `Special-Category` data — plus `[Confidence: Level]` and `[Remediation: Effort]`, and record it in the Anti-Pattern Findings section. Never ship a model that silently contains these.)*
 | Anti-Pattern | Why It Is an Error | Required Remediation |
 | :--- | :--- | :--- |
 | Nullable Booleans | Trinary state (True/False/Unknown) hides intent | Non-nullable boolean with an explicit default |
@@ -91,7 +89,6 @@ When the model runs in `amend` mode, the existing `docs/architecture/data-model.
 erDiagram
     CUSTOMER ||--o{ ORDER : places
     ORDER ||--|{ ORDER_LINE : contains
-    PRODUCT ||--o{ ORDER_LINE : "appears in"
     CUSTOMER {
         uuid id PK
         text email UK
@@ -109,11 +106,6 @@ erDiagram
         uuid product_id FK
         int quantity
         numeric unit_price
-    }
-    PRODUCT {
-        uuid id PK
-        text name
-        numeric list_price
     }
 ```
 
