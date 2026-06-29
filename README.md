@@ -58,6 +58,7 @@ Grouping is by convention only (the files stay flat for discovery).
 - **clean-architecture** — *prescriptive counterpart to `analyze-a-codebase`*; scaffolds and enforces a layered, dependency-inverted structure (Domain → Application → Interface Adapters → Infrastructure), mapping each artifact to a strict path and HALTing on inward-dependency violations. Speaks `design-vocab`.
 - **analyze-a-codebase** — ingests a repo and produces a structured system blueprint.
 - **document-a-codebase** — generates user / technical / installation docs from the FDS, blueprint, and code.
+- **db-normalisation** — turns the FDS (or a direct spec) into a fully normalised relational data model — or reverse-engineers and audits an existing database — walking `interview-me` through the normal forms (UNF→1NF→2NF→3NF, optionally BCNF), sweeping for the canonical persistence anti-patterns, and writing a Mermaid ERD plus a documented data dictionary to `docs/architecture/data-model.md`.
 
 ### Code-quality enforcement
 *Standalone review overlays — load whichever fits the codebase and task. Both audit only supplied code and calibrate every finding with `[Confidence: Level]` to curb false positives.*
