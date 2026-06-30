@@ -54,6 +54,12 @@ Grouping is by convention only (the files stay flat for discovery).
 - **interview-me** — relentless one-question-at-a-time design interrogation with a recommendation on every question.
 - **gather-requirements** — drives `interview-me` across two streams: a **product stream** producing a Product Requirements Document (PRD) of vision, personas, Epics and MoSCoW-prioritised user stories that seed the backlog, then a **functional stream** producing the Functional Design Specification (FDS), with every FDS requirement traced back to its originating PRD Epic/story.
 
+### Backlog seeding *(publish-side of `gather-requirements`)*
+*Turn the PRD/FDS into tracked work items. Re-runnable: a second pass reconciles the tracker against amended requirements (create/update/close) via embedded stable-ID markers — never duplicating.*
+- **seed-backlog** — *orchestrator*; resolves the platform once and sequences the two leaves across the whole Epic Register and Story Backlog, wiring each story to its parent epic, then emits an auditable seed report.
+  - **create-epic** — *leaf*; renders/writes one epic (PRD-primary, FDS-enriched).
+  - **create-user-story** — *leaf*; renders/writes one story as a child of its epic.
+
 ### Architecture, analysis & documentation
 - **clean-architecture** — *prescriptive counterpart to `analyze-a-codebase`*; scaffolds and enforces a layered, dependency-inverted structure (Domain → Application → Interface Adapters → Infrastructure), mapping each artifact to a strict path and HALTing on inward-dependency violations. Speaks `design-vocab`.
 - **analyze-a-codebase** — ingests a repo and produces a structured system blueprint.
@@ -144,12 +150,15 @@ Skills auto-discover, so nothing below is required. But the behavioral overlays 
 
 ## How skills compose
 
-Skills reference each other by `name` (declared in a doc-only `dependencies:` block). The two clusters with real orchestration:
+Skills reference each other by `name` (declared in a doc-only `dependencies:` block). The clusters with real orchestration:
 
 ```
 audit-application-health ──> audit-security-and-governance
                          ├──> audit-blueprint-implementation
                          └──> audit-test-coverage  <── remediate-test-coverage
+
+seed-backlog ──> create-epic ───────┐
+             └──> create-user-story ─┴──> resolve-repository-platform  (write-side adapter)
 
 teach-me          ──> teach-a-skill ──┐
 vibe-code-antidote ───────────────────┼──> competency-profile  (shared baseline)
