@@ -49,6 +49,7 @@ Grouping is by convention only (the files stay flat for discovery).
 - **agent-markup** — the machine-readable bracket-token schema (`[Risk: Level]`, `[Confidence: Level]`, `[Competency: Level]`, …).
 - **competency-profile** — the shared, out-of-tree, per-user record of a human's demonstrated skill, so calibration is continuous across skills.
 - **resolve-repository-platform** — figures out the hosting platform (GitHub/GitLab/…) before any platform-specific tooling runs.
+- **detect-test-harness** — resolves the project's test runner/framework, layout, and native test-double idiom from signal files before any test is read or written; asks one question only when inconclusive and never introduces a new framework silently.
 
 ### Requirements & discovery
 - **interview-me** — relentless one-question-at-a-time design interrogation with a recommendation on every question.
@@ -77,6 +78,8 @@ Grouping is by convention only (the files stay flat for discovery).
   - **audit-blueprint-implementation** — code-vs-blueprint/FDS drift.
   - **audit-test-coverage** — real coverage vs the target test surface.
 - **remediate-test-coverage** — closes gaps found by the coverage audit, writing the minimum sufficient tests.
+
+  Both test skills resolve the runner/framework through the shared **detect-test-harness** contract.
 
 ### Learning & skill-retention
 - **teach-me** — *orchestrator*; an end-to-end language course (intake, syllabus, sequencing, spaced repetition) that delegates each lesson to `teach-a-skill`.
@@ -158,6 +161,8 @@ Skills reference each other by `name` (declared in a doc-only `dependencies:` bl
 audit-application-health ──> audit-security-and-governance
                          ├──> audit-blueprint-implementation
                          └──> audit-test-coverage  <── remediate-test-coverage
+                                   └──────────┬──────────────┘
+                                              └──> detect-test-harness  (shared harness resolution)
 
 seed-backlog ──> create-epic ───────┐
              └──> create-user-story ─┴──> resolve-repository-platform  (write-side adapter)
