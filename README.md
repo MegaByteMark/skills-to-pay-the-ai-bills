@@ -20,7 +20,7 @@ Each skill is a folder containing a `SKILL.md`. Copy or symlink the folders you 
 cp -R skills/* ~/.agents/skills/
 
 # …or symlink a single skill (handy while iterating)
-ln -s "$PWD/skills/programming-tutor" ~/.config/opencode/skills/programming-tutor
+ln -s "$PWD/skills/teach-me" ~/.config/opencode/skills/teach-me
 ```
 
 Rules that matter for discovery:
@@ -52,12 +52,19 @@ Grouping is by convention only (the files stay flat for discovery).
 
 ### Requirements & discovery
 - **interview-me** — relentless one-question-at-a-time design interrogation with a recommendation on every question.
-- **gather-requirements** — drives `interview-me` to produce a complete Functional Design Specification (FDS).
+- **gather-requirements** — drives `interview-me` across two streams: a **product stream** producing a Product Requirements Document (PRD) of vision, personas, Epics and MoSCoW-prioritised user stories that seed the backlog, then a **functional stream** producing the Functional Design Specification (FDS), with every FDS requirement traced back to its originating PRD Epic/story.
+
+### Backlog seeding *(publish-side of `gather-requirements`)*
+*Turn the PRD/FDS into tracked work items. Re-runnable: a second pass reconciles the tracker against amended requirements (create/update/close) via embedded stable-ID markers — never duplicating.*
+- **seed-backlog** — *orchestrator*; resolves the platform once and sequences the two leaves across the whole Epic Register and Story Backlog, wiring each story to its parent epic, then emits an auditable seed report.
+  - **create-epic** — *leaf*; renders/writes one epic (PRD-primary, FDS-enriched).
+  - **create-user-story** — *leaf*; renders/writes one story as a child of its epic.
 
 ### Architecture, analysis & documentation
 - **clean-architecture** — *prescriptive counterpart to `analyze-a-codebase`*; scaffolds and enforces a layered, dependency-inverted structure (Domain → Application → Interface Adapters → Infrastructure), mapping each artifact to a strict path and HALTing on inward-dependency violations. Speaks `design-vocab`.
 - **analyze-a-codebase** — ingests a repo and produces a structured system blueprint.
 - **document-a-codebase** — generates user / technical / installation docs from the FDS, blueprint, and code.
+- **db-normalisation** — turns the FDS (or a direct spec) into a fully normalised relational data model — or reverse-engineers and audits an existing database — walking `interview-me` through the normal forms (UNF→1NF→2NF→3NF, optionally BCNF), sweeping for the canonical persistence anti-patterns, and writing a Mermaid ERD plus a documented data dictionary to `docs/architecture/data-model.md`.
 
 ### Code-quality enforcement
 *Standalone review overlays — load whichever fits the codebase and task. Both audit only supplied code and calibrate every finding with `[Confidence: Level]` to curb false positives.*
@@ -72,12 +79,13 @@ Grouping is by convention only (the files stay flat for discovery).
 - **remediate-test-coverage** — closes gaps found by the coverage audit, writing the minimum sufficient tests.
 
 ### Learning & skill-retention
-- **programming-tutor** — *orchestrator*; an end-to-end language course (intake, syllabus, sequencing, spaced repetition) that delegates each lesson to `teach-a-skill`.
+- **teach-me** — *orchestrator*; an end-to-end language course (intake, syllabus, sequencing, spaced repetition) that delegates each lesson to `teach-a-skill`.
 - **teach-a-skill** — *leaf*; closes **one** knowledge gap to a target competency. Promptable by an agent or a human.
 - **vibe-code-antidote** — a session overlay that hands you self-contained slices of a real build at random to fight skill atrophy, escalating to `teach-a-skill` when it detects a gap.
 
 ### Release & ops
 - **generate-release-notes** — high-density release notes from commits, diffs, and merged PR discussions.
+- **create-bug-report** — auto-captures every evidenced field (git/build version, runtime, pasted stack traces) and interviews only for the human-centric gaps, then renders a fixed bug-report schema and optionally files it as a Work Item via `resolve-repository-platform`. Evidence-first and anti-hallucination: unevidenced, unanswered fields stay `Unknown — requires verification`.
 
 ---
 
@@ -85,7 +93,7 @@ Grouping is by convention only (the files stay flat for discovery).
 
 Type these mid-session once the relevant skill is active.
 
-### programming-tutor
+### teach-me
 | Command | Effect |
 | :-- | :-- |
 | `/syllabus` | Reprint the full syllabus + progress dashboard |
@@ -128,7 +136,7 @@ No slash commands — invoke it with a target concept, e.g. *"teach-a-skill: Typ
 
 ### Make your agent proactive (optional)
 
-Skills auto-discover, so nothing below is required. But the behavioral overlays (`vibe-code-antidote`, `programming-tutor`) are opt-in by nature — if you want your agent to *offer* them without being asked, drop a snippet like this into your own project's `AGENTS.md` (or `CLAUDE.md`):
+Skills auto-discover, so nothing below is required. But the behavioral overlays (`vibe-code-antidote`, `teach-me`) are opt-in by nature — if you want your agent to *offer* them without being asked, drop a snippet like this into your own project's `AGENTS.md` (or `CLAUDE.md`):
 
 ```markdown
 ## Skill usage
@@ -136,21 +144,24 @@ Skills auto-discover, so nothing below is required. But the behavioral overlays 
   skill so I keep writing some of the code myself and stay sharp.
 - If you detect I don't understand part of the implementation, use `teach-a-skill`
   to close that one gap before continuing.
-- If I ask to learn a language or topic from scratch, use `programming-tutor`.
+- If I ask to learn a language or topic from scratch, use `teach-me`.
 ```
 
 ---
 
 ## How skills compose
 
-Skills reference each other by `name` (declared in a doc-only `dependencies:` block). The two clusters with real orchestration:
+Skills reference each other by `name` (declared in a doc-only `dependencies:` block). The clusters with real orchestration:
 
 ```
 audit-application-health ──> audit-security-and-governance
                          ├──> audit-blueprint-implementation
                          └──> audit-test-coverage  <── remediate-test-coverage
 
-programming-tutor ──> teach-a-skill ──┐
+seed-backlog ──> create-epic ───────┐
+             └──> create-user-story ─┴──> resolve-repository-platform  (write-side adapter)
+
+teach-me          ──> teach-a-skill ──┐
 vibe-code-antidote ───────────────────┼──> competency-profile  (shared baseline)
                                        └──> agent-markup / design-vocab  (shared contracts)
 ```

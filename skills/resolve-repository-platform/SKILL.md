@@ -14,6 +14,8 @@ Neutral Vocabulary (use these terms in prose; map to platform terms only at the 
   - Review Discussion: the comment/review thread attached to a Change Proposal.
   - Repository Custody: the namespace owning the repository (individual account vs. company/organisation).
   - Repository Visibility: whether the repository is public, internal, or private.
+  - Work Item: the platform-neutral umbrella for a tracked unit of work — a GitHub/GitLab/Bitbucket "issue", a GitLab "Epic", a Jira "story/epic". Never hard-code "issue" in shared prose.
+  - Parent Link: the hierarchy relation between work items (epic -> story / parent issue -> sub-issue). Term and mechanism vary by platform; resolve it here, not in consumers.
 
 Resolution Protocol:
 1. PHASE 1 (Host Inference): Read the remote with `git remote -v`. Parse the host of the origin (or first) remote:
@@ -38,11 +40,23 @@ Platform Adapter Map:
 
 *(Commands are ILLUSTRATIVE, not authoritative — exact flags vary by CLI version. Verify availability at runtime; never assert output you did not actually obtain.)*
 
+Work-Item Authoring Adapter Map (write-side — for consumers that CREATE or amend tracked work, e.g. `create-epic`, `create-user-story`, `seed-backlog`):
+| Platform | Work Item Term | Epic Representation | Illustrative Create / Amend / Close | Illustrative Parent Link |
+| :--- | :--- | :--- | :--- | :--- |
+| GitHub | Issue | Issue (conventionally `epic`-labelled; no first-class Epic type) | `gh issue create`, `gh issue edit <n>`, `gh issue close <n>` | native sub-issues via GraphQL `addSubIssue` (else a task-list / tracking issue) |
+| GitLab | Issue | Native Epic (group-level; tier-gated) | `glab issue create`, `glab issue update <n>`, `glab issue close <n>` (Epics via API where licensed) | epic↔issue association, or `/epic` quick action in the description |
+| Bitbucket | Issue | none native | REST API if a token is supplied, else unavailable | REST API only; no native epic hierarchy |
+| Self-hosted / Other | per user declaration | per user declaration | per user-declared tooling, else unavailable | per user-declared tooling |
+| No remote | n/a | n/a | unavailable — render the work item as portable Markdown instead of pushing | n/a |
+
+*(Write tooling and flags vary more than read tooling — confirm at runtime. Where a platform lacks first-class Epics or sub-issues, degrade to the conventional substitute named above rather than asserting a capability that is not present.)*
+
 [Operational Directives]
 - Resolve-Before-Invoke: A consuming skill MUST run this protocol and obtain a resolved platform (or an explicit git-only fallback) BEFORE issuing any platform-specific command. No skill may assume GitHub.
 - Single-Gate Discipline: The confirmation gate asks at most ONE question via `interview-me` (platform identity, plus base host for self-managed). Re-use the answer for the remainder of the run; never re-prompt.
 - Terminology Neutrality: In all shared and client-facing prose use the Neutral Vocabulary (Change Proposal, Review Discussion). Substitute the platform-specific term only inside platform-specific tooling steps.
 - Honest Unavailability: When platform tooling is unavailable, state it plainly and degrade — never fabricate Change Proposal content or assert Repository Visibility without confirmation.
+- Write-Side Safety: A consumer performing creates/amends/closes via the Work-Item Authoring map MUST obtain explicit user confirmation of the planned mutation set before issuing any write command, and degrade to emitting portable Markdown when no authenticated CLI is available — never silently mutate a tracker.
 
 Resolution Record (consumers embed this in their own Scan Context / output header):
 * **Platform:** [GitHub | GitLab | Bitbucket | Self-hosted:<host> | None] (`[Confidence: Level]`)
