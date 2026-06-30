@@ -85,6 +85,7 @@ Grouping is by convention only (the files stay flat for discovery).
 
 ### Release & ops
 - **generate-release-notes** — high-density release notes from commits, diffs, and merged PR discussions.
+- **create-bug-report** — auto-captures every evidenced field (git/build version, runtime, pasted stack traces) and interviews only for the human-centric gaps, then renders a fixed bug-report schema and optionally files it as a Work Item via `resolve-repository-platform`. Evidence-first and anti-hallucination: unevidenced, unanswered fields stay `Unknown — requires verification`.
 
 ---
 
