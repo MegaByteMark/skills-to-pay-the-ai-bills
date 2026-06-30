@@ -55,8 +55,8 @@ Token Taxonomy & Allowed Values:
 
   [Scope: Artefact]:
     Description: Declares the artefact archetype an output document represents, enabling downstream tooling to route or aggregate it.
-    Allowed Values: [Release, Security-Governance, Health]
-    Note: Written in shorthand as [Scope: Release] etc. This enumeration grows as new report-producing skills are added; extend it here rather than introducing undeclared scope values.
+    Allowed Values: [Release, Security-Governance, Health, Digest]
+    Note: Written in shorthand as [Scope: Release] etc. This enumeration grows as new report-producing skills are added; extend it here rather than introducing undeclared scope values. Digest = the client-facing weekly progress email owned by the client-email-digest skill.
 
 Output Portability Convention:
   All client-facing artefacts (FDS, system blueprint, audit reports, and documentation guides) must be authored as export-clean Markdown suitable for downstream PDF conversion under an organisation document template/letterhead. Use a standard heading hierarchy, avoid renderer-fragile constructs, and ensure tables degrade gracefully. The concrete PDF/branding mechanism is defined outside this skill.

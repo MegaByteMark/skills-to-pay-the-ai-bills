@@ -85,6 +85,7 @@ Grouping is by convention only (the files stay flat for discovery).
 
 ### Release & ops
 - **generate-release-notes** — high-density release notes from commits, diffs, and merged PR discussions.
+- **client-email-digest** — *client-facing sibling of `generate-release-notes`*; reuses it as the change-fact engine, then re-voices the work between two git points into a warm, non-technical weekly progress email (TLDR, prose change log, blockers, release timeline, upcoming leave). Keeps a lightweight, out-of-tree per-project blocker tracker so a blockage spanning several digests reports how long it's been open, and interviews only for the non-inferable inputs (release dates, comms channel, team leave).
 - **create-bug-report** — auto-captures every evidenced field (git/build version, runtime, pasted stack traces) and interviews only for the human-centric gaps, then renders a fixed bug-report schema and optionally files it as a Work Item via `resolve-repository-platform`. Evidence-first and anti-hallucination: unevidenced, unanswered fields stay `Unknown — requires verification`.
 
 ---
@@ -160,6 +161,8 @@ audit-application-health ──> audit-security-and-governance
 
 seed-backlog ──> create-epic ───────┐
              └──> create-user-story ─┴──> resolve-repository-platform  (write-side adapter)
+
+client-email-digest ──> generate-release-notes  (change-fact engine, re-voiced for the client)
 
 teach-me          ──> teach-a-skill ──┐
 vibe-code-antidote ───────────────────┼──> competency-profile  (shared baseline)
