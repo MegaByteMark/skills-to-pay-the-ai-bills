@@ -20,7 +20,7 @@ Operational Workflow:
 4. PHASE 3 (Render): Compile into the Story Output Schema. Map acceptance criteria to checkbox items; populate the Technical Contract from the traced FDS. Append the stable-ID marker footer.
 5. PHASE 4 (Preview & Write): Present the rendered story and the intended action (create | amend, parent link, target platform); require explicit confirmation before any write. On confirmation, create or amend and establish the Parent Link via the adapter row. If no authenticated CLI is available, emit Markdown instead and say so. Report the resulting work-item reference.
 
-[Operational Directives]
+## Operational Directives
 - PRD-Primary, FDS-Enriched: The PRD owns the story narrative, acceptance criteria, priority, and parent epic. The FDS supplies the Technical Contract — the Schema changes locked in and the verification surface. Never let FDS detail introduce a story the PRD does not contain.
 - Ambiguity Escalation, Never Invention: If the PRD/FDS leaves a required section underspecified or contradictory (e.g. untestable acceptance criteria, missing validation rule), do NOT guess. Escalate: (1) trigger `interview-me` for the specific gap, one question at a time; (2) if answered, render and note the detail was captured interactively (not yet persisted); (3) if it cannot be closed, recommend re-running `gather-requirements` in `amend` mode and HALT this story rather than pushing a half-specified work item. When invoked by `seed-backlog`, report the gap to the orchestrator instead of interviewing mid-batch.
 - Parent-Link Discipline: Every story is a child of exactly one epic. (Re)establish the Parent Link to the `EPIC-###` work item on every run via the resolved mechanism — never leave a story orphaned.
@@ -30,9 +30,7 @@ Operational Workflow:
 - Resolve-Before-Invoke & Write-Side Safety: No tracker command before resolution; no mutation before user confirmation.
 - Output Portability: Export-clean Markdown per the `agent-markup` Output Portability Convention.
 
-================================================================================
-[Story Output Schema]
-================================================================================
+## Story Output Schema
 
 # Story: [Title]  `[Priority: MoSCoW]`
 

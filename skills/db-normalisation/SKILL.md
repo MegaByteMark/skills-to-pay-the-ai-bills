@@ -22,7 +22,7 @@ Operational Workflow:
 4. PHASE 3 (Anti-Pattern Sweep): Scan the candidate model against the Anti-Pattern Error Register below and record every match in §6 — never silently normalise one away.
 5. PHASE 4 (ERD & Data Dictionary Generation): Compile the verified, normalised model into `docs/architecture/data-model.md`, matching the Output Schema below. Render the ERD as a valid Mermaid `erDiagram` and document every entity, attribute, key, and relationship.
 
-[Operational Directives]
+## Operational Directives
 - Execution Protocol: Use `interview-me` mechanics for every normalisation stage and ambiguity. Ask exactly ONE highly specific question at a time and provide a baseline recommendation on each. Honor the advancement contract: never advance a stage until the user issues the literal `move-next` command.
 - Target Normal Form: Default target is **3NF** — sufficient for the vast majority of applications. Offer **BCNF** when overlapping composite candidate keys exist or the user requests it. Treat 4NF/5NF/6NF as advisory only (see Stage 5); never auto-fragment to them, as over-decomposition harms query performance.
 - Brownfield Honesty: When auditing an existing database, never present a clean target ERD without first surfacing the as-built defects you found. The value is the delta between what exists and what should exist.
@@ -32,15 +32,13 @@ Operational Workflow:
 - Visuals: All diagrams must be valid Mermaid.js (`erDiagram`) code blocks. Use canonical crow's-foot cardinality (`||--o{`, `||--|{`, `}o--o{`).
 - Naming Discipline: Enforce strict, semantic, singular-or-plural-consistent table and column names and reject the anti-patterns below at the point of naming, not after the ERD is drawn.
 
-[Amendment Protocol]
+## Amendment Protocol
 When the model runs in `amend` mode, the existing `docs/architecture/data-model.md` is the authoritative baseline — you are editing it, not regenerating it:
 - Diff-Scoped Interview: Load the existing model, confirm exactly which entities/requirements changed, and run `interview-me` ONLY over those areas. Carry unchanged entities forward verbatim.
 - Re-Normalise the Delta: Re-run the Normalisation Stage Ladder and the Anti-Pattern Sweep over the changed entities and any entity related to them by a foreign key, so a new attribute cannot reintroduce a partial/transitive dependency unnoticed.
 - Revision History: Append a row to the Document Control table (date, change summary, affected entities) and bump the document version. Never delete retired entities silently — mark them `Deprecated` and retain them for history.
 
-================================================================================
-[Normalisation Stage Ladder] — one checkpoint per stage
-================================================================================
+## Normalisation Stage Ladder — one checkpoint per stage
 - STAGE 0 — Conceptual / Unnormalised Form (UNF): Extract core entities (nouns) from the requirements or as-built schema. Expect repeating groups, multi-valued attributes, and duplication. Present the flat starting picture.
 - STAGE 1 — First Normal Form (1NF) — Atomicity: Every column holds a single indivisible value; every row is unique under a declared primary key. ACTION: split multi-valued attributes (e.g. comma-separated lists) into separate rows/tables; assign primary keys.
 - STAGE 2 — Second Normal Form (2NF) — No Partial Dependencies: Model is in 1NF and every non-key attribute depends on the WHOLE primary key. ACTION: only relevant for composite keys — extract attributes that depend on part of the key into their own table.
@@ -48,9 +46,7 @@ When the model runs in `amend` mode, the existing `docs/architecture/data-model.
 - STAGE 4 — Boyce-Codd Normal Form (BCNF, "3.5NF") — CONDITIONAL: Every determinant is a candidate key. ACTION: trigger only when overlapping composite candidate keys exist or the user requests BCNF; decompose so no part of a candidate key depends on a non-key attribute.
 - STAGE 5 — Advisory Higher Forms (4NF/5NF/6NF) — FLAG ONLY: Note multi-valued dependencies (4NF), join dependencies (5NF), or temporal-history splits (6NF) if present, but recommend them only with explicit justification. Warn that over-fragmentation hurts query performance.
 
-================================================================================
-[Anti-Pattern Error Register] — always flag detected instances as urgent
-================================================================================
+## Anti-Pattern Error Register — always flag detected instances as urgent
 *(Every match is a design error. Tag inline with `[Risk: High]` — or `[Risk: Critical]` where it threatens integrity or leaks `Special-Category` data — plus `[Confidence: Level]` and `[Remediation: Effort]`, and record it in the Anti-Pattern Findings section. Never ship a model that silently contains these.)*
 | Anti-Pattern | Why It Is an Error | Required Remediation |
 | :--- | :--- | :--- |
@@ -68,9 +64,7 @@ When the model runs in `amend` mode, the existing `docs/architecture/data-model.
 | Reserved Keywords | `User`/`Order`/`Select` as identifiers cause syntax errors | Rename to non-reserved, semantic identifiers |
 | Ambiguous Naming | `data`/`value`/`info` carry no meaning | Strict, semantic column names |
 
-================================================================================
-[Output Schema] — docs/architecture/data-model.md
-================================================================================
+## Output Schema — docs/architecture/data-model.md
 
 # Persistence Layer Data Model
 

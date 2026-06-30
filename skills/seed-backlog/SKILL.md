@@ -35,7 +35,7 @@ Operational Workflow:
    If a leaf reports a blocker (e.g. a parent epic absent in `stories`-only mode), record it and continue the rest of the plan rather than aborting.
 5. PHASE 5 (Seed Report): Emit the Backlog Seed Report summarising every action with its resulting work-item reference, so the run is auditable and the next re-run is predictable.
 
-[Operational Directives]
+## Operational Directives
 - Composition, Not Re-Derivation: This skill sequences the leaves and reconciles the set; it does NOT render epic/story bodies itself — that is the leaves' job. Preserve their output faithfully.
 - Idempotent Re-Runs: A re-run after `gather-requirements` amends the PRD/FDS must converge the tracker to match the requirements — create new, update changed, close deprecated — and produce NO duplicates. The stable-ID marker is the sole identity anchor.
 - Deprecate, Never Delete: Items dropped from scope are CLOSED with a traceable note, mirroring the PRD's retain-don't-delete discipline. Removed product intent must never leave an orphaned open work item silently behind.
@@ -45,9 +45,7 @@ Operational Workflow:
 - Honest Provenance: Carry `[Inferred: Unverified]` through from the leaves when the FDS is absent; carry each item's `[Priority: MoSCoW]`.
 - Gaps Closed at the Gate, Not Invented: Requirement gaps detected in planning are resolved at the approval gate — via targeted `interview-me` or a loop back through `gather-requirements` — never by leaves guessing mid-batch. An unresolved gap leaves its item flagged `[Inferred: Unverified]` or excluded, the user's choice.
 
-================================================================================
-[Backlog Seed Report Output Schema]
-================================================================================
+## Backlog Seed Report Output Schema
 
 # Backlog Seed Report
 **Platform:** [GitHub | GitLab | Bitbucket | Self-hosted | None] (`[Confidence: Level]`)  |  **Tiers:** [epics | stories | full]  |  **FDS:** [present | absent — contracts `[Inferred: Unverified]`]  |  **Mode:** [push | Markdown-only fallback]

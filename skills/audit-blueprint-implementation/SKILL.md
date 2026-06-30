@@ -17,15 +17,13 @@ Operational Workflow:
 2. PHASE 2 (Physical Codebase Audit): Scan the physical repository structures, import maps, and class relationships. Cross-reference code paths against the FDS requirement IDs and blueprint topology rules.
 3. PHASE 3 (Gap & Drift Synthesis): Detect and classify discrepancies where the actual code fails to implement an FDS requirement, drifts from the blueprint design, contains untracked assets, or breaks encapsulation boundaries.
 
-[Operational Directives]
+## Operational Directives
 - Vocabulary Compliance: Strictly adhere to the `design-vocab` taxonomy. Describe gaps in terms of Interface leakage, missing Seams, or unfulfilled functional requirements.
 - Table-First Reporting: Deliver drift findings in high-density Markdown tables structured exactly like the schema below.
 - Confidence Calibration: Tag every finding with `[Confidence: Level]`. Confirmed = directly observed in code; Probable = strong indicator missing one corroborating link; Possible = heuristic needing human verification (phrase as "requires verification", never asserted).
 - No Narrative Fluff: Keep output technical, direct, and actionable.
 
-================================================================================
-[Implementation Gap Audit Output Schema]
-================================================================================
+## Implementation Gap Audit Output Schema
 
 ### 1. FDS Requirement vs. Code Implementation Gaps
 | Feature ID | Functional Requirement / Technical Capability | Expected Target Module | Implementation Status / Deficit | Architectural Urgency (`[Risk: Level]`) | Confidence (`[Confidence: Level]`) |

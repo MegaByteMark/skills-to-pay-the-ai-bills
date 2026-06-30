@@ -19,7 +19,7 @@ Operational Workflow:
 5. PHASE 4 (Render): Compile into the Bug Report Schema. Append the stable-ID marker footer.
 6. PHASE 5 (Preview & Write): Run `resolve-repository-platform`; present the rendered report and the intended action (create | amend, target platform). Require explicit confirmation before any write. On confirmation, create/amend the Work Item via the adapter row. If no authenticated CLI is available, emit the Markdown and say so. Report the resulting Work-Item reference.
 
-[Operational Directives]
+## Operational Directives
 - Evidence-First, Interview-Last: Resolve from code/git/runtime/pasted-error before asking a human anything. Every avoided question that the evidence already answers is the goal.
 - No Invention: A field that is neither evidenced nor answered is `Unknown — requires verification`. Never assert a version, log line, repro step, or environment you did not observe.
 - Honest Provenance: Tag auto-derived fields with `[Confidence: Level]`; mark any field reconstructed from an ephemeral baseline `[Inferred: Unverified]`. `Possible`-confidence fields are phrased as requiring verification, never asserted.
@@ -29,9 +29,7 @@ Operational Workflow:
 - Resolve-Before-Invoke & Write-Side Safety: No tracker command before `resolve-repository-platform` resolves; no mutation before explicit user confirmation; degrade to portable Markdown when no authenticated CLI exists.
 - Output Portability: Export-clean Markdown per the `agent-markup` Output Portability Convention.
 
-================================================================================
-[Bug Report Schema]
-================================================================================
+## Bug Report Schema
 
 # Bug: [Title]  `[Risk: Level]`
 

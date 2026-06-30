@@ -26,7 +26,7 @@ Operational Workflow:
      - **`reverse-engineer` origin:** Run as a **confirmation pass** over the reconstructed FDS draft, scoped to `[Confidence: Possible]` rows, `Unknown — requires verification` fields, and behaviors with no traceable `STORY-###`. Validation limits, authorization scopes, and error states read from code are `[Confidence: Confirmed|Probable]` evidence; behaviors inferred only from issue text or naming are `[Confidence: Possible]` and must be confirmed with product before being asserted.
 6. PHASE 5 (FDS Document Generation): Compile the verified requirements into the FDS, matching the "FDS Markdown Schema" below. Populate the Source (PRD) traceability column on every requirement row.
 
-[Operational Directives]
+## Operational Directives
 - Execution Protocol: You must use the `interview-me` skill mechanics for every interview phase. Ask exactly ONE highly specific question at a time to prevent human cognitive fatigue. Honor the `interview-me` advancement contract: never move to the next question until the user issues the literal `move-next` command — answering or asking follow-ups does not authorize advancing.
 - Stream Sequencing: In `full` mode, do NOT begin the FDS stream until the PRD is written and its Epic/story IDs are assigned, because those IDs are the FDS traceability anchors.
 - Output Location Contract: The PRD must be written to exactly `docs/requirements/product-requirements.md` and the FDS to exactly `docs/requirements/functional-requirements.md`, both relative to the repository root.
@@ -35,7 +35,7 @@ Operational Workflow:
 - Origin & Evidence Calibration (reverse-engineer): Every reconstructed row MUST carry an inline `[Confidence: Level]` and a source provenance reference (e.g. `src/OrderService.cs:88`, `issue #231 (closed)`, `blueprint §2.2`). Calibrate strictly against observed evidence: `Confirmed` = behaviour directly read from code/config; `Probable` = strong code indicator missing one corroborating link; `Possible` = inferred from issue text, naming, or heuristics only — phrase these as "requires verification" and NEVER assert them as fact. Any needed field with no evidence is written `Unknown — requires verification`. A reconstructed FDS row with no traceable product origin still takes `[Inferred: Unverified]` per the Traceability Contract.
 - Structural Layout: Each generated document must rigorously match its schema below and remain export-clean Markdown per the `agent-markup` Output Portability Convention.
 
-[Amendment Protocol]
+## Amendment Protocol
 When a stream runs in `amend` mode, the existing document is the authoritative baseline — you are editing it, not regenerating it:
 - Diff-Scoped Interview: Load the existing document and confirm with the user exactly which areas changed. Run `interview-me` ONLY over those areas; do not re-elicit settled requirements. Carry unchanged sections forward verbatim.
 - Append-Only Identifiers: NEVER renumber or reuse IDs. New items take the next free `EPIC-###` / `STORY-###` / `REQ-###`. Removed or abandoned items are NOT deleted — set their `Status` to `Deprecated` (and, for PRD backlog items, `[Priority: Wont]`) so traceability and history survive.
@@ -43,7 +43,7 @@ When a stream runs in `amend` mode, the existing document is the authoritative b
 - Revision History: Append a new row to the document's Revision History table (date, summary of change, affected IDs) on every amendment. Bump the document version.
 - Write-Back & Versioning: Write the amended document back to the same canonical output path. Git is the version store — do NOT create parallel `-vN` files or copies.
 
-[Reverse-Engineer Reconstruction Protocol]
+## Reverse-Engineer Reconstruction Protocol
 Runs in Phase 1 when the origin is `reverse-engineer`. Produces the *provisional* draft that the Phase 2/4 confirmation interviews then converge. Evidence-first and anti-hallucination throughout.
 - Evidence Sources (ingest before drafting):
   1. **Code structure** — prefer the existing `analyze-a-codebase` blueprint at `docs/architecture/system-blueprint.md` (Modules, Seams, data dictionary, persona registry). If it is absent, recommend running `analyze-a-codebase` first; proceed against a direct code scan only if the user declines, and tag the resulting rows no higher than `[Confidence: Probable]`.
@@ -63,9 +63,7 @@ PRD Interview Branches (product stream):
   - User Stories & Acceptance Criteria: `As a / I want / So that` statements with testable acceptance criteria and `[Priority: MoSCoW]` ranking.
   - Scope Boundaries: explicit out-of-scope items, assumptions, external dependencies, and release milestones.
 
-================================================================================
-[PRD Markdown Schema]
-================================================================================
+## PRD Markdown Schema
 
 # Product Requirements Document (PRD)
 
@@ -101,9 +99,7 @@ PRD Interview Branches (product stream):
 * **Assumptions & Dependencies:** External services, teams, or conditions the plan relies on.
 * **Release Milestones:** High-level sequencing of Epics across releases.
 
-================================================================================
-[FDS Markdown Schema]
-================================================================================
+## FDS Markdown Schema
 
 # Functional Design Specification (FDS)
 

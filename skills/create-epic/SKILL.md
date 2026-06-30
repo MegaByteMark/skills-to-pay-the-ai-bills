@@ -19,7 +19,7 @@ Operational Workflow:
 4. PHASE 3 (Render): Compile the gathered material into the Epic Output Schema. Map each section to its source per the Source-to-Section Map. Append the stable-ID marker footer.
 5. PHASE 4 (Preview & Write): Present the rendered epic and the intended action (create | amend, target platform) and require explicit confirmation before issuing any write. On confirmation, create or amend via the adapter row. If no authenticated CLI is available, emit the rendered Markdown instead of pushing and say so plainly. Report the resulting work-item reference (URL/number).
 
-[Operational Directives]
+## Operational Directives
 - PRD-Primary, FDS-Enriched: The PRD decides the epic's existence, title, scope, and priority. The FDS supplies the Technical Contract and the E2E Definition of Done. Never let an FDS detail invent scope the PRD does not justify.
 - Ambiguity Escalation, Never Invention: If the PRD/FDS leaves a required section underspecified or contradictory, do NOT guess. Escalate up this ladder: (1) trigger `interview-me` for the specific missing detail, one question at a time; (2) if the user supplies it, render the section and note that the detail was captured interactively (not yet persisted to the PRD/FDS); (3) if the gap cannot be closed, recommend re-running `gather-requirements` in `amend` mode to properly improve the PRD/FDS, and HALT this epic rather than pushing a half-specified work item. When invoked by `seed-backlog`, do not fire ad-hoc interviews mid-batch — report the gap to the orchestrator instead (see that skill's gate).
 - Stable-ID Identity: Embed `EPIC-###` as a machine marker in the work-item body (the footer below). Match existing items by that marker, NEVER by title — titles drift, IDs do not. This marker is the contract `seed-backlog` and `amend` mode rely on.
@@ -41,9 +41,7 @@ Source-to-Section Map:
 | Definition of Done · E2E Criteria | FDS §2 functional requirements traced here + story acceptance criteria |
 | Definition of Done · Handoff | Docs the merge must update (README / Interface docs) |
 
-================================================================================
-[Epic Output Schema]
-================================================================================
+## Epic Output Schema
 
 # Epic: [Title]  `[Priority: MoSCoW]`
 

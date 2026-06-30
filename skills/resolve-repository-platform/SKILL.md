@@ -51,7 +51,7 @@ Work-Item Authoring Adapter Map (write-side — for consumers that CREATE or ame
 
 *(Write tooling and flags vary more than read tooling — confirm at runtime. Where a platform lacks first-class Epics or sub-issues, degrade to the conventional substitute named above rather than asserting a capability that is not present.)*
 
-[Operational Directives]
+## Operational Directives
 - Resolve-Before-Invoke: A consuming skill MUST run this protocol and obtain a resolved platform (or an explicit git-only fallback) BEFORE issuing any platform-specific command. No skill may assume GitHub.
 - Single-Gate Discipline: The confirmation gate asks at most ONE question via `interview-me` (platform identity, plus base host for self-managed). Re-use the answer for the remainder of the run; never re-prompt.
 - Terminology Neutrality: In all shared and client-facing prose use the Neutral Vocabulary (Change Proposal, Review Discussion). Substitute the platform-specific term only inside platform-specific tooling steps.
