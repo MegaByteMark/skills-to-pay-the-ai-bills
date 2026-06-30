@@ -5,7 +5,8 @@ dependencies:
   - resolve-repository-platform  # Resolves the platform once and supplies the Work-Item Authoring map, including the Parent Link mechanism; no tracker write before it resolves
   - agent-markup  # [Priority: MoSCoW], [Policy], [Confidence: Level], [Inferred: Unverified], [Data: Classification]
   - create-epic  # Produces the parent epic work item this story links to and shares the stable-ID marker convention
-  - gather-requirements  # Produces the PRD/FDS this skill consumes; defines STORY-### identity and the source schemas
+  - gather-requirements  # Produces the PRD/FDS this skill consumes; defines STORY-### identity and the source schemas; the fallback when a gap cannot be closed by interview
+  - interview-me  # Extracts a missing/ambiguous detail from the user before rendering, one question at a time
 argument-hint: "<STORY-###> [create | amend]  # which story to publish; mode auto-detected from the tracker when omitted"
 user-invocable: true
 ---
@@ -21,6 +22,7 @@ Operational Workflow:
 
 [Operational Directives]
 - PRD-Primary, FDS-Enriched: The PRD owns the story narrative, acceptance criteria, priority, and parent epic. The FDS supplies the Technical Contract — the Schema changes locked in and the verification surface. Never let FDS detail introduce a story the PRD does not contain.
+- Ambiguity Escalation, Never Invention: If the PRD/FDS leaves a required section underspecified or contradictory (e.g. untestable acceptance criteria, missing validation rule), do NOT guess. Escalate: (1) trigger `interview-me` for the specific gap, one question at a time; (2) if answered, render and note the detail was captured interactively (not yet persisted); (3) if it cannot be closed, recommend re-running `gather-requirements` in `amend` mode and HALT this story rather than pushing a half-specified work item. When invoked by `seed-backlog`, report the gap to the orchestrator instead of interviewing mid-batch.
 - Parent-Link Discipline: Every story is a child of exactly one epic. (Re)establish the Parent Link to the `EPIC-###` work item on every run via the resolved mechanism — never leave a story orphaned.
 - Stable-ID Identity: Embed `STORY-###` as a machine marker in the body (footer below). Match existing items by that marker, NEVER by title.
 - Verification Framing: Express the verification surface as Interface-level checks at the story's Seams, sourced from the traced FDS requirements. Tag each rule's enforcement stance with `[Policy: Enforced | Advisory | Audit-Only]`. Do not invent stack-specific test tooling.

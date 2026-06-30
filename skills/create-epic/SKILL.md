@@ -4,7 +4,8 @@ description: Renders ONE epic work item from a single PRD Epic Register entry (E
 dependencies:
   - resolve-repository-platform  # Resolves the platform once and supplies the Work-Item Authoring adapter map; no tracker write before it resolves
   - agent-markup  # [Priority: MoSCoW], [Confidence: Level], [Inferred: Unverified], [Policy]
-  - gather-requirements  # Produces the PRD/FDS this skill consumes; defines EPIC-### identity and the source schemas
+  - gather-requirements  # Produces the PRD/FDS this skill consumes; defines EPIC-### identity and the source schemas; the fallback when a gap cannot be closed by interview
+  - interview-me  # Extracts a missing/ambiguous detail from the user before rendering, one question at a time
 argument-hint: "<EPIC-###> [create | amend]  # which epic to publish; mode auto-detected from the tracker when omitted"
 user-invocable: true
 ---
@@ -20,6 +21,7 @@ Operational Workflow:
 
 [Operational Directives]
 - PRD-Primary, FDS-Enriched: The PRD decides the epic's existence, title, scope, and priority. The FDS supplies the Technical Contract and the E2E Definition of Done. Never let an FDS detail invent scope the PRD does not justify.
+- Ambiguity Escalation, Never Invention: If the PRD/FDS leaves a required section underspecified or contradictory, do NOT guess. Escalate up this ladder: (1) trigger `interview-me` for the specific missing detail, one question at a time; (2) if the user supplies it, render the section and note that the detail was captured interactively (not yet persisted to the PRD/FDS); (3) if the gap cannot be closed, recommend re-running `gather-requirements` in `amend` mode to properly improve the PRD/FDS, and HALT this epic rather than pushing a half-specified work item. When invoked by `seed-backlog`, do not fire ad-hoc interviews mid-batch — report the gap to the orchestrator instead (see that skill's gate).
 - Stable-ID Identity: Embed `EPIC-###` as a machine marker in the work-item body (the footer below). Match existing items by that marker, NEVER by title — titles drift, IDs do not. This marker is the contract `seed-backlog` and `amend` mode rely on.
 - Amend, Don't Clobber: In `amend` mode the existing work item is the baseline. Update changed sections, preserve the marker, and do not reset unrelated fields (assignees, labels added by humans, discussion).
 - Honest Provenance: Tag any section derived without a persisted FDS as `[Inferred: Unverified]`. Carry the epic's `[Priority: MoSCoW]` through; if the PRD marks the epic `[Priority: Wont]` or `Status: Deprecated`, do NOT create it — defer to `seed-backlog`'s deprecation handling.

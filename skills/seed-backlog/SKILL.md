@@ -26,7 +26,8 @@ Operational Workflow:
      - **Close** — item the PRD now marks `Status: Deprecated` / `[Priority: Wont]` whose tracker work item still exists.
      - **Skip** — deprecated item with no tracker work item (nothing to do).
    Build the full mutation set as a plan. Match strictly by stable-ID marker, never by title.
-3. PHASE 3 (Approval Gate): Present the complete plan — counts and per-item action (create/update/close), target platform — and require explicit confirmation before ANY write. This is the single point of consent for the whole run.
+   While planning, run a **readiness check** over each Active item: flag any whose PRD/FDS source is too thin to render a complete epic/story (missing scope, untestable acceptance criteria, absent technical contract). Collect these as a Gaps list — do NOT silently push thin items.
+3. PHASE 3 (Approval Gate): Present the complete plan — counts and per-item action (create/update/close), target platform, AND the Gaps list — and require explicit confirmation before ANY write. This is the single point of consent for the whole run. When gaps exist, offer the user a fork: (a) authorise targeted `interview-me` questions now to close the gaps in-session, or (b) go back around the requirements loop with `gather-requirements` (`amend`) to improve the PRD/FDS first, or (c) proceed and let the affected items render with `[Inferred: Unverified]` sections. Keep ad-hoc interviews at THIS gate, not scattered through the write loop.
 4. PHASE 4 (Sequenced Execution): Execute the approved plan in dependency order so parents always exist before children:
      1. Epics first — invoke `create-epic` for each epic to create or amend (skip if the tier selector excludes epics).
      2. Stories next — invoke `create-user-story` for each story, passing the resolved parent epic work item (skip if the tier selector excludes stories).
@@ -42,6 +43,7 @@ Operational Workflow:
 - Single Resolution, Single Consent: Resolve the platform exactly once and obtain ONE approval for the whole mutation set; the leaves must not re-prompt for platform or per-item confirmation during a seeded run.
 - Write-Side Safety & Graceful Degradation: Honour `resolve-repository-platform`'s Write-Side Safety directive. If no authenticated CLI is available, stop at the plan and emit the full rendered backlog as portable Markdown instead of pushing — and say so plainly.
 - Honest Provenance: Carry `[Inferred: Unverified]` through from the leaves when the FDS is absent; carry each item's `[Priority: MoSCoW]`.
+- Gaps Closed at the Gate, Not Invented: Requirement gaps detected in planning are resolved at the approval gate — via targeted `interview-me` or a loop back through `gather-requirements` — never by leaves guessing mid-batch. An unresolved gap leaves its item flagged `[Inferred: Unverified]` or excluded, the user's choice.
 
 ================================================================================
 [Backlog Seed Report Output Schema]
