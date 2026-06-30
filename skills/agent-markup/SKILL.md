@@ -43,6 +43,11 @@ Token Taxonomy & Allowed Values:
     Allowed Values: [true]
     Note: Applied when a skill proceeds on a simulated FDS baseline instead of a saved contract. Never applied to blueprint-drift findings, which require a persisted, non-self-derived baseline.
 
+  [Priority: MoSCoW]:
+    Description: Ranks a product backlog item (Epic or user story) for release sequencing using the MoSCoW method. Drives scope negotiation and what lands in a milestone.
+    Allowed Values: [Must, Should, Could, Wont]
+    Note: Written in shorthand as [Priority: Must] etc. Must = release fails without it; Should = important but has a viable workaround; Could = desirable if capacity allows; Wont = explicitly out of scope for the current cycle (records the decision rather than dropping it silently). Owned by the gather-requirements skill's PRD stream.
+
   [Doc: Archetype]:
     Description: Selects the documentation archetype a generation run targets, binding it to a fixed output path.
     Allowed Values: [QuickStart, Technical, Troubleshooting, Installation]
@@ -50,8 +55,8 @@ Token Taxonomy & Allowed Values:
 
   [Scope: Artefact]:
     Description: Declares the artefact archetype an output document represents, enabling downstream tooling to route or aggregate it.
-    Allowed Values: [Release, Security-Governance, Health]
-    Note: Written in shorthand as [Scope: Release] etc. This enumeration grows as new report-producing skills are added; extend it here rather than introducing undeclared scope values.
+    Allowed Values: [Release, Security-Governance, Health, Digest]
+    Note: Written in shorthand as [Scope: Release] etc. This enumeration grows as new report-producing skills are added; extend it here rather than introducing undeclared scope values. Digest = the client-facing weekly progress email owned by the client-email-digest skill.
 
 Output Portability Convention:
   All client-facing artefacts (FDS, system blueprint, audit reports, and documentation guides) must be authored as export-clean Markdown suitable for downstream PDF conversion under an organisation document template/letterhead. Use a standard heading hierarchy, avoid renderer-fragile constructs, and ensure tables degrade gracefully. The concrete PDF/branding mechanism is defined outside this skill.

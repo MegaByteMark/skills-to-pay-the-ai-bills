@@ -1,16 +1,16 @@
 ---
 name: competency-profile
-description: Shared contract for the human's competency baseline — the per-user, out-of-tree record of demonstrated skill per area. Defines the canonical storage location, schema, and read/merge protocol so any skill that teaches, assesses, or hands work to a human reads and writes the SAME baseline. Consumed by teach-a-skill, programming-tutor, and vibe-code-antidote so calibration is continuous across skills and sessions and never duplicated or committed to a project.
+description: Shared contract for the human's competency baseline — the per-user, out-of-tree record of demonstrated skill per area. Defines the canonical storage location, schema, and read/merge protocol so any skill that teaches, assesses, or hands work to a human reads and writes the SAME baseline. Consumed by teach-a-skill, teach-me, and vibe-code-antidote so calibration is continuous across skills and sessions and never duplicated or committed to a project.
 dependencies:
   - agent-markup  # [Competency: Level] (the baseline enumeration) and [Confidence: Level] (calibration certainty)
 ---
 
 # Purpose
-The human's skill in an area (e.g. "TypeScript async/await", "SQL joins") is a fact about the *person*, not about a project or a skill. It must be recorded once and shared, so a workday under `vibe-code-antidote` and an evening under `programming-tutor` read and update the same baseline. This skill owns that record. It is a contract, not an interactive experience — consuming skills invoke it; the user does not.
+The human's skill in an area (e.g. "TypeScript async/await", "SQL joins") is a fact about the *person*, not about a project or a skill. It must be recorded once and shared, so a workday under `vibe-code-antidote` and an evening under `teach-me` read and update the same baseline. This skill owns that record. It is a contract, not an interactive experience — consuming skills invoke it; the user does not.
 
 # Scope (own this, nothing else)
 - **OWNS:** per-area human competency baseline — `[Competency: Level]`, calibration `[Confidence: Level]`, the evidence behind each, and provenance (which skill last observed it, when).
-- **DOES NOT OWN:** per-project codebase comprehension (stays with `vibe-code-antidote`); course/syllabus progress (stays with `programming-tutor`, per language). These reference the baseline but persist separately. Never write project- or course-specific state into the shared baseline.
+- **DOES NOT OWN:** per-project codebase comprehension (stays with `vibe-code-antidote`); course/syllabus progress (stays with `teach-me`, per language). These reference the baseline but persist separately. Never write project- or course-specific state into the shared baseline.
 
 # Storage — per-user, global, NEVER in the workspace
 The baseline is one record per user/machine, shared across every project and skill. It MUST NOT live in any project tree, be committed, or appear in `git status`. Resolve the path in order:
@@ -28,7 +28,7 @@ One file, NOT namespaced per project (the whole point is cross-project continuit
 | Area | [Competency: Level] | [Confidence: Level] | Evidence (observed work) | Last source | Updated |
 | :-- | :-- | :-- | :-- | :-- | :-- |
 | TypeScript async/await | Solo | Confirmed | wrote retry wrapper unaided | vibe-code-antidote | 2026-06-26 |
-| SQL joins | Not-Ready | Probable | could not explain a JOIN | programming-tutor | 2026-06-20 |
+| SQL joins | Not-Ready | Probable | could not explain a JOIN | teach-me | 2026-06-20 |
 ```
 Use stable, granular area names (language/domain + concept) so different skills resolve to the same row. When unsure whether an area already exists, match on concept rather than minting a near-duplicate row.
 
