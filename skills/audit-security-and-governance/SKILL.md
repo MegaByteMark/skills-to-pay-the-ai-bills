@@ -20,7 +20,7 @@ Operational Workflow:
      - Supplementary flags: hardcoded secrets committed to the repository, and dependency-license exposure (see Copyleft Contamination Rule).
 3. PHASE 3 (Evidence-Bound Synthesis): Classify and tabulate findings into the schema below. Every finding is anchored to observed code, a recognized standard reference, a severity, and a calibrated confidence, with a prescribed remediation and effort estimate.
 
-[Operational Directives]
+## Operational Directives
 - Vocabulary Compliance: Strictly adhere to the `design-vocab` taxonomy. Describe exposures in terms of leaky Interfaces, bypassed Seams, and unguarded Modules. The terms component, service, unit, API, signature, and boundary are prohibited.
 - Standards Anchoring: Every security finding MUST cite its OWASP Top 10 (2021) category AND a CWE identifier. Every governance finding MUST cite the specific GDPR article or principle it implicates (e.g. Art. 5 data minimisation, Art. 9 special-category data, Art. 32 security of processing, Art. 33 breach notification). Only real, existing CWE/CVE/GDPR identifiers may be cited — never fabricate an identifier.
 - Evidence-Bound Findings: Every finding MUST anchor to a real file path plus the concrete observed pattern that evidences it. Any suspicion that cannot be tied to actual observed code is DROPPED, never speculated into the report. Calibrate `[Confidence: Level]`: Confirmed = directly observed exploitable pattern; Probable = strong indicator missing one corroborating link; Possible = heuristic signal needing human verification. Phrase every `Possible` finding as "requires verification" — never assert it. For a client-facing audit, a missed finding is recoverable; a fabricated accusation is not.
@@ -34,9 +34,7 @@ Operational Workflow:
 - Table-First Reporting: Deliver findings in high-density Markdown tables structured exactly like the schema below.
 - No Narrative Fluff: Keep output technical, direct, and actionable.
 
-================================================================================
-[Security & Governance Audit Output Schema]
-================================================================================
+## Security & Governance Audit Output Schema
 
 ### 0. Scan Context (`[Scope: Security-Governance]`)
 * **Baseline:** [Contract-enriched | Standalone — no contract baseline, reduced context]

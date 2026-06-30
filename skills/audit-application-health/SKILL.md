@@ -26,7 +26,7 @@ Operational Workflow:
 3. PHASE 3 (Cross-Cutting Synthesis): Correlate findings ACROSS leaves to surface insight no single leaf can see — e.g. a bypassed Seam from the implementation audit that is simultaneously the security exposure, or an untested deep Interface that is also a PII data flow. Each correlated finding inherits the highest `[Risk: Level]` of its constituents.
 4. PHASE 4 (Two-Register Report Assembly): Assemble the versioned Application Health Audit document per the schema below — a plain-language executive layer over technical appendices — and write it to a non-overwriting versioned path.
 
-[Operational Directives]
+## Operational Directives
 - Two-Register Mandate: The Executive Summary and Remediation Roadmap are written in plain business/legal language a non-technical decision-maker grasps — risk framed as regulatory, financial, and reputational exposure (a Critical GDPR finding is stated as such, not as a CWE number). The technical appendices retain full `design-vocab` taxonomy and `agent-markup` tokens for the client's engineers. This Executive layer is the ONLY place the `No Narrative Fluff` directive is relaxed; the appendices stay terse.
 - Composition, Not Re-Derivation: This skill orchestrates and synthesises; it does NOT re-run raw analysis the leaves already perform. Preserve each leaf's findings faithfully — never soften, drop, or invent findings during synthesis. The cross-cutting pass adds correlations on top; it does not edit the underlying tables.
 - Risk-vs-Effort Roadmap: Every finding carried into the roadmap pairs `[Risk: Level]` with `[Remediation: Effort]`. Order the roadmap to lead with high-risk / low-effort quick wins, then high-risk / high-effort major remediations, then the remainder. Surface all `Critical` findings before anything else.
@@ -34,9 +34,7 @@ Operational Workflow:
 - Export-Ready Markdown: Keep the document export-clean for downstream PDF conversion under the organisation's document template/letterhead — standard heading hierarchy, no renderer-fragile constructs, tables that degrade gracefully. (Exact PDF/branding mechanism is defined separately.)
 - Confidence Honesty: Carry each finding's `[Confidence: Level]` into the report. `Possible` findings are presented as "requires verification" in both registers — never asserted to the client as fact.
 
-================================================================================
-[Application Health Audit Output Schema]
-================================================================================
+## Application Health Audit Output Schema
 
 # Application Health Audit (`[Scope: Health]`)
 **Run:** [YYYYMMDD-rNN]  |  **Platform:** [GitHub | GitLab | Bitbucket | Self-hosted | None]  |  **Coverage:** [leaves executed]  |  **Excluded:** [sections skipped + reason, e.g. "Test Coverage — contracts not generated"]

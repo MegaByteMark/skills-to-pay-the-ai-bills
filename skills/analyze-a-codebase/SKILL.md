@@ -14,7 +14,7 @@ Operational Workflow:
 2. PHASE 2 (Ingestion & Delta Analysis): Map the physical repository structures, boundaries, and dependencies. Actively extract library, framework, and language versions from manifest files (e.g., package.json, .csproj, go.mod, Gemfile, Prisma schemas) and independently evaluate their official vendor support timelines and EOL (End of Life) statuses relative to the current calendar year.
 3. PHASE 3 (Deterministic Output via Incremental Checkpoints): Output the final blueprint strictly matching the "Rationalized Schema Structure" below. You must deliver this blueprint ONE major section at a time. Before rendering the first section, announce the checkpoint protocol to the user: explain that you will pause after every section and that they must issue the explicit command `move-next` to advance, so they have unlimited time to ask follow-up questions. After rendering a section, PAUSE execution, explain your key findings/clarifications, and invite the user to ask questions or request corrections. You MUST remain on the current section — answering questions, applying corrections, and re-rendering as needed — until the user issues the literal `move-next` command. Answering a user question is NOT approval to advance; treat any message that is not the exact `move-next` command as further work on the current section.
 
-[Operational Directives]
+## Operational Directives
 - Checkpoint Advancement Contract: The ONLY trigger that authorizes moving from one section to the next is the user issuing the literal command `move-next`. State this convention explicitly at the start of Phase 3. Never auto-advance after answering a question or applying an edit; if in doubt, stay on the current section and wait for `move-next`.
 - Output Location Contract: Upon final approval of all checkpoints, the entire consolidated blueprint must be written to or overwritten at exactly `docs/architecture/system-blueprint.md` relative to the repository root.
 - Vocabulary Compliance: You must strictly adhere to the taxonomy defined in the `design-vocab` skill. All structural elements must be described using Module, Interface, Implementation, Depth, Seam, and Adapter. The terms component, service, unit, API, signature, and boundary are explicitly prohibited.
@@ -24,9 +24,7 @@ Operational Workflow:
 - Table-First Design: Use Markdown tables for profiles, registries, dictionaries, and matrices.
 - Visuals: Use valid Mermaid.js code blocks exclusively for all diagrams.
 
-================================================================================
-[Rationalized Schema Structure & Checkpoint Sequence]
-================================================================================
+## Rationalized Schema Structure & Checkpoint Sequence
 
 ### SECTION 1 CHECKPOINT: System Overview & Governance Profile
 #### 1.1 Core Intent & Persona Registry

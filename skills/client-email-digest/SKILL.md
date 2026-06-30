@@ -21,7 +21,7 @@ Operational Workflow:
 5. PHASE 4 (Render & Persist): Render the five-section email against the schema. Then write back the digest state: advance the baseline to `until-ref`, persist the updated blocker ledger (with first-seen dates and durations), the release timeline, comms channel, and known leave. State the resolved storage path the first time you touch it.
 6. PHASE 5 (Preview): Present the rendered email plus a one-line summary of what changed in the tracker (blockers opened/closed, baseline advanced). Offer to adjust tone, greeting, or sign-off before the user sends it. This skill drafts the email; it never sends it.
 
-[Operational Directives]
+## Operational Directives
 - Audience Pivot: Write for a client who is paying for outcomes, not reading code. Translate every technical change into the value or capability it delivers. Strip jargon, internal codenames, Module/file names, SHAs, branch names, author handles, and ticket IDs. If a sentence only makes sense to an engineer, rewrite or cut it.
 - Fixed Five Sections: TLDR, Change log, Blockers, Release timeline, and Upcoming leave are ALWAYS present — clients rely on a consistent shape week to week. When a section has nothing real, render an honest "all clear" line (e.g. "No blockers this week."); never pad with fabricated content and never silently drop a section.
 - TLDR Hard Cap: The TLDR is at most **6 bullets**, each at most **6 words**, each a finished outcome ("Checkout flow now live", "Search 40% faster"). No sub-bullets, no trailing prose. Fewer real bullets beats six padded ones.
@@ -54,9 +54,7 @@ If the runtime is chat-only with no writable out-of-tree location, hold the stat
 | :-- | :-- | :-- |
 ```
 
-================================================================================
-[Client Digest Email Schema]  `[Scope: Digest]`
-================================================================================
+## Client Digest Email Schema  `[Scope: Digest]`
 
 **Subject:** [Project] — Weekly progress, week of [date]
 

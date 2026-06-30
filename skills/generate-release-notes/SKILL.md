@@ -13,7 +13,7 @@ Operational Workflow:
 3. PHASE 3 (Change Proposal Discussion Ingestion): Resolve the hosting platform and tooling via the `resolve-repository-platform` protocol — do NOT assume GitHub. For every Change Proposal (GitHub/Bitbucket Pull Request, GitLab Merge Request) merged within the baseline-to-`HEAD` window, ingest its title, body, and Review Discussion via the resolved platform's CLI as mapped in that skill's adapter map (e.g. on GitHub `gh pr list --state merged`, then `gh pr view <n> --comments`; on GitLab the `glab` equivalents). Mine this discussion for intent the raw commit log omits — the *why* behind a change, breaking-change callouts, migration steps, known limitations, and reviewer-surfaced caveats. If no authenticated platform CLI is available, or the repo has no associated remote/Change Proposals, skip this phase silently and proceed on the commit/delta evidence alone.
 4. PHASE 4 (Snapshot Synthesis): Parse, filter, and bucket the combined commit + Change Proposal discussion records into strict prefix categories based on the nature of the code changes. Format the final output into a hyper-condensed bulleted layout matching the schema below.
 
-[Operational Directives]
+## Operational Directives
 - Defacto Escape Hatch Rule: Evaluate the parsed commit collection. If 100% of the diff contains exclusively routine patches, minor lint corrections, or test additions with zero structural modifications, bypass detailed summaries entirely and default the entire output to:
   `"Bug fixes and performance improvements."`
 - Shorthand Categorization Enforcements: Every bullet point generated must be prefixed using the following strict architectural tokens:
@@ -32,9 +32,7 @@ Operational Workflow:
 - Empty Category Suppression: Render a bullet only when a qualifying change exists for that token. Never emit placeholder text. If every bullet under a section header is empty, omit that header entirely. An honest, short list of real changes always beats a padded schema.
 - Anti-Fabrication & Traceability: Every bullet MUST trace to a concrete commit, file delta, or merged Change Proposal fact. Never infer, extrapolate, or announce unshipped, planned, or speculative work, even if a Change Proposal comment discusses future intent. If the evidence does not confirm it shipped, it does not appear.
 
-================================================================================
-[Release Note Output Schema]
-================================================================================
+## Release Note Output Schema
 
 ### Release Notes Snapshot (`[Scope: Release]`)
 
