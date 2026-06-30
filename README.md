@@ -149,6 +149,12 @@ Skills auto-discover, so nothing below is required. But the behavioral overlays 
 - If you detect I don't understand part of the implementation, use `teach-a-skill`
   to close that one gap before continuing.
 - If I ask to learn a language or topic from scratch, use `teach-me`.
+- Before adding features to an inherited or unfamiliar codebase, check for
+  `docs/requirements/functional-requirements.md` and `docs/architecture/system-blueprint.md`.
+  If either is missing, treat that as a finding, not a reason to skip discovery: run
+  `analyze-a-codebase` (which seeds the FDS via `gather-requirements`) and surface the
+  scope gaps before writing any new feature. Do not jump straight into new work on a
+  system we don't yet have a picture of.
 ```
 
 ---
