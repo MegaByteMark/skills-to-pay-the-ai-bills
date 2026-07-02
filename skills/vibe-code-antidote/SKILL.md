@@ -20,9 +20,13 @@ Never write either store inside the project tree, never commit it, never let it 
 
 **1. Human skill baseline → `competency-profile` (shared, per-user, global).** A user's skill in an area is a fact about the *person*, not this project — so it is NOT kept here. Read it at session start for the Capability Gate; write demonstrated levels back through its merge protocol after every handoff. This is the SAME baseline `teach-me` and `teach-a-skill` use, so a build day and a study evening share one truth. Use the `[Competency: Level]` enumeration.
 
-**2. Per-project local state → out-of-tree, namespaced per project.** What is genuinely project-specific stays local: the user's *codebase comprehension* (their mental model of THIS software), the handoff ledger, escalation flags, and session settings. Resolve a path in order: (1) agent state store, e.g. `${XDG_STATE_HOME:-$HOME/.local/state}/vibe-antidote/<project-key>.md`; (2) fallback `${TMPDIR:-/tmp}/vibe-antidote/<project-key>.md`, where `<project-key>` is a slug/short-hash of the absolute project path. State both resolved paths on first activation. Treat temp storage as best-effort; if cleared, fall back to cold intake. In chat-only runtimes use agent memory or emit paste-back snapshots on pause — never substitute a workspace file.
+**2. Per-project local state → out-of-tree, namespaced per project.** What is genuinely project-specific stays local: the user's *codebase comprehension* (their mental model of THIS software), the handoff ledger, escalation flags, and session settings. Two candidate paths in strict priority order, where `<project-key>` is a slug/short-hash of the absolute project path:
+1. `${XDG_STATE_HOME:-$HOME/.local/state}/vibe-antidote/<project-key>.md`
+2. `${TMPDIR:-/tmp}/vibe-antidote/<project-key>.md`
 
-**Loop.** At session start read BOTH stores; if local state exists, skip cold intake and resume. Update the relevant store immediately after every calibration probe, completed handoff, struggle, and escalation.
+Discover exactly as `competency-profile` prescribes: check path 1 then path 2, first hit wins, STOP; if neither exists this project simply has no prior state — do NOT search elsewhere. **Read == write:** write back to the path you read from; create path 1 on a cold start. State the outcome and resolved path once on first activation. In chat-only runtimes use agent memory or emit paste-back snapshots on pause — never substitute a workspace file.
+
+**Loop.** At session start read BOTH stores. The **global baseline is authoritative for skill levels** — never re-ask an area already recorded there (see Calibration). A missing *per-project* file means only that THIS codebase is new to the tool; it does NOT mean the person is unknown, so do not restart calibration from zero. Update the relevant store immediately after every calibration probe, completed handoff, struggle, and escalation.
 
 **Local state format** (skill levels live in `competency-profile`, not here):
 ```markdown
@@ -47,9 +51,9 @@ Never write either store inside the project tree, never commit it, never let it 
 5. If no safe candidate exists now, keep building yourself. Never invent a contrived or risky handoff to hit cadence; forward progress wins ties.
 
 # Calibration
-Earn evidence the user can attempt a task without turning the session into an interview. Start from the shared baseline — never re-interrogate an area already `[Confidence: Confirmed]` in `competency-profile`.
-- **Cold intake** (first activation only, one turn): comfortable languages/stacks; familiarity with *this* codebase (own / inherited / generated-never-read); desired hands-on level + any deadline pressure. Record answers as *claims* marked `[Confidence: Possible]` until backed by observed code.
-- **Continuous:** every time the user writes, edits, or explains code, update the relevant area's `[Competency: Level]` and `[Confidence: Level]` and write it back to `competency-profile` (observed work outranks self-report). Brief conservatively until corroborated.
+Earn evidence without turning the session into an interview. **Infer first, ask almost nothing, refine continuously** — never block the build on intake, and never re-interrogate an area already in `competency-profile` (that record, not a questionnaire, is the source of skill truth).
+- **Start on conservative defaults (no gating turn):** read the global baseline for per-area `[Competency: Level]`; infer the rest from the repo (detected languages/stacks, git history and authorship, hand-written vs generated code); seed still-unknown areas at the **worst-case safe default** (`Unknown`/`Paired` → conservative micro-briefs) so the first handoffs are safe by construction. Then sharpen quietly from observed code — observed work outranks self-report and writes straight back to `competency-profile`.
+- **Minimal project intake, only for the un-inferable:** the user's relationship to *this* codebase (own / inherited / generated-never-read), desired hands-on level, and any deadline pressure. Ask ONCE and compactly — **prefer the runtime's structured question tool when available; fall back to a single numbered list** in chat-only runtimes. Never re-ask languages/stacks the baseline or repo already answer. Record answers as `[Confidence: Possible]` until observed code corroborates.
 - **Regression rule:** if a submission betrays misunderstanding of something previously Solo/Guided, downgrade that area in the shared baseline and tighten future briefs.
 
 # The Two Gates (before EVERY handoff)
