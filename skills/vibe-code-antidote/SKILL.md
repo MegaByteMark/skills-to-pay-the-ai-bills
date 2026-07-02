@@ -31,12 +31,18 @@ Discover this **lazily, never at activation** — only the first time you actual
 - **DEFER everything else** until it is genuinely needed — i.e. just before the first handoff, never at activation: per-project state discovery/creation, computing the project-key, repo inference, and intake. A cold start with no per-project file is normal.
 - **Forbidden at activation** (these are exactly what caused minute-plus starts): opening `competency-profile`'s SKILL.md, running `git log`/`git remote`, listing or reading the repo (README included), stack profiling, writing any state file, or asking an intake question.
 
-The **global baseline is authoritative for skill levels** — never re-ask an area already recorded there (see Calibration). A missing *per-project* file means only that THIS codebase is new to the tool; it does NOT mean the person is unknown, so do not restart calibration from zero. Update the relevant store immediately after every calibration probe, completed handoff, read-back, struggle, and escalation.
+The **global baseline is authoritative for skill levels** — never re-ask an area already recorded there (see Calibration). A missing *per-project* file means only that THIS codebase is new to the tool; it does NOT mean the person is unknown, so do not restart calibration from zero. Update the relevant store immediately after every calibration probe, completed handoff, read-back, struggle, and escalation — and, so nothing is lost to compaction, the moment any handoff or read-back is *issued* (not only when it resolves) and on any change to status (active/paused), intensity, or deadline pressure (see Surviving Compaction).
+
+**Surviving Compaction (the overlay's memory is the file, not the chat).** A session overlay only survives as long as its instructions stay in context — but runtimes summarise or truncate long conversations, and when they do, everything about the live overlay that exists only in chat is gone: that you were active, your settings, and any handoff the human is mid-way through. So the per-project store — not your recollection — is the single source of truth for the overlay's liveness. Two rules:
+- **Checkpoint the moment it changes, not just on completion:** `Status`, intensity, deadline pressure, and any *issued-but-unanswered* handoff or read-back (the exact slice/Interface and what you are awaiting) go to the `In Flight` pointer immediately. A compaction that lands while the human is mid-handoff must lose nothing.
+- **Re-hydrate on resume, don't restart:** if you find yourself continuing a build with no overlay in view but the per-project file exists and reads `Status: active`, treat it as a post-compaction *resume*, not a cold start — read the file (this IS the deferred per-project read finally coming due), restore settings and any outstanding ask, and carry on silently. Do NOT re-announce activation, re-run intake, or recalibrate. Whenever a summary/compaction is produced, preserve a one-line survival marker so the resume can trigger at all: `vibe-code-antidote ACTIVE — <intensity>, deadline <state>, outstanding <ask>, state file <path>`.
 
 **Local state format** (skill levels live in `competency-profile`, not here):
 ```markdown
 # Vibe-Code Antidote — Project State (<project-key>)
-**Last:** [date] | **Intensity:** normal | **Deadline pressure:** none
+**Status:** active | **Last:** [date] | **Intensity:** normal | **Deadline pressure:** none
+## In Flight (resume pointer — the overlay's memory across compaction)
+- Outstanding: [none | write-handoff: <slice/Interface> | read-back: <slice>] | Awaiting: [nothing | user's code | user's walk-through] | Issued: [date]
 ## Codebase Comprehension
 - Stated purpose (user's words, verbatim): [...] | Verified: yes/no
 - Mental model: [Strong | Partial | Weak | Unknown]
@@ -107,7 +113,7 @@ Promote toward Solo after unaided wins (sparser briefs, more edge cases); demote
 - `/readback` — ask me to walk through a slice you wrote (comprehension read-back).
 - `/take-over` — you write this one; I review or skip.
 - `/skip` — skip this handoff, keep building.
-- `/pause-antidote` / `/resume-antidote` — stop / restart all handoffs.
+- `/pause-antidote` / `/resume-antidote` — stop / restart all handoffs. `/resume-antidote` also force-rehydrates from the per-project state file if compaction dropped the overlay and auto-resume never fired.
 - `/intensity light|normal|intense` — change intervention frequency.
 - `/profile` — show the dashboard: shared competency levels + this project's comprehension and ledgers.
 - `/calibrate [area]` — quick calibration probe on an area.
