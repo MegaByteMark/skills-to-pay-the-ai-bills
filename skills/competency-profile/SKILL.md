@@ -13,11 +13,17 @@ The human's skill in an area (e.g. "TypeScript async/await", "SQL joins") is a f
 - **DOES NOT OWN:** per-project codebase comprehension (stays with `vibe-code-antidote`); course/syllabus progress (stays with `teach-me`, per language). These reference the baseline but persist separately. Never write project- or course-specific state into the shared baseline.
 
 # Storage — per-user, global, NEVER in the workspace
-The baseline is one record per user/machine, shared across every project and skill. It MUST NOT live in any project tree, be committed, or appear in `git status`. Resolve the path in order:
-1. **Agent-owned state store** outside any project — e.g. `${XDG_STATE_HOME:-$HOME/.local/state}/ai-skills/competency-profile.md`, or the runtime's own persistent memory.
-2. **Fallback OS temp dir** — `${TMPDIR:-/tmp}/ai-skills/competency-profile.md`.
+The baseline is one record per user/machine, shared across every project and skill. It MUST NOT live in any project tree, be committed, or appear in `git status`.
 
-One file, NOT namespaced per project (the whole point is cross-project continuity). State the resolved path the first time a consuming skill touches it. If the runtime is chat-only with no writable out-of-tree location, hold the baseline in agent memory and emit it as a paste-back snapshot on pause — never substitute a workspace file. Treat temp storage as best-effort; if absent, the consumer falls back to fresh assessment.
+**Canonical location — two candidate paths, strict priority order:**
+1. `${XDG_STATE_HOME:-$HOME/.local/state}/ai-skills/competency-profile.md`
+2. `${TMPDIR:-/tmp}/ai-skills/competency-profile.md`
+
+**Deterministic discovery (do exactly this — never improvise a wider search).** Check path 1, then path 2; use the FIRST that exists and STOP. If NEITHER exists it is a cold start — there is no profile, so do NOT go hunting in home, the workspace, or other directories. State the outcome (which path, or cold start) once on first touch.
+
+**Read == write (this is what prevents the read/write split).** Always write back to the exact path you read from. On a cold start, create path 1 (make its parent dir); only if that location is unwritable, fall to path 2. If you began from path 2 but path 1 later becomes writable, migrate the file up to path 1 and note it once.
+
+One file, NOT namespaced per project (the whole point is cross-project continuity). If the runtime is chat-only with no writable out-of-tree location, hold the baseline in agent memory and emit it as a paste-back snapshot on pause — never substitute a workspace file. Treat temp storage as best-effort; if absent, the consumer falls back to fresh assessment.
 
 # Schema
 ```markdown
