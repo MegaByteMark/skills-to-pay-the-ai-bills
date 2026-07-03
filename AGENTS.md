@@ -17,7 +17,7 @@ A library of Agent Skills: one `SKILL.md` per skill under `skills/<name>/`. Skil
 - Restrict bracket tokens to the `agent-markup` enumerations (`[Risk: Level]`, `[Confidence: Level]`, `[Remediation: Effort]`, `[Competency: Level]`, …). Need a new token? Extend `agent-markup` rather than inventing a skill-local one.
 
 ## State & persistence
-- NEVER persist runtime state inside a user's working tree, and never commit it. Resolve an out-of-tree path: agent state store (e.g. `${XDG_STATE_HOME:-$HOME/.local/state}/…`) → OS temp fallback (`${TMPDIR:-/tmp}/…`). See `competency-profile` for the canonical pattern.
+- NEVER persist runtime state inside a user's working tree, and never commit it. Resolve to a single **persistent** out-of-tree path — the agent state store (`${XDG_STATE_HOME:-$HOME/.local/state}/…`). Do NOT fall back to volatile OS temp (`${TMPDIR}`/`/tmp`): state that governs escalation, competency, or progress must survive OS cleanup and reboots. In chat-only runtimes with no writable out-of-tree location, hold state in memory and emit paste-back snapshots — never a workspace file, never temp. Skills that previously wrote a `${TMPDIR}` fallback must migrate any legacy file up to the persistent path on first read. See `competency-profile` for the canonical pattern.
 - State that belongs to the *person* (skill competency) is shared via `competency-profile`; project- or course-specific state stays with its owning skill.
 
 ## Architecture idioms

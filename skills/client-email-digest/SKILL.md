@@ -33,9 +33,9 @@ Operational Workflow:
 - Output Portability: Export-clean Markdown per the `agent-markup` Output Portability Convention, suitable for pasting into an email client or rendering under a letterhead. `[Scope: Digest]`.
 
 Storage — per-project, out-of-tree, NEVER in the working tree:
-The digest state (baseline pointer + blocker ledger + timeline + leave) is project-specific and MUST NOT live in the user's repo, be committed, or appear in `git status`. Namespace it per project (by remote URL slug, else top-level directory name) and resolve the path in order:
-1. Agent-owned state store — `${XDG_STATE_HOME:-$HOME/.local/state}/ai-skills/client-email-digest/<project-id>/digest-state.md`.
-2. Fallback OS temp dir — `${TMPDIR:-/tmp}/ai-skills/client-email-digest/<project-id>/digest-state.md`.
+The digest state (baseline pointer + blocker ledger + timeline + leave) is project-specific and MUST NOT live in the user's repo, be committed, or appear in `git status`. Namespace it per project (by remote URL slug, else top-level directory name) and resolve to a single persistent path (no volatile `${TMPDIR}`/`/tmp` fallback, so state survives OS cleanup and reboots):
+- `${XDG_STATE_HOME:-$HOME/.local/state}/ai-skills/client-email-digest/<project-id>/digest-state.md`.
+If a legacy `${TMPDIR:-/tmp}/ai-skills/client-email-digest/<project-id>/digest-state.md` exists from an older version, migrate it to the persistent path on first read.
 If the runtime is chat-only with no writable out-of-tree location, hold the state in agent memory and emit it as a paste-back snapshot at the end of the run so the next digest can resume duration tracking — never substitute a workspace file.
 
 ```markdown
