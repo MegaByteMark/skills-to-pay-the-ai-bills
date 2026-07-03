@@ -15,15 +15,14 @@ The human's skill in an area (e.g. "TypeScript async/await", "SQL joins") is a f
 # Storage — per-user, global, NEVER in the workspace
 The baseline is one record per user/machine, shared across every project and skill. It MUST NOT live in any project tree, be committed, or appear in `git status`.
 
-**Canonical location — two candidate paths, strict priority order:**
-1. `${XDG_STATE_HOME:-$HOME/.local/state}/ai-skills/competency-profile.md`
-2. `${TMPDIR:-/tmp}/ai-skills/competency-profile.md`
+**Canonical location — one persistent path, no volatile fallback:**
+- `${XDG_STATE_HOME:-$HOME/.local/state}/ai-skills/competency-profile.md`
 
-**Deterministic discovery (do exactly this — never improvise a wider search).** Check path 1, then path 2; use the FIRST that exists and STOP. If NEITHER exists it is a cold start — there is no profile, so do NOT go hunting in home, the workspace, or other directories. State the outcome (which path, or cold start) once on first touch.
+**Deterministic discovery (do exactly this — never improvise a wider search).** Read the canonical path; if it exists, use it and STOP. If it does not exist it is a cold start — there is no profile, so do NOT go hunting in home, the workspace, or other directories. State the outcome (found, or cold start) once on first touch. This store must survive OS cleanup and reboots, so it is **never** written under `${TMPDIR}`/`/tmp`. If only a legacy `${TMPDIR:-/tmp}/ai-skills/competency-profile.md` exists (written by an older version), migrate it up to the canonical path on first read and note it once.
 
-**Read == write (this is what prevents the read/write split).** Always write back to the exact path you read from. On a cold start, create path 1 (make its parent dir); only if that location is unwritable, fall to path 2. If you began from path 2 but path 1 later becomes writable, migrate the file up to path 1 and note it once.
+**Read == write (this is what prevents the read/write split).** Always write back to the canonical path. On a cold start, create it (make its parent dir).
 
-One file, NOT namespaced per project (the whole point is cross-project continuity). If the runtime is chat-only with no writable out-of-tree location, hold the baseline in agent memory and emit it as a paste-back snapshot on pause — never substitute a workspace file. Treat temp storage as best-effort; if absent, the consumer falls back to fresh assessment.
+One file, NOT namespaced per project (the whole point is cross-project continuity). If the runtime is chat-only with no writable out-of-tree location, hold the baseline in agent memory and emit it as a paste-back snapshot on pause — never substitute a workspace file, and never fall back to volatile temp storage.
 
 # Schema
 ```markdown
