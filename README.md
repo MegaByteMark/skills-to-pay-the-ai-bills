@@ -114,13 +114,16 @@ Type these mid-session once the relevant skill is active.
 | Command | Effect |
 | :-- | :-- |
 | `/handoff` | Hand me the next eligible slice now |
+| `/readback` | Walk me through code you just wrote |
 | `/take-over` | You write this one; I review or skip |
 | `/skip` | Skip this handoff, keep building |
 | `/pause-antidote` · `/resume-antidote` | Stop / restart all handoffs |
 | `/intensity light\|normal\|intense` | Change handoff frequency |
 | `/review-only` | Never hand me writing; I review your code |
+| `/no-readback` | Never probe comprehension; handoffs only |
 | `/profile` | Show competency + comprehension dashboard |
 | `/calibrate [area]` | Quick calibration probe on an area |
+| `/init-my-skills` | Broad self-report intake across languages, frameworks, databases, and tools |
 | `/harder` · `/easier` | Adjust handoff difficulty |
 
 ### teach-a-skill
