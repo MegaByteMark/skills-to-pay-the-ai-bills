@@ -2,61 +2,28 @@
 name: agent-markup
 description: Defines the strict token syntax, bracket-enclosed schema fields, and machine-readable value enumerations used for cross-agent parsing and automation.
 ---
-Markup Syntax Rule:
-  All machine-readable tokens must be enclosed in square brackets `[...]` to separate data fields from human-readable prose, enabling regex extraction and downstream automation.
+All machine-readable tokens MUST be in square brackets `[...]`.
 
-Token Taxonomy & Allowed Values:
-  [Auth: Scope]:
-    Description: Defines the explicit access control tier or permissions matrix.
-    Allowed Values: [Read, Write, Admin, None]
-    
-  [Risk: Level]:
-    Description: Dictates technical debt, lifecycle urgency, or security vulnerability severity.
-    Allowed Values: [Low, Medium, High, Critical]
-    
-  [Policy]:
-    Description: Specifies the enforcement stance of a development rule or verification gate.
-    Allowed Values: [Enforced, Advisory, Audit-Only]
-    Note: Written bare as [Policy] as a schema/column marker; written in instance shorthand as [Policy: Enforced] etc. when tagging a concrete rule inline (parallel to [Risk: High]).
+[Auth: Scope]: [Read, Write, Admin, None]
 
-  [Data: Classification]:
-    Description: Classifies the sensitivity tier of data handled at a code path, store, or seam. Drives PII inventory and data-protection findings.
-    Allowed Values: [Public, Internal, Confidential, PII, Special-Category]
-    Note: Special-Category maps to GDPR Article 9 sensitive data (health, biometrics, race, religion, sexual orientation, etc.) and carries the strictest handling obligations.
+[Risk: Level]: [Low, Medium, High, Critical]
 
-  [Confidence: Level]:
-    Description: Declares how certain a finding is, calibrated against directly observed code evidence. Curbs speculative or hallucinated findings.
-    Allowed Values: [Confirmed, Probable, Possible]
-    Note: Confirmed = directly observed exploitable pattern; Probable = strong indicator missing one corroborating link; Possible = heuristic signal requiring human verification. Possible findings must be phrased as "requires verification", never asserted.
+[Policy]: [Enforced, Advisory, Audit-Only]. Written `[Policy: Enforced]` etc. when tagging a concrete rule.
 
-  [Remediation: Effort]:
-    Description: Estimates the implementation cost to resolve a finding, enabling risk-vs-effort prioritisation in remediation roadmaps.
-    Allowed Values: [Low, Medium, High]
+[Data: Classification]: [Public, Internal, Confidential, PII, Special-Category]. Special-Category = GDPR Art. 9 (health, biometrics, race, religion, sexual orientation, etc.) — strictest handling obligations.
 
-  [Competency: Level]:
-    Description: Declares a human's demonstrated ability in a single skill area, calibrated against observed work — not self-report. Shared across every skill that teaches, assesses, or hands work to a human so the same baseline travels with the person.
-    Allowed Values: [Not-Ready, Paired, Guided, Solo]
-    Note: Ordered weakest-to-strongest. Solo = wrote comparable work unaided; Guided = succeeds with a full spec/acceptance criteria; Paired = succeeds only with a worked scaffold and step-by-step prompts; Not-Ready = cannot currently do it OR cannot explain what it does. A claim from self-report is provisional until corroborated by observed work; pair with [Confidence: Level] to express calibration certainty. Owned/persisted by the competency-profile skill.
+[Confidence: Level]: [Confirmed, Probable, Possible]. Confirmed = directly observed; Probable = strong indicator missing one link; Possible = heuristic needing verification — phrase as "requires verification", never assert.
 
-  [Inferred: Unverified]:
-    Description: Marks output derived from an ephemeral, in-context baseline that was reconstructed rather than read from a persisted contract. Signals reduced fidelity to downstream readers and automation.
-    Allowed Values: [true]
-    Note: Applied when a skill proceeds on a simulated FDS baseline instead of a saved contract. Never applied to blueprint-drift findings, which require a persisted, non-self-derived baseline.
+[Remediation: Effort]: [Low, Medium, High]
 
-  [Priority: MoSCoW]:
-    Description: Ranks a product backlog item (Epic or user story) for release sequencing using the MoSCoW method. Drives scope negotiation and what lands in a milestone.
-    Allowed Values: [Must, Should, Could, Wont]
-    Note: Written in shorthand as [Priority: Must] etc. Must = release fails without it; Should = important but has a viable workaround; Could = desirable if capacity allows; Wont = explicitly out of scope for the current cycle (records the decision rather than dropping it silently). Owned by the gather-requirements skill's PRD stream.
+[Competency: Level]: [Not-Ready, Paired, Guided, Solo]. Ordered weakest-to-strongest. Solo = wrote comparable work unaided; Guided = succeeds with full spec/acceptance criteria; Paired = succeeds only with scaffold + step-by-step prompts; Not-Ready = cannot do or explain. Self-report is provisional `[Confidence: Possible]` until corroborated by observed work. Owned by competency-profile.
 
-  [Doc: Archetype]:
-    Description: Selects the documentation archetype a generation run targets, binding it to a fixed output path.
-    Allowed Values: [QuickStart, Technical, Troubleshooting, Installation]
-    Note: Written in shorthand as [Doc: QuickStart] etc. Path bindings are owned by the document-a-codebase skill.
+[Inferred: Unverified]: [true]. Marks output from an ephemeral in-context baseline. Never applied to blueprint-drift findings.
 
-  [Scope: Artefact]:
-    Description: Declares the artefact archetype an output document represents, enabling downstream tooling to route or aggregate it.
-    Allowed Values: [Release, Security-Governance, Health, Digest]
-    Note: Written in shorthand as [Scope: Release] etc. This enumeration grows as new report-producing skills are added; extend it here rather than introducing undeclared scope values. Digest = the client-facing weekly progress email owned by the client-email-digest skill.
+[Priority: MoSCoW]: [Must, Should, Could, Wont]. Written `[Priority: Must]` etc. Must = release fails without it; Should = viable workaround; Could = desirable if capacity; Wont = explicitly out-of-scope (records decision). Owned by gather-requirements PRD stream.
 
-Output Portability Convention:
-  All client-facing artefacts (FDS, system blueprint, audit reports, and documentation guides) must be authored as export-clean Markdown suitable for downstream PDF conversion under an organisation document template/letterhead. Use a standard heading hierarchy, avoid renderer-fragile constructs, and ensure tables degrade gracefully. The concrete PDF/branding mechanism is defined outside this skill.
+[Doc: Archetype]: [QuickStart, Technical, Troubleshooting, Installation]. Path bindings owned by document-a-codebase.
+
+[Scope: Artefact]: [Release, Security-Governance, Health, Digest]. Digest = client-facing weekly progress email from client-email-digest. Extend this enumeration here when adding report-producing skills.
+
+Output Portability: All client-facing artefacts (FDS, blueprint, audits, docs) as export-clean Markdown — standard heading hierarchy, no renderer-fragile constructs, tables degrade gracefully. PDF/branding mechanism is separate.
