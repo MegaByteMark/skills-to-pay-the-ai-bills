@@ -2,32 +2,23 @@
 name: competency-profile
 description: Shared contract for the human's competency baseline — the per-user, out-of-tree record of demonstrated skill per area. Defines the canonical storage location, schema, and read/merge protocol so any skill that teaches, assesses, or hands work to a human reads and writes the SAME baseline. Consumed by teach-a-skill, teach-me, and vibe-code-antidote so calibration is continuous across skills and sessions and never duplicated or committed to a project.
 dependencies:
-  - agent-markup  # [Competency: Level] (the baseline enumeration) and [Confidence: Level] (calibration certainty)
+  - agent-markup
 ---
+OWNS: per-area human competency — `[Competency: Level]`, `[Confidence: Level]`, evidence, provenance (which skill, when).
 
-# Purpose
-The human's skill in an area (e.g. "TypeScript async/await", "SQL joins") is a fact about the *person*, not about a project or a skill. It must be recorded once and shared, so a workday under `vibe-code-antidote` and an evening under `teach-me` read and update the same baseline. This skill owns that record. It is a contract, not an interactive experience — consuming skills invoke it; the user does not.
+DOES NOT OWN: per-project codebase comprehension (`vibe-code-antidote`); course/syllabus progress (`teach-me`).
 
-# Scope (own this, nothing else)
-- **OWNS:** per-area human competency baseline — `[Competency: Level]`, calibration `[Confidence: Level]`, the evidence behind each, and provenance (which skill last observed it, when).
-- **DOES NOT OWN:** per-project codebase comprehension (stays with `vibe-code-antidote`); course/syllabus progress (stays with `teach-me`, per language). These reference the baseline but persist separately. Never write project- or course-specific state into the shared baseline.
+Storage: one record per user/machine, across every project/skill. NEVER in workspace, never committed.
+- Canonical: `${XDG_STATE_HOME:-$HOME/.local/state}/ai-skills/competency-profile.md`
+- Discovery: read canonical path; if exists, use it. If absent = cold start — do NOT hunt elsewhere. State outcome once.
+- Migrate legacy `${TMPDIR:-/tmp}/ai-skills/competency-profile.md` to canonical path on first read.
+- Read == write. Always write back to canonical path. Cold start → create (make parent dir).
+- One file, NOT per-project. Chat-only runtimes: hold in memory + paste-back snapshot on pause — never workspace file, never volatile temp.
 
-# Storage — per-user, global, NEVER in the workspace
-The baseline is one record per user/machine, shared across every project and skill. It MUST NOT live in any project tree, be committed, or appear in `git status`.
-
-**Canonical location — one persistent path, no volatile fallback:**
-- `${XDG_STATE_HOME:-$HOME/.local/state}/ai-skills/competency-profile.md`
-
-**Deterministic discovery (do exactly this — never improvise a wider search).** Read the canonical path; if it exists, use it and STOP. If it does not exist it is a cold start — there is no profile, so do NOT go hunting in home, the workspace, or other directories. State the outcome (found, or cold start) once on first touch. This store must survive OS cleanup and reboots, so it is **never** written under `${TMPDIR}`/`/tmp`. If only a legacy `${TMPDIR:-/tmp}/ai-skills/competency-profile.md` exists (written by an older version), migrate it up to the canonical path on first read and note it once.
-
-**Read == write (this is what prevents the read/write split).** Always write back to the canonical path. On a cold start, create it (make its parent dir).
-
-One file, NOT namespaced per project (the whole point is cross-project continuity). If the runtime is chat-only with no writable out-of-tree location, hold the baseline in agent memory and emit it as a paste-back snapshot on pause — never substitute a workspace file, and never fall back to volatile temp storage.
-
-# Schema
+Schema:
 ```markdown
 # Competency Baseline
-**Owner:** [user/handle or machine] | **Updated:** [ISO date]
+**Owner:** [user/handle] | **Updated:** [ISO date]
 
 ## Areas
 | Area | [Competency: Level] | [Confidence: Level] | Evidence (observed work) | Last source | Updated |
@@ -35,17 +26,16 @@ One file, NOT namespaced per project (the whole point is cross-project continuit
 | TypeScript async/await | Solo | Confirmed | wrote retry wrapper unaided | vibe-code-antidote | 2026-06-26 |
 | SQL joins | Not-Ready | Probable | could not explain a JOIN | teach-me | 2026-06-20 |
 ```
-Use stable, granular area names (language/domain + concept) so different skills resolve to the same row. When unsure whether an area already exists, match on concept rather than minting a near-duplicate row.
+Use stable, granular area names (language/domain + concept) so different skills resolve to same row. Match on concept rather than minting near-duplicates.
 
-# Read / Merge Protocol
-Consuming skills MUST follow this so concurrent and sequential updates stay coherent:
-- **Read at start.** Before assessing or teaching, read the baseline and treat existing rows as the starting truth — do not re-interrogate areas already recorded with `[Confidence: Confirmed]`.
-- **Observed work outranks self-report.** Only promote an area's `[Competency: Level]` on corroborating *observed* work; a verbal claim is provisional and recorded at most `[Confidence: Possible]`.
-- **Update, don't clobber.** When updating a row, write the new level/confidence, refresh evidence + source + date; never blank another skill's evidence.
-- **Conflict resolution.** On disagreement, the row backed by the more recent *observed work* wins. A higher `[Confidence: Level]` from older observed work is only overridden by newer observed work, not by self-report.
-- **Regression is allowed and expected.** If a skill observes a misunderstanding of a previously higher-rated area, downgrade it (with new evidence). Skill atrophy is real; the baseline must be able to fall, not only rise.
-- **Provenance is mandatory.** Every write records which skill observed it and when, so consumers can weigh staleness.
+Read/Merge Protocol:
+- Read at start. Existing `[Confidence: Confirmed]` rows are truth — do not re-interrogate.
+- Observed work outranks self-report. Promote level only on corroborating *observed* work; verbal claim = provisional, at most `[Confidence: Possible]`.
+- Update, don't clobber: write new level/confidence, refresh evidence + source + date; never blank another skill's evidence.
+- Conflict: row backed by more recent *observed work* wins.
+- Regression allowed: downgrade on observed misunderstanding with new evidence.
+- Provenance mandatory: every write records which skill + when.
 
-# Compliance
-- Use the `[Competency: Level]` and `[Confidence: Level]` enumerations from `agent-markup` exactly; introduce no parallel rubric.
-- This skill defines storage + schema + merge rules only. It performs no teaching, no syllabus building, and no project analysis — those belong to its consumers.
+Compliance:
+- Use `[Competency: Level]` and `[Confidence: Level]` enumerations from `agent-markup` exactly.
+- This skill = storage + schema + merge rules only. No teaching, syllabus, or project analysis.
