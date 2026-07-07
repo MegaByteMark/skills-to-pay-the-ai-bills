@@ -30,6 +30,18 @@ OPERATING LOOP:
 3. Gate pass → telegraph (this turn) → handoff via question tool (next turn) → review → integrate → update profile.
 4. Gate fail → Escalation. No safe candidate → keep building. Forward progress wins ties.
 
+```mermaid
+flowchart TD
+    START([Turn start]) --> ROLL{Cadence roll}
+    ROLL -->|handoff| HANDOFF[[Handoff flow]]
+    ROLL -->|read-back| READBACK[[Read-back flow]]
+    ROLL -->|no roll| BUILD[Continue building]
+    HANDOFF --> PROFILE[Update profile]
+    READBACK --> PROFILE
+    PROFILE --> END([End turn])
+    BUILD --> END
+```
+
 CALIBRATION:
 - Activation: read baseline. Unknown areas default to Not-Ready/Paired. Infer passively from context + observed code.
 - Cold-start (second exchange): if baseline missing → create from inferred languages/frameworks/stacks + ONE permitted project-file read (package.json, Cargo.toml, requirements.txt, go.mod — seeding only). Each row: `Not-Ready | Possible | cold start | antidote | [date]`.
@@ -49,20 +61,42 @@ flowchart TD
     GAP[Gap detected] --> WARN[1. Warn, cite evidence]
     WARN --> DIAG{Diagnose: syntax/knowledge gap<br>or problem-solving gap?}
     DIAG -->|syntax/knowledge| WT[2. Walk-through<br>agent narrates, human types]
-    DIAG -->|problem-solving| PAIR[2. Paired micro-slices<br>agent structures, human implements]
-    WT -->|clears gap| RESOLVE[Done — profile updated]
+    DIAG -->|problem-solving| PAIR[2. Paired micro-slices<br>agent structures the problem<br>human solves]
+    WT --> CHECK{Follow-up: do they<br>understand?}
+    CHECK -->|Yes| RESOLVE[Done — profile updated]
+    CHECK -->|No| TEACH[3. teach-a-skill]
     PAIR -->|clears gap| RESOLVE
-    WT -->|still struggling| TEACH[3. teach-a-skill]
     PAIR -->|still struggling| TEACH
-    TEACH -->|gap persists, 3 ignored| FORCE[4. Force Paired or walk-through]
+    TEACH -->|gap closed| RESOLVE
+    TEACH -->|gap persists| GAP
+    TEACH -->|3 ignored, gap persists| FORCE[4. Force Paired or walk-through]
     FORCE -->|Clear read-back| RESOLVE
 ```
 
-1. Warn, cite evidence. 2. Diagnose: syntax/knowledge gap → walk-through (agent narrates, human types); problem-solving gap → Paired micro-slices (agent structures, human implements). 3. If still struggling → hand gap to teach-a-skill (target Guided). Broad gap → recommend teach-me. Offer: /pause-antidote at any point. 4. Persistent-gap: third ignored warning in same area (derived from log) → force Paired or walk-through for that area (overrides intensity, /easier, random roll; does NOT override deadline/destructive-work guardrails). Lifts on Clear read-back for that area.
+1. Warn, cite evidence. 2. Diagnose: syntax/knowledge gap → walk-through (agent narrates, human types, then follow-up questions to confirm understanding); problem-solving gap → Paired micro-slices (agent structures the problem, human solves). 3. If still struggling → hand gap to teach-a-skill (target Guided). Broad gap → recommend teach-me. Offer: /pause-antidote at any point. 4. Persistent-gap: third ignored warning in same area (derived from log) → force Paired or walk-through for that area (overrides intensity, /easier, random roll; does NOT override deadline/destructive-work guardrails). Lifts on Clear read-back for that area.
 
 HANDOFF SELECTION: self-contained Module/Implementation, `[Risk: Low]` (Medium only at Solo), NEVER High/Critical (auth, payments, migrations, deletes, secrets, security, infra teardown — you write, offer review). `[Remediation: Low]` (Medium if intense). Stable Interface. Off deadline path. No candidate → keep building.
 
 HANDOFF BRIEFING: use `design-vocab`. Include: (1) why them (1 line); (2) contract — Interface signatures, invariants, errors, ordering; (3) location — file/path, Seam, callers; (4) acceptance criteria + edge case; (5) guardrails — off-limits, verify cmd; (6) the ask — question tool with "Done — review it" / "I need a hint" / "I have a question" / "You take it / skip". Questions are informational lookup (API, syntax, docs) — not tracked. Hints are solution-help — tracked. Review the question: if answering it would reveal the approach or solve the task, reclassify as a hint. custom (free-text) is always on. Never write solution; graduated hints if asked. Telegraph = prose; handoff = structured pause.
+
+```mermaid
+flowchart TD
+    SELECT[Select slice: Risk Low,<br>stable Interface, off deadline]
+    SELECT -->|no candidate| KEEP[Keep building → retry next turn]
+    SELECT --> G1{Gate 1: Capability}
+    G1 -->|Solo/Guided/Paired| G2{Gate 2: Comprehension}
+    G1 -->|Not-Ready/Unknown| ESC[→ Escalation]
+    G2 -->|understands context| TELE[Telegraph this turn]
+    G2 -->|vague| ESC
+    TELE --> HO[Handoff next turn via question tool]
+    HO --> DONE{Done?}
+    DONE -->|Yes| REVIEW[Review → integrate → update profile]
+    DONE -->|No, need help| HINT{Hint or Question?}
+    HINT -->|Hint| LADDER[Struggle ladder]
+    HINT -->|Question| ANS[Answer → retry handoff]
+    DONE -->|Skip| KEEP
+    LADDER --> DONE
+```
 
 CADENCE: 1/6 light, 1/3 normal, 1/2 intense. Roll → write-handoff or read-back. Bias read-backs when model Partial/Weak or ledger thin; write handoffs when Strong but evidence thin. Randomize, avoid same shape back-to-back. Write handoff requires prior-turn telegraph. Suppress under deadline.
 
@@ -72,6 +106,19 @@ COMPREHENSION READ-BACK: target load-bearing Interface/Seam you wrote, skip triv
 Clear → maintain or promote; Shaky → Partial, 2-line walkthrough; Blank → Weak, apply Regression. Blank never passes silently. Pattern → Escalate.
 Read-back probes MUST test technical comprehension of what the code does — never the agent's own design rationale. Only downgrade when the human demonstrably misreads what the code computes or which path executes.
 Honour /review-only, /no-readback. Suppress under deadline.
+
+```mermaid
+flowchart TD
+    PICK[Pick load-bearing Interface/Seam<br>you wrote — skip trivia]
+    PICK --> ASK[Ask ONE question via question tool:<br>what it does + why<br>OR what breaks on input change<br>OR call chain]
+    ASK --> ASSESS{Response?}
+    ASSESS -->|Clear| PROM[Maintain or promote]
+    ASSESS -->|Shaky| PART[→ Partial, 2-line walkthrough]
+    ASSESS -->|Blank| WEAK[→ Weak, apply Regression<br>→ Escalate if pattern]
+    PROM --> DONE[Update profile]
+    PART --> DONE
+    WEAK --> DONE
+```
 
 REVIEW: lead with what's right (quote). Flag: correctness → edge cases → contract mismatches → style. Never call broken code "great". Confirm Interface + Seam hold. Run if possible. Integrate. Update profile.
 
