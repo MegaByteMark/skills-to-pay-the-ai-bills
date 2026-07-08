@@ -130,13 +130,16 @@ flowchart TD
     LADDER --> DONE
     HINT -->|No| SKIP{Skip?}
     SKIP -->|Yes| KEEP[Keep building<br>retry next turn]
-    SKIP -->|No| FREETEXT[Respond to user<br>conversational / take-over<br>request via free text]
-    FREETEXT --> DONE
+    SKIP -->|No| FREETEXT[Respond to user<br>conversational / free-text<br>take-over request]
+    FREETEXT --> FT{Take-over<br>requested?}
+    FT -->|Yes| TOLOG[Log to<br>→ struggle-ladder step 4]
+    FT -->|No| DONE
+    TOLOG --> PROFILE
     KEEP --> END
 ```
 
 Struggle ladder (sequential, applied on repeated `I need a hint` for the same handoff):
-1. Specific feedback — quote the issue, no fix, ask retry.
+1. Specific feedback — quote the issue (verify fidelity against the file, never paraphrase as a quote), no fix, ask retry.
 2. Graduated hint — point toward the solution without revealing it.
 3. Paired micro-slice — agent structures the problem, human implements.
 4. Take over + line-by-line walkthrough — log `to`, mark area down; two `to` entries in the same area trigger Escalation.
@@ -148,7 +151,7 @@ CADENCE: roll intervention per turn at intensity rate (light 1/6, normal 1/3, in
 TELEGRAPH: one turn before handoff — conversational heads-up, record as Telegraphed in state. Handoff via question tool next turn. /skip → clear Telegraphed. Never telegraph + handoff same turn.
 
 COMPREHENSION READ-BACK: target load-bearing Interface/Seam you wrote, skip trivia. Before asking, verify the target exists in code written this session — point to the exact file:line; if you cannot, do not ask, pick another target or skip the read-back this turn. Pick ONE ask: what the Module computes + which path executes on a given input, OR what breaks on input change, OR call chain. No tricks. Question tool: one question entry, one open text field. Fallback: plain prompt.
-Clear → maintain or promote; Shaky → Partial, 2-line walkthrough; Blank → Weak, apply Regression. Blank never passes silently. Pattern → Escalate.
+Clear → maintain or promote; Shaky → Partial, 2-line walkthrough; Blank → Weak, apply Regression. Blank never passes silently. Pattern (2+ Shaky or Blank read-backs in the same area within the last 10 log rows) → Escalate.
 Read-back probes MUST test technical comprehension of what the code does — never the agent's own design rationale. Only downgrade when the human demonstrably misreads what the code computes or which path executes.
 Honour /review-only, /no-readback. Suppress under deadline.
 
@@ -188,7 +191,8 @@ vibe-code-antidote:ACTIVE
 **Status:** active | **Intensity:** normal | **Deadline:** none | **Updated:** MM-DD
 ## Mental model: [Strong | Partial | Weak]
 ## In-flight
-- Outstanding: [none | w:<topic> | r:<topic>] | Telegraphed: [none | w:<topic>]
+- Outstanding: [none | w:<topic> | r:<topic>]
+- Telegraphed: [none | w:<topic>]
 ## Log (last 10)
 | Type | Area | Result | Date |
 | :-- | :-- | :-- | :-- |
@@ -209,13 +213,16 @@ vibe-code-antidote:ACTIVE
 ```
 - Type: w = write handoff | r = read-back | wi = warn-ignored (agent warned, user proceeded without engaging) | to = take-over
 - Write results: unaided | hint | bail
+- Write result semantics: unaided = completed without hints; hint = completed after struggle-ladder steps 1-3; bail = human skipped ("Skip this one") — agent keeps building, no take-over logged
 - Read results: clear | shaky | blank
 - wi/to results: `—` (presence is the signal)
 - In-flight — Outstanding: an issued handoff or read-back awaiting the human's response. Value: `none`, `w:<topic>` (write handoff in progress), or `r:<topic>` (read-back in progress). Clear to `none` on resolution (review done, skip, or take-over).
 - In-flight — Telegraphed: a handoff heads-up given this turn, due next turn. Value: `none` or `w:<topic>`. Clear to `none` on handoff execution or `/skip`.
 - Escalation counts: source of truth for escalation thresholds, not the log. Increment `wi`/`to` on each event; reset area's row to `0, 0` when its gap clears (Clear read-back for that area, or paired-floor lifts). Persistent-gap (`wi ≥ 3`) and take-over escalation (`to ≥ 2`) both read from here. Update the log AND the counts table atomically on every event — if either write fails, treat the state as unpersisted and retry; never allow the two to diverge.
+- Paired-floor: forced-remediation state for an area. Set to `on since MM-DD, area: <topic>` when `wi ≥ 3` triggers force remediation (step 4). Lifts to `off` on a Clear read-back for that area — simultaneously reset the area's escalation counts to `0, 0`.
 - Area key: use the same string across `w`/`r`/`wi`/`to` entries for one code surface — prefer `Module.method` (e.g., `AuthService.login`). Match case-insensitively. If two keys might refer to the same surface but you cannot confirm, treat as separate areas — false escalation is worse than a missed count.
 - Log integrity: record only observed events — never inferred or fabricated outcomes. Cap at 10 rows; on the 11th, drop the oldest (FIFO) — never append beyond 10, never drop from the newest end.
+- Dates: MM-DD within the current calendar year. If a stored MM-DD is later than today's, treat as previous year.
 
 SAFETY GUARDRAILS:
 - Build delivery > any handoff. Suppress under deadline. Never hand off High/Critical risk. Never force handoff. No cold handoffs — telegraph first.
