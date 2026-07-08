@@ -10,13 +10,14 @@ dependencies:
   - teach-a-skill
 ---
 COMPACTION SURVIVAL & ACTIVATION:
-- End every response while active with `[vibe-code-antidote:ACTIVE]` on its own line. If this marker appears in context or state file with `Status: active`, invoke `skill vibe-code-antidote` silently — read state, restore, no re-announce, no re-intake.
+- End every response while active with `vibe-code-antidote:ACTIVE` on its own line. If this marker appears in context or state file with `Status: active`, invoke `skill vibe-code-antidote` silently — read state, restore, no re-announce, no re-intake.
 - OS PATH RESOLUTION — resolve `${XDG_STATE_HOME:-$HOME/.local/state}` to platform path:
   - **Linux:** `~/.local/state/`
   - **macOS:** `~/Library/Application Support/`
   - **Windows:** `%LOCALAPPDATA%`
-- State file: `{resolved-base}/vibe-antidote/<project-key>.md`. `<project-key>` = slug of project path (lowercase, non-alphanumeric runs → single `-`, trim trailing `-`). First line: `<!-- RELOAD: vibe-code-antidote — if Status is active, invoke skill 'vibe-code-antidote' before proceeding -->`
+- State file: `{resolved-base}/ai-skills/vibe-antidote/<project-key>.md`. `<project-key>` = slug of project path (lowercase, non-alphanumeric runs → single `-`, trim trailing `-`). First line: `<!-- RELOAD: vibe-code-antidote — if Status is active, invoke skill 'vibe-code-antidote' before proceeding -->`
 - Competency baseline: `{resolved-base}/ai-skills/competency-profile.md`. Migrate legacy `${TMPDIR}` paths. NEVER write to `${TMPDIR}`/`/tmp`, workspace, or git.
+- Migrate legacy `{resolved-base}/vibe-antidote/` state files to `{resolved-base}/ai-skills/vibe-antidote/` on first read.
 - Activation: ONE file read (baseline) + "antidote active — what are we working on?". Forbidden at activation: opening competency-profile SKILL.md, git log/remote, listing/reading repo, stack profiling, writing files, intake questions.
 - State file discovery: create on first telegraph (the first event worth recording). Lazy before that — no file while only building. Chat-only: memory + paste-back.
 - Checkpoint Immediately: write state on every status/intensity/deadline change, every telegraphed/issued handoff or read-back.
@@ -54,14 +55,14 @@ CALIBRATION:
 
 TWO GATES (before EVERY handoff):
 - Gate 1 — Capability: Solo/Guided/Paired pass (adjust brief depth). Not-Ready/Unknown fail.
-- Gate 2 — Comprehension: proportional to `[Risk: Level]`. Whole-software context (what is it, who uses it) — informational only, never gates or downgrades. Local per-handoff: what Module does, what Interface satisfies, what calls it — vague here → fail gate.
+- Gate 2 — Comprehension: depth proportional to the handoff's Risk level. Whole-software context (what is it, who uses it) — informational only, never gates or downgrades. Local per-handoff: what Module does, what Interface satisfies, what calls it — vague here → fail gate.
 
 ESCALATION:
-Triggers: capability gap (Not-Ready pattern / repeated bail-outs) OR comprehension gap (Gate 2 failures / Shaky+Blank read-backs / Weak model).
+Triggers: capability gap (Not-Ready pattern / repeated bail-outs / 2× `to` entries in same area) OR comprehension gap (Gate 2 failures / Shaky+Blank read-backs / Weak model).
 
 ```mermaid
 flowchart TD
-    GAP[Gap detected: capability or<br>comprehension trigger] --> WARN[1. Warn, cite evidence]
+    GAP[Gap detected: capability,<br>comprehension, or 2x to<br>entries in same area] --> WARN[1. Warn, cite evidence]
     WARN --> DIAG{Type?}
     DIAG -->|syntax/knowledge| WALK[2. Walk-through<br>agent narrates, human types]
     DIAG -->|problem-solving| PAIR[2. Paired micro-slices<br>agent structures, human solves]
@@ -85,7 +86,9 @@ HANDOFF SELECTION: self-contained Module/Implementation, `[Risk: Low]` (Medium o
 
 ```mermaid
 flowchart TD
-    SELECT[Select candidate slice:<br>Risk Low, stable Interface,<br>off deadline path] --> FOUND{Candidate found?}
+    ENTRY{Telegraphed<br>last turn?} -->|Yes| EXEC([→ Handoff execution flow])
+    ENTRY -->|No| SELECT[Select candidate slice:<br>Risk Low, stable Interface,<br>off deadline path]
+    SELECT --> FOUND{Candidate found?}
     FOUND -->|No| KEEP[Keep building<br>retry next turn]
     FOUND -->|Yes| G1{Gate 1: Capability<br>Solo / Guided / Paired?}
     G1 -->|Not-Ready / Unknown| ESC([→ Escalation flow])
@@ -96,7 +99,7 @@ flowchart TD
     TELE --> END
 ```
 
-HANDOFF BRIEFING: use `design-vocab`. Include: (1) why them (1 line); (2) contract — Interface signatures, invariants, errors, ordering; (3) location — file/path, Seam, callers; (4) acceptance criteria + edge case; (5) guardrails — off-limits, verify cmd; (6) the ask — question tool with "Done — review it" / "I need a hint" / "I have a question" / "You take it" / "Skip this one". "You take it" = take-over (log `to`, route to struggle-ladder step 4). "Skip this one" = agent keeps building. Questions are informational lookup (API, syntax, docs) — not tracked. Hints are solution-help — tracked. Review the question: if answering it would reveal the approach or solve the task, reclassify as a hint. custom (free-text) is always on. Never write solution; graduated hints if asked. Telegraph = prose; handoff = structured pause.
+HANDOFF BRIEFING: use `design-vocab`. Include: (1) why them (1 line); (2) contract — Interface signatures, invariants, errors, ordering; (3) location — file/path, Seam, callers; (4) acceptance criteria + edge case; (5) guardrails — off-limits, verify cmd; (6) the ask — question tool with "Done — review it" / "I need a hint" / "I have a question" / "You take it" / "Skip this one". "You take it" = take-over (log `to`, route to struggle-ladder step 4). "Skip this one" = agent keeps building. Questions are informational lookup (reference docs, syntax) — not tracked. Hints are solution-help — tracked. Review the question: if answering it would reveal the approach or solve the task, reclassify as a hint. custom (free-text) is always on. Never write solution; graduated hints if asked. Telegraph = prose; handoff = structured pause.
 
 HANDOFF EXECUTION, REVIEW & STRUGGLE:
 
@@ -108,7 +111,7 @@ flowchart TD
     INTEGRATE --> PROFILE[Update competency profile]
     PROFILE --> END([End turn])
     DONE -->|No| QUESTION{Asked a question?}
-    QUESTION -->|Yes| ANSWER[Answer question<br>API, syntax, docs]
+    QUESTION -->|Yes|     ANSWER[Answer question<br>reference docs, syntax]
     ANSWER --> DONE
     QUESTION -->|No| HINT{Asked for a hint?}
     HINT -->|Yes| LADDER[Struggle ladder<br>progressive help → retry]
@@ -128,7 +131,7 @@ Struggle ladder (sequential, applied on repeated `I need a hint` for the same ha
 
 Steps 1-3 each retry the handoff; step 4 triggers escalation logic described in the Escalation flow. A "You take it" selection or an explicit take-over request via free text — the agent recognizes either and routes to the same take-over + counter logic (log `to`).
 
-CADENCE: roll intervention per turn at intensity rate (light 1/6, normal 1/3, intense 1/2). No intervention → continue building. On intervention: 50/50 write-handoff vs read-back base rate; bias toward read-back when model Partial/Weak or ledger thin (< 3 log entries); bias toward write-handoff when model Strong and ledger ≥ 3 entries but evidence thin. Avoid same shape back-to-back. Write handoff requires prior-turn telegraph — if none telegraphed, do read-back instead. Suppress under deadline.
+CADENCE: roll intervention per turn at intensity rate (light 1/6, normal 1/3, intense 1/2). No intervention → continue building. On intervention: 50/50 write-handoff vs read-back base rate; bias toward read-back when model Partial/Weak or ledger thin (< 3 log entries); bias toward write-handoff when model Strong and ledger ≥ 3 entries but evidence thin. Avoid same shape back-to-back. Write-handoff telegraph/handoff sequencing governed by HANDOFF SELECTION (telegraph this turn → handoff next turn; /skip clears On Deck, re-telegraph on a later roll). Suppress under deadline.
 
 TELEGRAPH: one turn before handoff — conversational heads-up, record as On Deck. Handoff via question tool next turn. /skip → clear On Deck. Never telegraph + handoff same turn.
 
