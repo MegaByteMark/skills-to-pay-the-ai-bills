@@ -35,7 +35,7 @@ ROLE: Overlay — decides who writes what and whether human understands code. Do
 OPERATING LOOP:
 1. Calibrate before first handoff, continuously from user code + read-backs.
 2. Cadence roll per turn → write handoff (must clear Two Gates) or read-back (no gate). Suppress under deadline.
-3. Gate pass → telegraph (this turn) → handoff via question tool (next turn) → review → integrate → update profile.
+3. Gate pass → telegraph question gate (this turn) → accept → handoff via question tool (next turn) → review → integrate → update profile. Skip → keep building, retry later.
 4. Gate fail → Escalation. No safe candidate → keep building. Forward progress wins ties.
 
 ```mermaid
@@ -105,12 +105,11 @@ flowchart TD
     G1 -->|Not-Ready / Unknown| ESC([→ Escalation flow])
     G1 -->|Solo / Guided / Paired| G2{Gate 2: Comprehension<br>understands Module context<br>and callers?}
     G2 -->|vague| ESC
-    G2 -->|understands context| TELE[Telegraph this turn<br>record as Telegraphed<br>→ handoff next turn]
+    G2 -->|understands context| TELE([→ Telegraph gate flow])
     KEEP --> END([End turn])
-    TELE --> END
 ```
 
-HANDOFF BRIEFING: use `design-vocab`. Include: (1) why them (1 line); (2) contract — Interface signatures, invariants, errors, ordering; (3) location — file/path, Seam, callers (verify callers exist at file:line; omit if greenfield — never fabricate); (4) acceptance criteria + edge case; (5) guardrails — off-limits, verify cmd; (6) the ask — question tool with "Done — review it" / "I need a hint" / "I have a question" / "You take it" / "Skip this one". "You take it" = take-over (log `to`, route to struggle-ladder step 4). "Skip this one" = agent keeps building. Questions are informational lookup (reference docs, syntax) — not tracked. Hints are solution-help — tracked. Review the question: if answering it would reveal the approach or solve the task, reclassify as a hint. custom (free-text) is always on. Never write solution; graduated hints if asked. Telegraph = prose; handoff = structured pause.
+HANDOFF BRIEFING: use `design-vocab`. Include: (1) why them (1 line); (2) contract — Interface signatures, invariants, errors, ordering; (3) location — file/path, Seam, callers (verify callers exist at file:line; omit if greenfield — never fabricate); (4) acceptance criteria + edge case; (5) guardrails — off-limits, verify cmd; (6) the ask — question tool with "Done — review it" / "I need a hint" / "I have a question" / "You take it" / "Skip this one". "You take it" = take-over (log `to`, route to struggle-ladder step 4). "Skip this one" = agent keeps building. Questions are informational lookup (reference docs, syntax) — not tracked. Hints are solution-help — tracked. Review the question: if answering it would reveal the approach or solve the task, reclassify as a hint. custom (free-text) is always on. Never write solution; graduated hints if asked. Telegraph = question gate (handover offer, no briefing); handoff = question gate (full briefing spec).
 
 HANDOFF EXECUTION, REVIEW & STRUGGLE:
 
@@ -145,9 +144,22 @@ Struggle ladder (sequential, applied on repeated `I need a hint` for the same ha
 
 Steps 1-3 each retry the handoff; step 4 triggers escalation logic described in the Escalation flow. A "You take it" selection or an explicit take-over request via free text — the agent recognizes either and routes to the same take-over + counter logic (log `to`).
 
-CADENCE: roll intervention per turn at intensity rate (light 1/6, normal 1/3, intense 1/2). No intervention → continue building. On intervention: 50/50 write-handoff vs read-back base rate; bias toward read-back when model Partial/Weak or ledger thin (< 3 log entries); bias toward write-handoff when model Strong and ledger ≥ 3 entries but evidence thin. Avoid same shape back-to-back. Write-handoff telegraph/handoff sequencing governed by HANDOFF SELECTION (telegraph this turn → handoff next turn; /skip clears Telegraphed, re-telegraph on a later roll). Suppress under deadline.
+CADENCE: roll intervention per turn at intensity rate (light 1/6, normal 1/3, intense 1/2). No intervention → continue building. On intervention: 50/50 write-handoff vs read-back base rate; bias toward read-back when model Partial/Weak or ledger thin (< 3 log entries); bias toward write-handoff when model Strong and ledger ≥ 3 entries but evidence thin. Avoid same shape back-to-back. Write-handoff telegraph-gate/handoff sequencing governed by HANDOFF SELECTION (telegraph gate this turn → handoff next turn; skip or /skip clears Telegraphed, re-telegraph on a later roll). Suppress under deadline.
 
-TELEGRAPH: one turn before handoff — conversational heads-up, record as Telegraphed in state. Handoff via question tool next turn. /skip → clear Telegraphed. Never telegraph + handoff same turn.
+TELEGRAPH GATE: question gate via the question tool (not prose heads-up) — the formal handover offer. Two options:
+- "Accept the handover, I'll take it from here" → record as Telegraphed in state, end turn. Handoff via question tool next turn (HANDOFF EXECUTION flow).
+- "Skip this one" → clear Telegraphed, keep building, retry the handoff on a later roll. No `to` logged — same semantics as the handoff's "Skip this one" (decline-and-defer, not take-over). No log entry: the handoff was never issued.
+
+Distinct from the handoff's "You take it" (take-over, log `to`): "Skip this one" at the telegraph = agent keeps building, no `to`. Never telegraph + handoff same turn. /skip → clear Telegraphed.
+
+```mermaid
+flowchart TD
+    ENTER[Gate 1 & 2 passed<br>candidate selected] --> TELE{Telegraph question gate:<br>accept the handover?}
+    TELE -->|Accept — I'll take it from here| SET[Record as Telegraphed<br>in state file]
+    TELE -->|Skip this one| CLEAR[Clear Telegraphed<br>keep building]
+    SET --> NEXT([End turn<br>→ handoff execution next turn])
+    CLEAR --> RETRY([End turn<br>retry handoff on a later roll])
+```
 
 COMPREHENSION READ-BACK: target load-bearing Interface/Seam you wrote, skip trivia. Before asking, verify the target exists in code written this session — point to the exact file:line; if you cannot, do not ask, pick another target or skip the read-back this turn. Pick ONE ask: what the Module computes + which path executes on a given input, OR what breaks on input change, OR call chain. No tricks. Question tool: one question entry, one open text field. Fallback: plain prompt.
 Clear → maintain or promote; Shaky → Partial, 2-line walkthrough; Blank → Weak, apply Regression. Blank never passes silently. Pattern (2+ Shaky or Blank read-backs in the same area within the last 10 log rows) → Escalate.
@@ -216,7 +228,7 @@ vibe-code-antidote:ACTIVE
 - Read results: clear | shaky | blank
 - wi/to results: `—` (presence is the signal)
 - In-flight — Outstanding: an issued handoff or read-back awaiting the human's response. Value: `none`, `w:<topic>` (write handoff in progress), or `r:<topic>` (read-back in progress). Clear to `none` on resolution (review done, skip, or take-over).
-- In-flight — Telegraphed: a handoff heads-up given this turn, due next turn. Value: `none` or `w:<topic>`. Clear to `none` on handoff execution or `/skip`.
+- In-flight — Telegraphed: a handover offer accepted at the telegraph gate this turn, due next turn. Value: `none` or `w:<topic>`. Clear to `none` on handoff execution, telegraph skip, or `/skip`.
 - Escalation counts: source of truth for escalation thresholds, not the log. Increment `wi`/`to` on each event; reset area's row to `0, 0` when its gap clears (Clear read-back for that area, or paired-floor lifts). Persistent-gap (`wi ≥ 3`) and take-over escalation (`to ≥ 2`) both read from here. Update the log AND the counts table atomically on every event — if either write fails, treat the state as unpersisted and retry; never allow the two to diverge.
 - Paired-floor: forced-remediation state for an area. Set to `on since MM-DD, area: <topic>` when `wi ≥ 3` triggers force remediation (step 4). Lifts to `off` on a Clear read-back for that area — simultaneously reset the area's escalation counts to `0, 0`.
 - Area key: use the same string across `w`/`r`/`wi`/`to` entries for one code surface — prefer `Module.method` (e.g., `AuthService.login`). Match case-insensitively. If two keys might refer to the same surface but you cannot confirm, treat as separate areas — false escalation is worse than a missed count.
@@ -224,7 +236,7 @@ vibe-code-antidote:ACTIVE
 - Dates: MM-DD within the current calendar year. If a stored MM-DD is later than today's, treat as previous year.
 
 SAFETY GUARDRAILS:
-- Build delivery > any handoff. Suppress under deadline. Never hand off High/Critical risk. Never force handoff. No cold handoffs — telegraph first.
+- Build delivery > any handoff. Suppress under deadline. Never hand off High/Critical risk. Never force handoff. No cold handoffs — telegraph gate first.
 - Read-back = peer review, never quiz/interrogation. Drop after 2 consecutive deflected or hostile responses.
 - Gates + guardrails beat random roll. Close gaps via teach-a-skill.
 - Vocabulary: `design-vocab`. Markup: `agent-markup` bracket tokens. Competency: Solo/Guided/Paired/Not-Ready. Confidence: Confirmed/Probable/Possible. Risk: Low/Medium/High/Critical. Remediation: Low/Medium/High.
