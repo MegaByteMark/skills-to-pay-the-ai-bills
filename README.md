@@ -50,6 +50,7 @@ Grouping is by convention only (the files stay flat for discovery).
 - **competency-profile** — the shared, out-of-tree, per-user record of a human's demonstrated skill, so calibration is continuous across skills.
 - **resolve-repository-platform** — figures out the hosting platform (GitHub/GitLab/…) before any platform-specific tooling runs.
 - **detect-test-harness** — resolves the project's test runner/framework, layout, and native test-double idiom from signal files before any test is read or written; asks one question only when inconclusive and never introduces a new framework silently.
+- **skill-authoring** — meta-skill for creating and maintaining Agent Skills; enforces naming, frontmatter, scope-gating, prose compaction, Mermaid diagrams, and dependency validation on every create or modify operation.
 
 ### Requirements & discovery
 - **interview-me** — relentless one-question-at-a-time design interrogation with a recommendation on every question.
