@@ -74,13 +74,17 @@ flowchart TD
     LEARNED -->|Yes| DONE
     LEARNED -->|No| COUNT{wi entries in<br>this area ≥ 3?}
     COUNT -->|No| LOGGED([Gap logged —<br>re-evaluate on next<br>encounter in this area])
-    COUNT -->|Yes| FORCE[4. Force Paired or walk-through<br>for this area — overrides<br>intensity, /easier, random roll]
-    FORCE --> FCHECK{Clear read-back?}
+    COUNT -->|Yes| FORCE[4. Force remediation<br>for this area — overrides<br>intensity, /easier, random roll]
+    FORCE --> FTYPE{Gap type?}
+    FTYPE -->|syntax/knowledge| FWALK[Forced walk-through<br>agent narrates, human types]
+    FTYPE -->|problem-solving| FPAIR[Forced paired micro-slices<br>agent structures, human solves]
+    FWALK --> FCHECK{Clear read-back?}
+    FPAIR --> FCHECK
     FCHECK -->|Yes| DONE
-    FCHECK -->|No| FORCE
+    FCHECK -->|No| FTYPE
 ```
 
-1. Warn, cite evidence (log `wi` if user proceeds without engaging). 2. Diagnose: syntax/knowledge gap → walk-through (agent narrates, human types, then follow-up questions to confirm understanding); problem-solving gap → Paired micro-slices (agent structures the problem, human solves). 3. If still struggling → hand gap to teach-a-skill (target Guided). Broad gap → recommend teach-me. Offer: /pause-antidote at any point. 4. Persistent-gap: third `wi` entry in same area → force Paired or walk-through for that area (overrides intensity, /easier, random roll; does NOT override deadline/destructive-work guardrails). Lifts on Clear read-back for that area.
+1. Warn, cite evidence (log `wi` if user proceeds without engaging). 2. Diagnose: syntax/knowledge gap → walk-through (agent narrates, human types, then follow-up questions to confirm understanding); problem-solving gap → Paired micro-slices (agent structures the problem, human solves). 3. If still struggling → hand gap to teach-a-skill (target Guided). Broad gap → recommend teach-me. Offer: /pause-antidote at any point. 4. Persistent-gap: third `wi` entry in same area → force remediation for that area — route by gap type as in step 2 (syntax/knowledge → walk-through, problem-solving → Paired). Overrides intensity, /easier, random roll; does NOT override deadline/destructive-work guardrails. Lifts on Clear read-back for that area.
 
 HANDOFF SELECTION: self-contained Module/Implementation, `[Risk: Low]` (Medium only at Solo), NEVER High/Critical (auth, payments, migrations, deletes, secrets, security, infra teardown — you write, offer review). `[Remediation: Low]` (Medium if intense). Stable Interface. Off deadline path. No candidate → keep building.
 
