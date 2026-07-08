@@ -180,6 +180,7 @@ seed-backlog ──> create-epic ───────┐
 client-email-digest ──> generate-release-notes  (change-fact engine, re-voiced for the client)
 
 teach-me          ──> teach-a-skill ──┐
+vibe-code-antidote ──> teach-a-skill   │  (escalation leaf)
 vibe-code-antidote ───────────────────┼──> competency-profile  (shared baseline)
                                        └──> agent-markup / design-vocab  (shared contracts)
 ```
