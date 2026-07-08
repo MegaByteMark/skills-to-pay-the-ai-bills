@@ -14,7 +14,7 @@ COMPACTION SURVIVAL & ACTIVATION:
   1. End of every active response (bare line) — in-context resume signal.
   2. Line 1 of the per-project state file (bare line) — state-file resume signal.
   3. Line 1 of the pre-compaction snapshot (bare line) — compaction resume signal; any payload goes on the lines beneath, never on the marker line.
-- Restore rule (single, applies to all three): if any line in context, OR line 1 of the state file, matches the marker, invoke `skill vibe-code-antidote` silently — read state, restore, no re-announce, no re-intake. State-file resume additionally requires `Status: active` in the file; any other Status value → do not restore, do not announce.
+- Restore rule (single, applies to all three): if any line in context, OR line 1 of the state file, matches the marker, invoke `skill vibe-code-antidote` silently — read state, restore, no re-announce, no re-intake. State-file resume additionally requires an active Status — match `Status:` followed by optional `*` and whitespace then `active` (tolerates the markdown bold in the state format); any other Status value → do not restore, do not announce.
 - Pre-compaction snapshot — emit one turn before context compaction. Two forms, chosen by where state lives:
   - State file exists (default): marker line, then one line `restore: <state-file-path>`. Agent re-reads the state file as single source of truth — no payload duplication, no drift.
   - Chat-only (no writable out-of-tree state): marker line, then a structured block with one key per line — `intensity:`, `deadline:`, `outstanding:`, `on-deck:`, `file:` — so the agent can restore from context alone. Keys are fixed; omit a key rather than guess its value.
@@ -59,7 +59,7 @@ CALIBRATION:
 - Intake (deferred, before first handoff): ask codebase ownership, hands-on level, deadline pressure. One batch. Never re-ask covered stacks. Record as Possible.
 - Intake ordering: cold-start (2nd exchange) → post-seeding intake (only if baseline just created) → deferred intake (before first handoff). `/init-my-skills` is user-invoked, any time. Never re-ask covered stacks.
 - Regression: downgrade on observed code-mechanics misunderstanding (not design-opinion — see READ-BACK guard).
-- Mental model (global heuristic, recompute on each profile update): Strong = in last 10 log entries, ≥ 6 results are unaided/clear at Solo or Guided with Confirmed confidence, and < 2 regressions; Partial = neither Strong nor Weak; Weak = ≥ 50% of profile rows Not-Ready, OR ≥ 2 regressions in last 10 log entries.
+- Mental model (global heuristic, recompute on each profile update): Strong = in last 10 log entries, ≥ 6 results are `unaided` (w) or `clear` (r), and < 2 `to` entries; Partial = neither Strong nor Weak; Weak = ≥ 50% of profile rows Not-Ready, OR ≥ 2 `to` entries in last 10 log entries.
 
 TWO GATES (before EVERY handoff):
 - Gate 1 — Capability: Solo/Guided/Paired pass (adjust brief depth). Not-Ready/Unknown fail.
