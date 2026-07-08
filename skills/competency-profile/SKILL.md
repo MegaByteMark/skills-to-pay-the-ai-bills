@@ -13,7 +13,6 @@ STORAGE:
   - **Windows:** `%LOCALAPPDATA%`
 - Canonical: `{resolved-base}/ai-skills/competency-profile.md`
 - Discovery: read canonical path; if exists, use it. If absent = cold start — do NOT hunt elsewhere.
-- Migrate legacy `${TMPDIR:-/tmp}/ai-skills/competency-profile.md` to canonical path on first read.
 - Read == write. Always write back to canonical path. Cold start → create (make parent dir).
 - One file, NOT per-project. Chat-only runtimes: hold in memory + paste-back snapshot — never workspace file, never volatile temp.
 

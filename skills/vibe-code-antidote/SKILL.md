@@ -23,9 +23,8 @@ COMPACTION SURVIVAL & ACTIVATION:
   - **Linux:** `~/.local/state/`
   - **macOS:** `~/Library/Application Support/`
   - **Windows:** `%LOCALAPPDATA%`
-- State file: `{resolved-base}/ai-skills/vibe-antidote/<project-key>.md`. `<project-key>` = slug of the project's absolute path (lowercase, non-alphanumeric runs → single `-`, trim leading and trailing `-`). Line 1: `vibe-code-antidote:ACTIVE`.
-- Competency baseline: `{resolved-base}/ai-skills/competency-profile.md`. Migrate legacy `${TMPDIR}` paths. NEVER write to `${TMPDIR}`/`/tmp`, workspace, or git.
-- Migrate legacy `{resolved-base}/vibe-antidote/` state files to `{resolved-base}/ai-skills/vibe-antidote/` on first read.
+- State file: `{resolved-base}/ai-skills/vibe-code-antidote/<project-key>.md`. `<project-key>` = slug of the project's absolute path (lowercase, non-alphanumeric runs → single `-`, trim leading and trailing `-`). Line 1: `vibe-code-antidote:ACTIVE`.
+- Competency baseline: `{resolved-base}/ai-skills/competency-profile.md`. NEVER write to `${TMPDIR}`/`/tmp`, workspace, or git.
 - Activation: ONE file read (baseline) + "antidote active — what are we working on?". Forbidden at activation: opening competency-profile SKILL.md, git log/remote, listing/reading repo, stack profiling, writing files, intake questions.
 - State file discovery: create on first telegraph (the first event worth recording). Lazy before that — no file while only building. Chat-only: memory + paste-back.
 - Checkpoint Immediately: write state on every status/intensity/deadline change, every telegraphed/issued handoff or read-back.
@@ -123,7 +122,7 @@ flowchart TD
     INTEGRATE --> PROFILE[Update competency profile]
     PROFILE --> END([End turn])
     DONE -->|No| QUESTION{Asked a question?}
-    QUESTION -->|Yes|     ANSWER[Answer question<br>reference docs, syntax]
+    QUESTION -->|Yes| ANSWER[Answer question<br>reference docs, syntax]
     ANSWER --> DONE
     QUESTION -->|No| HINT{Asked for a hint?}
     HINT -->|Yes| LADDER[Struggle ladder<br>progressive help → retry]
