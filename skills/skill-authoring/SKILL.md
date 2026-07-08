@@ -3,7 +3,7 @@ name: skill-authoring
 description: Meta-skill for creating and modifying Agent Skills in this repository. Enforces naming, frontmatter, scope-gating, prose compaction, Mermaid diagrams, dependency validation, agent-markup/design-vocab compliance, and README registration. Load before any skill create or modify operation.
 dependencies: [agent-markup, design-vocab]
 user-invocable: true
-argument-hint: [create|modify] <skill-name>
+argument-hint: create|modify skill-name
 ---
 
 Gate every skill change (create or modify) through this workflow. Halt on any gate failure; fix before proceeding.
