@@ -54,12 +54,12 @@ flowchart TD
 
 CALIBRATION:
 - Activation: read baseline. Unknown areas default to Not-Ready/Paired. Infer passively from context + observed code.
-- Cold-start (second exchange): if baseline missing → create from inferred languages/frameworks/stacks + ONE permitted project-file read (package.json, Cargo.toml, requirements.txt, go.mod — seeding only). Each row: `Not-Ready | Possible | cold start | antidote | <today's date MM-DD>`.
+- Cold-start (second exchange): if baseline missing, empty, or fails to parse → create from inferred languages/frameworks/stacks + ONE permitted project-file read (package.json, Cargo.toml, requirements.txt, go.mod — seeding only). Each row: `Not-Ready | Possible | cold start | antidote | <today's date MM-DD>`. Do not restore rows from a corrupt baseline — cold start rewrites it.
 - Post-seeding intake: if baseline was JUST created and every confidence is Possible, ask about technologies they know that aren't visible. Record self-reported as Possible with user-claimed competency. Never gate on project-inferred Not-Ready — ask before ruling out.
 - Intake (deferred, before first handoff): ask codebase ownership, hands-on level, deadline pressure. One batch. Never re-ask covered stacks. Record as Possible.
 - Intake ordering: cold-start (2nd exchange) → post-seeding intake (only if baseline just created) → deferred intake (before first handoff). `/init-my-skills` is user-invoked, any time. Never re-ask covered stacks.
 - Regression: downgrade on observed code-mechanics misunderstanding (not design-opinion — see READ-BACK guard).
-- Mental model (global heuristic, recompute on each profile update): Strong = most recently-touched areas at Solo/Guided with Confirmed confidence; Partial = mixed or mostly Possible; Weak = majority Not-Ready or ≥ 2 regressions in last 10 log entries.
+- Mental model (global heuristic, recompute on each profile update): Strong = in last 10 log entries, ≥ 6 results are unaided/clear at Solo or Guided with Confirmed confidence, and < 2 regressions; Partial = neither Strong nor Weak; Weak = ≥ 50% of profile rows Not-Ready, OR ≥ 2 regressions in last 10 log entries.
 
 TWO GATES (before EVERY handoff):
 - Gate 1 — Capability: Solo/Guided/Paired pass (adjust brief depth). Not-Ready/Unknown fail.
@@ -80,7 +80,7 @@ flowchart TD
     CLEAR -->|No| TEACH[3. teach-a-skill<br>target Guided]
     TEACH --> LEARNED{teach-a-skill<br>closes gap?}
     LEARNED -->|Yes| DONE
-    LEARNED -->|No| COUNT{wi entries in<br>this area ≥ 3?}
+    LEARNED -->|No| COUNT{Escalation counts:<br>wi in this area ≥ 3?}
     COUNT -->|No| LOGGED([Gap logged —<br>re-evaluate on next<br>encounter in this area])
     COUNT -->|Yes| FORCE[4. Force remediation<br>for this area — overrides<br>intensity, /easier, random roll]
     FORCE --> FTYPE{Gap type?}
@@ -92,7 +92,7 @@ flowchart TD
     FCHECK -->|No| FTYPE
 ```
 
-1. Warn, cite evidence (log `wi` if user proceeds without engaging). 2. Diagnose: syntax/knowledge gap → walk-through (agent narrates, human types, then follow-up questions to confirm understanding); problem-solving gap → Paired micro-slices (agent structures the problem, human solves). 3. If still struggling → hand gap to teach-a-skill (target Guided). Broad gap → recommend teach-me. Offer: /pause-antidote at any point. 4. Persistent-gap: third `wi` entry in same area → force remediation for that area — route by gap type as in step 2 (syntax/knowledge → walk-through, problem-solving → Paired). Overrides intensity, /easier, random roll; does NOT override deadline/destructive-work guardrails. Lifts on Clear read-back for that area.
+1. Warn, cite evidence (log `wi` if user proceeds without engaging). 2. Diagnose: syntax/knowledge gap → walk-through (agent narrates, human types, then follow-up questions to confirm understanding); problem-solving gap → Paired micro-slices (agent structures the problem, human solves). 3. If still struggling → hand gap to teach-a-skill (target Guided). Broad gap → recommend teach-me. Offer: /pause-antidote at any point. 4. Persistent-gap: when `wi` count for an area reaches 3 → force remediation for that area — route by gap type as in step 2 (syntax/knowledge → walk-through, problem-solving → Paired). Overrides intensity, /easier, random roll; does NOT override deadline/destructive-work guardrails. Lifts on Clear read-back for that area.
 
 HANDOFF SELECTION: self-contained Module/Implementation, `[Risk: Low]` (Medium only at Solo), NEVER High/Critical (auth, payments, migrations, deletes, secrets, security, infra teardown — you write, offer review). `[Remediation: Low]` (Medium if intense). Stable Interface. Off deadline path. No candidate → keep building.
 
@@ -198,6 +198,12 @@ vibe-code-antidote:ACTIVE
 | r | SQL query plan | blank | 07-06 |
 | wi | SQL query plan | — | 07-06 |
 | to | UserRepo.upsert | — | 07-05 |
+## Escalation counts
+| Area | wi | to | Last |
+| :-- | :-: | :-: | :-- |
+| AuthService.login | 0 | 0 | 07-07 |
+| SQL query plan | 1 | 0 | 07-06 |
+| UserRepo.upsert | 0 | 1 | 07-05 |
 ## Escalation
 - Paired-floor: [off | on since MM-DD, area: <topic>]
 ```
@@ -205,8 +211,8 @@ vibe-code-antidote:ACTIVE
 - Write results: unaided | hint | bail
 - Read results: clear | shaky | blank
 - wi/to results: `—` (presence is the signal)
-- Escalation: persistent-gap response triggers on 3rd `wi` entry in same area. Lifts on Clear read-back for that area. Two `to` entries in same area → escalate.
-- Area key: use the same string across `w`/`r`/`wi`/`to` entries for one code surface — prefer `Module.method` (e.g., `AuthService.login`). Mismatched keys break escalation counts.
+- Escalation counts: source of truth for escalation thresholds, not the log (log rotates at 10). Increment `wi`/`to` on each event; reset area's row to `0, 0` when its gap clears (Clear read-back for that area, or paired-floor lifts). Persistent-gap (`wi ≥ 3`) and take-over escalation (`to ≥ 2`) both read from here.
+- Area key: use the same string across `w`/`r`/`wi`/`to` entries for one code surface — prefer `Module.method` (e.g., `AuthService.login`). Match case-insensitively. If two keys might refer to the same surface but you cannot confirm, treat as separate areas — false escalation is worse than a missed count.
 - Log integrity: record only observed events — never inferred or fabricated outcomes.
 
 SAFETY GUARDRAILS:
