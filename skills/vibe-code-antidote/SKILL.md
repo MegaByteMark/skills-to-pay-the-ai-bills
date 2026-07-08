@@ -14,7 +14,7 @@ COMPACTION SURVIVAL & ACTIVATION:
   1. End of every active response (bare line) — in-context resume signal.
   2. Line 1 of the per-project state file (bare line) — state-file resume signal.
   3. Line 1 of the pre-compaction snapshot (bare line) — compaction resume signal; any payload goes on the lines beneath, never on the marker line.
-- Restore rule (single, applies to all three): if any line in context, OR line 1 of the state file, matches the marker, invoke `skill vibe-code-antidote` silently — read state, restore, no re-announce, no re-intake. State-file resume additionally requires an active Status — match `Status:` followed by optional `*` and whitespace then `active` (tolerates the markdown bold in the state format); any other Status value → do not restore, do not announce.
+- Restore rule (single, applies to all three): if any line in the agent's own prior output, OR line 1 of the state file, matches the marker, invoke `skill vibe-code-antidote` silently — read state, restore, no re-announce, no re-intake. A user quoting the marker (e.g. asking about it) does NOT trigger restore. State-file resume additionally requires an active Status — match `Status:` followed by zero, one, or two `*` (markdown bold tolerance) then whitespace then `active`; any other Status value → do not restore, do not announce.
 - Pre-compaction snapshot — emit one turn before context compaction. Two forms, chosen by where state lives:
   - State file exists (default): marker line, then one line `restore: <state-file-path>`. Agent re-reads the state file as single source of truth — no payload duplication, no drift.
   - Chat-only (no writable out-of-tree state): marker line, then a structured block with one key per line — `intensity:`, `deadline:`, `outstanding:`, `on-deck:`, `file:` — so the agent can restore from context alone. Keys are fixed; omit a key rather than guess its value.
@@ -53,7 +53,7 @@ flowchart TD
 ```
 
 CALIBRATION:
-- Activation: read baseline. Unknown areas default to Not-Ready/Paired. Infer passively from context + observed code.
+- Activation: read baseline. Unknown areas default to Not-Ready/Paired. Infer passively from context + observed code — calibrate only on human-authored code (distinguish by `w` log entries; everything else including `to` is agent-written). Never infer competency from your own output.
 - Cold-start (second exchange): if baseline missing, empty, or fails to parse → create from inferred languages/frameworks/stacks + ONE permitted project-file read (package.json, Cargo.toml, requirements.txt, go.mod — seeding only). Each row: `Not-Ready | Possible | cold start | antidote | <today's date MM-DD>`. Do not restore rows from a corrupt baseline — cold start rewrites it.
 - Post-seeding intake: if baseline was JUST created and every confidence is Possible, ask about technologies they know that aren't visible. Record self-reported as Possible with user-claimed competency. Never gate on project-inferred Not-Ready — ask before ruling out.
 - Intake (deferred, before first handoff): ask codebase ownership, hands-on level, deadline pressure. One batch. Never re-ask covered stacks. Record as Possible.
@@ -165,7 +165,7 @@ flowchart TD
     WEAK --> DONE
 ```
 
-REVIEW: lead with what's right (quote). Flag: correctness → edge cases → contract mismatches → style. Never call broken code "great". Confirm Interface + Seam hold. Run if possible. Integrate. Update profile.
+REVIEW: lead with what's right (quote — verify fidelity against the file, never paraphrase as a quote). Flag: correctness → edge cases → contract mismatches → style. Never call broken code "great". Confirm Interface + Seam hold. Run if possible. Integrate. Update profile.
 
 DIFFICULTY: promote after unaided wins (sparser briefs, more edge cases). Demote on regression. Honour /easier /harder immediately.
 
@@ -211,9 +211,9 @@ vibe-code-antidote:ACTIVE
 - Write results: unaided | hint | bail
 - Read results: clear | shaky | blank
 - wi/to results: `—` (presence is the signal)
-- Escalation counts: source of truth for escalation thresholds, not the log (log rotates at 10). Increment `wi`/`to` on each event; reset area's row to `0, 0` when its gap clears (Clear read-back for that area, or paired-floor lifts). Persistent-gap (`wi ≥ 3`) and take-over escalation (`to ≥ 2`) both read from here.
+- Escalation counts: source of truth for escalation thresholds, not the log. Increment `wi`/`to` on each event; reset area's row to `0, 0` when its gap clears (Clear read-back for that area, or paired-floor lifts). Persistent-gap (`wi ≥ 3`) and take-over escalation (`to ≥ 2`) both read from here. Update the log AND the counts table atomically on every event — if either write fails, treat the state as unpersisted and retry; never allow the two to diverge.
 - Area key: use the same string across `w`/`r`/`wi`/`to` entries for one code surface — prefer `Module.method` (e.g., `AuthService.login`). Match case-insensitively. If two keys might refer to the same surface but you cannot confirm, treat as separate areas — false escalation is worse than a missed count.
-- Log integrity: record only observed events — never inferred or fabricated outcomes.
+- Log integrity: record only observed events — never inferred or fabricated outcomes. Cap at 10 rows; on the 11th, drop the oldest (FIFO) — never append beyond 10, never drop from the newest end.
 
 SAFETY GUARDRAILS:
 - Build delivery > any handoff. Suppress under deadline. Never hand off High/Critical risk. Never force handoff. No cold handoffs — telegraph first.
