@@ -83,8 +83,8 @@ Every diagram must satisfy these structural constraints. Halt on violation.
 | 2 | **Flat sequential gates** | When logic has >2 outcomes, split into a sequential yes/no chain. Each gate peels off one path; the "No" edge falls through to the next gate. This eliminates overlapping loopback edges. |
 | 3 | **No process-node loops** | Rectangles (process nodes) route to diamonds, never directly to other process nodes. A loopback must pass through an explicit decision diamond that gates re-entry — it must be unambiguous what is skipped or repeated on the loop. |
 | 4 | **Visible counters** | If a condition depends on accumulated state (e.g., "3rd attempt"), the counter must be a visible decision diamond (`COUNT{≥3?}`). Never bury counter logic in edge labels. |
-| 5 | **All paths terminate or hold** | Every edge must reach a terminal leaf or a defined state-machine hold loop (e.g., `FCHECK →|No| FORCE` = stay in forced mode until condition met). No dead-end edges missing a "No" path. |
-| 6 | **Loopbacks land on diamonds** | A loopback edge targets a diamond, not a process node. The diamond's question gates whether re-entry proceeds through the same path or an escalated one. |
+| 5 | **All paths terminate or hold** | Every edge must reach a terminal leaf or a defined state-machine hold loop (e.g., `FORCE → FCHECK{Clear?} →|No| FORCE` — process routes to diamond, diamond "No" holds by looping back to same process). No dead-end edges missing a "No" path. |
+| 6 | **Loopbacks land on diamonds** | Re-entry loopbacks target a diamond, not a process node. Hold-loop exemption: a diamond "No" edge may loop back to the immediately-preceding process node that feeds it (see Rule 5) — the diamond already gates re-exit. All other diamond→process loopbacks forbidden. |
 
 ## Compaction directive
 
