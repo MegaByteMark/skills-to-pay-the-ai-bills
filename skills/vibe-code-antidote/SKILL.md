@@ -58,45 +58,68 @@ Triggers: capability gap (Not-Ready pattern / repeated bail-outs) OR comprehensi
 
 ```mermaid
 flowchart TD
-    GAP[Gap detected] --> WARN[1. Warn, cite evidence]
-    WARN --> DIAG{Diagnose: syntax/knowledge gap<br>or problem-solving gap?}
-    DIAG -->|syntax/knowledge| WT[2. Walk-through<br>agent narrates, human types]
-    DIAG -->|problem-solving| PAIR[2. Paired micro-slices<br>agent structures the problem<br>human solves]
-    WT --> CHECK{Follow-up: do they<br>understand?}
-    CHECK -->|Yes| RESOLVE[Done — profile updated]
-    CHECK -->|No| TEACH[3. teach-a-skill]
-    PAIR -->|clears gap| RESOLVE
-    PAIR -->|still struggling| TEACH
-    TEACH -->|gap closed| RESOLVE
-    TEACH -->|gap persists| GAP
-    TEACH -->|3 ignored, gap persists| FORCE[4. Force Paired or walk-through]
-    FORCE -->|Clear read-back| RESOLVE
+    GAP[Gap detected: capability or<br>comprehension trigger] --> WARN[1. Warn, cite evidence]
+    WARN --> DIAG{Type?}
+    DIAG -->|syntax/knowledge| WALK[2. Walk-through<br>agent narrates, human types]
+    DIAG -->|problem-solving| PAIR[2. Paired micro-slices<br>agent structures, human solves]
+    WALK --> CLEAR{Remediation<br>clears gap?}
+    PAIR --> CLEAR
+    CLEAR -->|Yes| DONE[Done — profile updated]
+    CLEAR -->|No| TEACH[3. teach-a-skill<br>target Guided]
+    TEACH --> LEARNED{teach-a-skill<br>closes gap?}
+    LEARNED -->|Yes| DONE
+    LEARNED -->|No| COUNT{Ignored warnings<br>in this area ≥ 3?}
+    COUNT -->|No| LOGGED[Gap logged<br>re-evaluate on next<br>encounter in this area]
+    COUNT -->|Yes| FORCE[4. Force Paired or walk-through<br>for this area — overrides<br>intensity, /easier, random roll]
+    FORCE --> FCHECK{Clear read-back?}
+    FCHECK -->|Yes| DONE
+    FCHECK -->|No| FORCE
 ```
 
 1. Warn, cite evidence. 2. Diagnose: syntax/knowledge gap → walk-through (agent narrates, human types, then follow-up questions to confirm understanding); problem-solving gap → Paired micro-slices (agent structures the problem, human solves). 3. If still struggling → hand gap to teach-a-skill (target Guided). Broad gap → recommend teach-me. Offer: /pause-antidote at any point. 4. Persistent-gap: third ignored warning in same area (derived from log) → force Paired or walk-through for that area (overrides intensity, /easier, random roll; does NOT override deadline/destructive-work guardrails). Lifts on Clear read-back for that area.
 
 HANDOFF SELECTION: self-contained Module/Implementation, `[Risk: Low]` (Medium only at Solo), NEVER High/Critical (auth, payments, migrations, deletes, secrets, security, infra teardown — you write, offer review). `[Remediation: Low]` (Medium if intense). Stable Interface. Off deadline path. No candidate → keep building.
 
+```mermaid
+flowchart TD
+    SELECT[Select candidate slice:<br>Risk Low, stable Interface,<br>off deadline path] --> FOUND{Candidate found?}
+    FOUND -->|No| KEEP[Keep building<br>retry next turn]
+    FOUND -->|Yes| G1{Gate 1: Capability<br>Solo / Guided / Paired?}
+    G1 -->|Not-Ready / Unknown| ESC[→ Escalation flow]
+    G1 -->|Solo / Guided / Paired| G2{Gate 2: Comprehension<br>understands Module context<br>and callers?}
+    G2 -->|vague| ESC
+    G2 -->|understands context| TELE[Telegraph this turn<br>record On Deck<br>→ handoff next turn]
+```
+
 HANDOFF BRIEFING: use `design-vocab`. Include: (1) why them (1 line); (2) contract — Interface signatures, invariants, errors, ordering; (3) location — file/path, Seam, callers; (4) acceptance criteria + edge case; (5) guardrails — off-limits, verify cmd; (6) the ask — question tool with "Done — review it" / "I need a hint" / "I have a question" / "You take it / skip". Questions are informational lookup (API, syntax, docs) — not tracked. Hints are solution-help — tracked. Review the question: if answering it would reveal the approach or solve the task, reclassify as a hint. custom (free-text) is always on. Never write solution; graduated hints if asked. Telegraph = prose; handoff = structured pause.
+
+HANDOFF EXECUTION, REVIEW & STRUGGLE:
 
 ```mermaid
 flowchart TD
-    SELECT[Select slice: Risk Low,<br>stable Interface, off deadline]
-    SELECT -->|no candidate| KEEP[Keep building → retry next turn]
-    SELECT --> G1{Gate 1: Capability}
-    G1 -->|Solo/Guided/Paired| G2{Gate 2: Comprehension}
-    G1 -->|Not-Ready/Unknown| ESC[→ Escalation]
-    G2 -->|understands context| TELE[Telegraph this turn]
-    G2 -->|vague| ESC
-    TELE --> HO[Handoff next turn via question tool]
-    HO --> DONE{Done?}
-    DONE -->|Yes| REVIEW[Review → integrate → update profile]
-    DONE -->|No, need help| HINT{Hint or Question?}
-    HINT -->|Hint| LADDER[Struggle ladder]
-    HINT -->|Question| ANS[Answer → retry handoff]
-    DONE -->|Skip| KEEP
-    LADDER --> DONE
+    HO[Handoff via question tool] --> DONE{Done?}
+    DONE -->|Yes| REVIEW[Review code<br>lead with what's right<br>flag correctness, edge cases<br>contract mismatches, style]
+    REVIEW --> INTEGRATE[Integrate & run<br>confirm Interface + Seam hold]
+    INTEGRATE --> PROFILE[Update competency profile]
+    DONE -->|No| QUESTION{Asked a question?}
+    QUESTION -->|Yes| ANSWER[Answer question<br>API, syntax, docs]
+    ANSWER --> HO
+    QUESTION -->|No| HINT{Asked for a hint?}
+    HINT -->|Yes| LADDER[Struggle ladder<br>progressive help → retry]
+    LADDER --> HO
+    HINT -->|No| SKIP{Skip?}
+    SKIP -->|Yes| KEEP[Keep building<br>retry next turn]
+    SKIP -->|No| FREETEXT[Respond to user<br>conversational / take-over<br>request via free text]
+    FREETEXT --> HO
 ```
+
+Struggle ladder (sequential, applied on repeated `I need a hint` for the same handoff):
+1. Specific feedback — quote the issue, no fix, ask retry.
+2. Graduated hint — point toward the solution without revealing it.
+3. Paired micro-slice — agent structures the problem, human implements.
+4. Take over + line-by-line walkthrough — mark area down; two take-overs in the same area trigger Escalation.
+
+Steps 1-3 each retry the handoff; step 4 triggers escalation logic described in the Escalation flow. An explicit take-over request from the user arrives through the free-text path — the agent recognizes it and routes to the same take-over + counter logic.
 
 CADENCE: 1/6 light, 1/3 normal, 1/2 intense. Roll → write-handoff or read-back. Bias read-backs when model Partial/Weak or ledger thin; write handoffs when Strong but evidence thin. Randomize, avoid same shape back-to-back. Write handoff requires prior-turn telegraph. Suppress under deadline.
 
