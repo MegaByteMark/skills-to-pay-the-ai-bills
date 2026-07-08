@@ -17,7 +17,7 @@ COMPACTION SURVIVAL & ACTIVATION:
 - Restore rule (single, applies to all three): if any line in the agent's own prior output, OR line 1 of the state file, matches the marker, invoke `skill vibe-code-antidote` silently — read state, restore, no re-announce, no re-intake. A user quoting the marker (e.g. asking about it) does NOT trigger restore. State-file resume additionally requires an active Status — match `Status:` followed by zero, one, or two `*` (markdown bold tolerance) then whitespace then `active`; any other Status value → do not restore, do not announce.
 - Pre-compaction snapshot — emit one turn before context compaction. Two forms, chosen by where state lives:
   - State file exists or persistent path is writable (default): marker line, then one line `restore: <state-file-path>`. Agent re-reads the state file as single source of truth — no payload duplication, no drift.
-  - Chat-only (a write to the persistent path has failed, or runtime has no writable out-of-tree location): marker line, then a structured block with one key per line — `intensity:`, `deadline:`, `outstanding:`, `on-deck:`, `file:` — so the agent can restore from context alone. Keys are fixed; omit a key rather than guess its value.
+  - Chat-only (a write to the persistent path has failed, or runtime has no writable out-of-tree location): marker line, then a structured block with one key per line — `intensity:`, `deadline:`, `outstanding:`, `telegraphed:`, `file:` — so the agent can restore from context alone. Keys are fixed; omit a key rather than guess its value.
   Never append payload to the marker line.
 - OS PATH RESOLUTION — resolve `${XDG_STATE_HOME:-$HOME/.local/state}` to platform path:
   - **Linux:** `~/.local/state/`
