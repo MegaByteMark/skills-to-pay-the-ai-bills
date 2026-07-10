@@ -121,7 +121,7 @@ flowchart TD
     INTEGRATE --> PROFILE[Update competency profile]
     PROFILE --> END([End turn])
     DONE -->|No| QUESTION{Asked a question?}
-    QUESTION -->|Yes| ANSWER[Answer question<br>reference docs, syntax]
+    QUESTION -->|Yes| ANSWER[Collect question via question-tool<br>free-text field, then answer<br>— reference docs, syntax]
     ANSWER --> DONE
     QUESTION -->|No| HINT{Asked for a hint?}
     HINT -->|Yes| LADDER[Struggle ladder<br>progressive help → retry]
@@ -135,6 +135,8 @@ flowchart TD
     TOLOG --> PROFILE
     KEEP --> END
 ```
+
+Loop-back: arriving back at the gate diamond means re-issue the handoff question tool (same options as the briefing) — never end the turn or drop to prose after answering a question, a hint retry, or non-take-over free text. Collect the user's question via the question-tool free-text field, not a prose prompt.
 
 Struggle ladder (sequential, applied on repeated `I need a hint` for the same handoff):
 1. Specific feedback — quote the issue (verify fidelity against the file, never paraphrase as a quote), no fix, ask retry.
