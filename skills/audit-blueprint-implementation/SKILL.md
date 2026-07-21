@@ -1,6 +1,10 @@
 ---
 name: audit-blueprint-implementation
 description: Audits the physical codebase against the established system blueprint and the Functional Design Specification (FDS) to expose missing features, structural implementation gaps, broken seams, and untracked assets.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - design-vocab
   - agent-markup

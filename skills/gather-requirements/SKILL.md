@@ -1,6 +1,10 @@
 ---
 name: gather-requirements
 description: Conducts an exhaustive, granular engineering discovery by executing the interview-me skill across two streams — a product stream that produces a Product Requirements Document (PRD) of vision, personas, Epics and prioritised user stories that seed the backlog, and a functional stream that produces a complete Functional Design Specification (FDS) of behavioral truth. The FDS traces every requirement back to its originating PRD Epic/story. Runs in two origins — interview (greenfield elicitation) or reverse-engineer (brownfield), which reconstructs a draft PRD/FDS from the existing codebase and the open/closed issue backlog, tags every reconstructed item with calibrated [Confidence: Level] and source provenance, then runs a confirmation-only interview over the gaps and low-confidence rows so an inherited system with no formal PRD/FDS can be converged with product over time. Creates these artifacts from scratch or amends existing ones in place, preserving stable IDs and a revision history.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - interview-me
   - agent-markup

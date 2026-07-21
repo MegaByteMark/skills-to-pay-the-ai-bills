@@ -1,6 +1,10 @@
 ---
 name: audit-security-and-governance
 description: Scans the physical codebase for security vulnerabilities, data-protection/GDPR governance exposures, and repository custody/visibility/licensing posture, anchoring every finding to OWASP/CWE/GDPR references with calibrated confidence. Runs standalone on raw code or enriches against the blueprint/FDS when present.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - design-vocab
   - agent-markup

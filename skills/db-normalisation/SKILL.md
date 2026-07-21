@@ -1,6 +1,10 @@
 ---
 name: db-normalisation
 description: Transforms business requirements (the gather-requirements FDS, or a direct user spec) — or reverse-engineers an already-existing database schema — into a fully normalised relational data model. Drives interview-me through the normal forms one stage at a time (UNF -> 1NF -> 2NF -> 3NF, optionally BCNF), runs an anti-pattern sweep for the canonical persistence-layer design errors, and writes a Mermaid ER diagram plus a fully documented data dictionary into the target repository. Use to design a new persistence layer, normalise a messy spec, or audit and remediate the schema of a live database.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - interview-me
   - gather-requirements

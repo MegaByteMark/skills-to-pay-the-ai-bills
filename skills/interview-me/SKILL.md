@@ -1,6 +1,10 @@
 ---
 name: interview-me
 description: Relentlessly stress-test a system design, migration plan, or codebase architecture before building. Walk down each decision tree branch one-by-one, providing an expert recommendation with every question, and extracting answers from the codebase automatically whenever possible.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - design-vocab
 ---

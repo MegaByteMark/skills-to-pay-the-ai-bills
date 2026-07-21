@@ -1,6 +1,10 @@
 ---
 name: generate-release-notes
 description: Analyzes git commits, code deltas, and merged Change Proposal (pull/merge request) discussions between a user-specified historical point and the current HEAD to generate a high-density, shorthand-categorized release note snapshot.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - design-vocab
   - interview-me

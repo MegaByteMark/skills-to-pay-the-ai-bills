@@ -1,6 +1,10 @@
 ---
 name: design-vocab
 description: Enforce a rigid, shared architectural vocabulary across all skills to eliminate semantic drift during code design, analysis, and restructuring.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 references:
   - "A Philosophy of Software Design (John Ousterhout) - Module, Interface, Depth, Leverage, Locality"
   - "Working Effectively with Legacy Code (Michael Feathers) - Seam"

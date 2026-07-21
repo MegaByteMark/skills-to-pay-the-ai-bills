@@ -1,6 +1,10 @@
 ---
 name: clean-architecture
 description: 'Scaffold, place, and enforce a layered Clean Architecture. Map each artifact (Entities, Use Cases, Interface Adapters, Infrastructure) to its layer, keep dependencies pointing INWARD via Dependency Inversion, keep the Domain/Application core framework- and DB-agnostic, and HALT on inward-dependency violations. Use when generating a new layered structure, deciding which layer code belongs in, or reviewing a layered codebase for dependency-rule breaches. Not a universal mandate — apply only to projects that have adopted (or are adopting) a layered/clean design.'
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 user-invocable: true
 dependencies:
   - design-vocab

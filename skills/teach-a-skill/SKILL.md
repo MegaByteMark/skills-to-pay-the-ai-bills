@@ -1,6 +1,10 @@
 ---
 name: teach-a-skill
 description: 'Leaf skill that closes ONE scoped knowledge gap. Teaches a single concept to a target competency via the Agile Learning Pattern (brief intro, idiomatic example, interactive challenge, immediate feedback, graduated struggle protocol, mastery check). Promptable by another agent or invoked directly by a human. Reads and updates the shared competency baseline; returns the achieved competency. Does NOT build syllabi, choose languages, or run cross-topic spaced repetition — that is the orchestrator''s job.'
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 argument-hint: 'Target concept (e.g. "TypeScript async/await"); optional target level (Guided/Solo), environment, and known baseline'
 user-invocable: true
 dependencies:

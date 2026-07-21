@@ -1,6 +1,10 @@
 ---
 name: create-epic
 description: Renders ONE epic work item from a single PRD Epic Register entry (EPIC-###), enriched with the traced FDS technical contract, and creates or amends it in the resolved workflow tracking system. PRD-primary, FDS-enriched. Idempotent via an embedded stable-ID marker so re-runs amend in place rather than duplicate. The single-epic leaf sequenced by the seed-backlog orchestrator; also invocable directly for one epic.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - resolve-repository-platform
   - agent-markup

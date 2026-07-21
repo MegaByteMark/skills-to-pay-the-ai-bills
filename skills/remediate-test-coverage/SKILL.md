@@ -1,6 +1,10 @@
 ---
 name: remediate-test-coverage
 description: Remediation counterpart to audit-test-coverage. Runs the audit to obtain an authoritative gap set, reconciles it against the Minimum Verification Surface Baseline, presents a risk-vs-effort remediation plan for per-tier human approval, then writes Interface-verifying tests with fake/mock Adapters at Seams, executes them, iterates to green, escalates any production defects it uncovers, and emits a versioned closure report. Builds the minimum sufficient verification surface — never gold-plates.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - audit-test-coverage
   - design-vocab

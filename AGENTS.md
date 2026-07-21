@@ -9,8 +9,9 @@ A library of Agent Skills: one `SKILL.md` per skill under `skills/<name>/`. Skil
 - One folder per skill under `skills/`. The folder name MUST equal the frontmatter `name` and match `^[a-z0-9]+(-[a-z0-9]+)*$`.
 - Discovery is **flat** (`skills/*/SKILL.md`). NEVER nest skills inside category sub-folders — grouping is expressed in the README only.
 - `SKILL.md` must be upper-case. `name` must be unique across the repo.
-- Required frontmatter read by the runtime: `name`, `description` (≤1024 chars, specific enough for correct selection). `license`, `compatibility`, and `metadata` are also recognized; all other fields are ignored by the runtime.
+- Required frontmatter: `name`, `description` (≤1024 chars, specific enough for correct selection), `license`, and `metadata` (with `author` and `version`). `compatibility` is also recognized; all other fields are ignored by the runtime.
 - This repo additionally uses `dependencies`, `argument-hint`, and `user-invocable` as **documentation-only** fields. Reference other skills by bare `name` in `dependencies`.
+- Bump `metadata.version` on every modification. Use semantic versioning: bump major for breaking changes, minor for new features, patch for fixes and prose edits.
 
 ## Vocabulary & markup compliance
 - Use the `design-vocab` taxonomy for architecture: Module, Interface, Implementation, Depth, Seam, Adapter. Avoid unit/component/service/API/boundary except when naming a literal path.
