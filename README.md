@@ -72,6 +72,7 @@ Grouping is by convention only (the files stay flat for discovery).
 *Standalone review overlays — load whichever fits the codebase and task. Both audit only supplied code and calibrate every finding with `[Confidence: Level]` to curb false positives.*
 - **dry-kiss** — enforces DRY / KISS / YAGNI to block duplication, over-engineering, and gratuitous cleverness.
 - **solid-principles** — enforces SOLID OOP design; HALTs on God classes, tight coupling, and brittle inheritance with a `[Risk: Level]` tag.
+- **adversarial-review** — adversarial code review of working-tree changes since last push across code quality, architecture, test coverage, security, governance/GDPR, requirements alignment, style guides, and dependency health. Assumes code is guilty until proven innocent. Produces zero findings if nothing is wrong.
 
 ### Audit & remediation
 - **audit-application-health** — *orchestrator*; runs the three leaf audits and synthesises one client-facing health report.
