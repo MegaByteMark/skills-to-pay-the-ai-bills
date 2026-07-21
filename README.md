@@ -60,6 +60,10 @@ Grouping is by convention only (the files stay flat for discovery).
 - **competitor-analysis** — conversational wizard that ingests the business-model-canvas output for value proposition and target market context, profiles 3–5 competitors with strengths/weaknesses/pricing, builds a comparison matrix, and outputs a SWOT summary in Markdown and HTML.
 - **go-to-market** — conversational wizard that ingests the business-model-canvas output (Channels, Customer Relationships, Revenue Streams) and optionally the value-proposition canvas to structure a phased launch roadmap, marketing channels, sales strategy, and target KPIs, then compiles the complete GTM plan into Markdown and HTML.
 
+### Estimation & planning
+*Sizes requirements from the PRD/FDS baseline before publishing to the backlog. Produces deliverable HTML reports; never modifies the working tree.*
+- **estimation** — estimates effort for new or existing requirements in story points (agile velocity) or time (days) against a PRD/FDS baseline. Delegates delta discovery to `gather-requirements` (output-to-memory, no disk write) and sizing interviews to `interview-me`. Renders a timestamped HTML report with executive summary and per-feature breakdown.
+
 ### Backlog seeding *(publish-side of `gather-requirements`)*
 *Turn the PRD/FDS into tracked work items. Re-runnable: a second pass reconciles the tracker against amended requirements (create/update/close) via embedded stable-ID markers — never duplicating.*
 - **seed-backlog** — *orchestrator*; resolves the platform once and sequences the two leaves across the whole Epic Register and Story Backlog, wiring each story to its parent epic, then emits an auditable seed report.
