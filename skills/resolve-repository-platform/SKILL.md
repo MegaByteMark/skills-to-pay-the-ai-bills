@@ -1,6 +1,10 @@
 ---
 name: resolve-repository-platform
 description: Shared protocol for determining which hosting platform a repository lives on (GitHub, GitLab, Bitbucket, self-hosted, or none) before any platform-specific tooling is invoked. Provides host inference, a user confirmation gate when inference is inconclusive, a platform->CLI/terminology adapter map, and a git-only graceful-degradation fallback. Consumed by any skill that would otherwise hard-code GitHub assumptions.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - interview-me
   - agent-markup

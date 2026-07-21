@@ -1,6 +1,10 @@
 ---
 name: document-a-codebase
 description: Ingests the Functional Design Specification (FDS), system blueprint, and physical codebase to generate consistent, highly structured user, technical, or installation documentation based on a specified token archetype.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - design-vocab
   - agent-markup

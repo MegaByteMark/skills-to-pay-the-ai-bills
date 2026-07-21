@@ -1,6 +1,10 @@
 ---
 name: audit-test-coverage
 description: Discovers physical test files, evaluates actual coverage patterns against the target test surface blueprint and the FDS contract, and flags brittle tests or untested deep interfaces.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - design-vocab
   - agent-markup

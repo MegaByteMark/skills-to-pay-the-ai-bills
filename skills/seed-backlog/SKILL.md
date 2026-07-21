@@ -1,6 +1,10 @@
 ---
 name: seed-backlog
 description: Write-side orchestrator that seeds the workflow tracking system from the PRD and FDS produced by gather-requirements. Resolves the platform once, sequences the create-epic and create-user-story leaves across the whole Epic Register and User Story Backlog, wires every story to its parent epic, and is safely re-runnable — on a second pass it reconciles the tracker against amended requirements (create new, update changed, close deprecated) using embedded stable-ID markers, never duplicating. Mirrors gather-requirements on the publish side.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - resolve-repository-platform
   - create-epic

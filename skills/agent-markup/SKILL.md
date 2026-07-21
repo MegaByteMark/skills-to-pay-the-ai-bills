@@ -1,6 +1,10 @@
 ---
 name: agent-markup
 description: Defines the strict token syntax, bracket-enclosed schema fields, and machine-readable value enumerations used for cross-agent parsing and automation.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 ---
 All machine-readable tokens MUST be in square brackets `[...]`.
 

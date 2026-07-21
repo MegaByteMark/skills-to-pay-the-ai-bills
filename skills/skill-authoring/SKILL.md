@@ -1,6 +1,10 @@
 ---
 name: skill-authoring
-description: Meta-skill for creating and modifying Agent Skills in this repository. Enforces naming, frontmatter, scope-gating, prose compaction, Mermaid diagrams, dependency validation, agent-markup/design-vocab compliance, and README registration. Load before any skill create or modify operation.
+description: Meta-skill for creating and modifying Agent Skills in this repository. Enforces naming, frontmatter (including license, metadata, and version-bumping), scope-gating, prose compaction, Mermaid diagrams, dependency validation, agent-markup/design-vocab compliance, and README registration. Load before any skill create or modify operation.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.1.0
 dependencies: [agent-markup, design-vocab]
 user-invocable: true
 argument-hint: create|modify skill-name
@@ -19,8 +23,10 @@ flowchart TD
     C1 -->|yes| C2{"scope overlaps existing skill?"}
     C2 -->|yes| HALT2(["HALT: point to existing skill"])
     C2 -->|no| C3{"user-invocable explicitly set?"}
+    C3 -->|yes| C_FM{"license & metadata<br>(author, version) present?"}
     C3 -->|no| HALT3(["HALT: must be true or false"])
-    C3 -->|yes| C4{"all dependencies exist &<br>no circular chain?"}
+    C_FM -->|no| HALT_FM(["HALT: add license and metadata (author, version)"])
+    C_FM -->|yes| C4{"all dependencies exist &<br>no circular chain?"}
     C4 -->|no| HALT4(["HALT: report missing dep or cycle"])
     C4 -->|yes| C5{"≥2 decision points or<br>multi-phase workflow?"}
     C5 -->|yes| MERMAID["Include Mermaid diagram:<br>expand all decisions,<br>challenge vague routes"]
@@ -51,7 +57,8 @@ flowchart TD
     M7 -->|no| M8
     SYNC --> M8["Run prose compaction:<br>strip non-behavioral prose"]
     M8 --> M9["Re-validate agent-markup<br>& design-vocab"]
-    M9 --> COMPACT
+    M9 --> M10["Bump metadata.version<br>per semantic versioning"]
+    M10 --> COMPACT
 ```
 
 ## Rules
@@ -61,7 +68,7 @@ Apply on every create or modify. Halt on violation; fix before proceeding.
 | # | Rule | Detail |
 |---|------|--------|
 | 1 | **Naming & discovery** | Folder == `name`, matches `^[a-z0-9]+(-[a-z0-9]+)*$`, unique across repo. `SKILL.md` upper-case, flat under `skills/<name>/`, no sub-folders. |
-| 2 | **Frontmatter minimum** | `name`, `description` (≤1024 chars, specific enough for runtime selection). `dependencies` always present (`[]` if none). `user-invocable` explicitly `true` or `false`. |
+| 2 | **Frontmatter minimum** | `name`, `description` (≤1024 chars, specific enough for runtime selection), `license`, `metadata` (with `author` and `version`). `dependencies` always present (`[]` if none). `user-invocable` explicitly `true` or `false`. |
 | 3 | **Dependency validation** | Every dep must exist as a folder under `skills/`. No circular chains. Orchestrators depend on leaves, never reverse. |
 | 4 | **Scope gate** | One purpose per skill. Before adding behavior: verify it doesn't belong in a dependency or new leaf. Push back on scope creep. |
 | 5 | **Prose compaction** | Strip every sentence that doesn't change what the agent *does*. No qualifiers, justifications, or restated definitions. Target: smallest token count preserving instruction completeness without introducing ambiguity. Run compaction after every modification. |
@@ -72,6 +79,7 @@ Apply on every create or modify. Halt on violation; fix before proceeding.
 | 10 | **State persistence** | If persisting state: `${XDG_STATE_HOME:-$HOME/.local/state}/ai-skills/...`. Never working tree. Never temp. |
 | 11 | **README registration** | New skills: add to README catalog under correct category. On modify: sync entry if description or scope changed. |
 | 12 | **Challenge the human** | Reason whether request is fully thought through. Consider downstream impact. Prioritize anti-hallucination over compliance with incomplete request. |
+| 13 | **Version bumping** | Bump `metadata.version` on every modification. Use semantic versioning: major for breaking changes, minor for new features, patch for fixes and prose edits. |
 
 ## Mermaid diagram rules
 

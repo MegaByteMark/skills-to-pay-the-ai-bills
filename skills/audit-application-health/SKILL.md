@@ -1,6 +1,10 @@
 ---
 name: audit-application-health
 description: Overarching audit orchestrator that runs the security/governance, blueprint-implementation, and test-coverage leaf audits, then synthesises a single client-facing Application Health Audit with an executive risk rollup, cross-cutting findings, a risk-vs-effort remediation roadmap, and versioned export-ready output.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - audit-security-and-governance
   - audit-blueprint-implementation

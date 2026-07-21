@@ -1,6 +1,10 @@
 ---
 name: solid-principles
 description: 'Enforce SOLID object-oriented design principles to ensure scalable, maintainable, and decoupled code. Apply during code generation and structural audits to detect God classes, tight coupling, and brittle inheritance.'
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 user-invocable: true
 dependencies:
   - agent-markup

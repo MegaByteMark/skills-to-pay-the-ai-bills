@@ -1,6 +1,10 @@
 ---
 name: adversarial-review
 description: 'Adversarial code review of working-tree changes since last push. Assumes code is guilty until proven innocent. Covers code quality, architectural alignment, test coverage, security, governance/GDPR, requirements alignment, style guide compliance, and dependency health — as a staging gate before PR submission. Reports nothing if no issues found.'
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 user-invocable: true
 dependencies:
   - interview-me
