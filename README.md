@@ -56,6 +56,7 @@ Grouping is by convention only (the files stay flat for discovery).
 - **interview-me** — relentless one-question-at-a-time design interrogation with a recommendation on every question.
 - **gather-requirements** — drives `interview-me` across two streams: a **product stream** producing a Product Requirements Document (PRD) of vision, personas, Epics and MoSCoW-prioritised user stories that seed the backlog, then a **functional stream** producing the Functional Design Specification (FDS), with every FDS requirement traced back to its originating PRD Epic/story.
 - **business-model-canvas** — conversational wizard that walks through the 9 building blocks of the Business Model Canvas one at a time, then compiles the completed canvas into Markdown and HTML formats.
+- **value-proposition** — conversational wizard that ingests the business-model-canvas output to establish Customer Profile and Value Map context, then guides the user through the Value Proposition Canvas and compiles it into Markdown and HTML.
 
 ### Backlog seeding *(publish-side of `gather-requirements`)*
 *Turn the PRD/FDS into tracked work items. Re-runnable: a second pass reconciles the tracker against amended requirements (create/update/close) via embedded stable-ID markers — never duplicating.*
