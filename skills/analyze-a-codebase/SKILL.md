@@ -1,19 +1,20 @@
 ---
 name: analyze-a-codebase
-description: Ingest a repository, identify architecture drift, evaluate technical dependencies against rolling EOL horizons, and produce a rigid, text-based system blueprint delivered via interactive section-by-section checkpoints.
+description: Ingest a repository, identify architecture drift, evaluate technical dependencies against rolling EOL horizons, and produce a rigid, text-based system blueprint with a code navigation signpost — delivered via interactive section-by-section checkpoints.
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 dependencies:
   - design-vocab
   - agent-markup
   - gather-requirements
+user-invocable: true
 ---
 1. PHASE 1 (Contract Gate): Check `docs/requirements/functional-requirements.md`.
    - Missing/empty → hand off to `gather-requirements` to generate FDS.
    - ELSE: proceed, using FDS as behavioral baseline.
-2. PHASE 2 (Ingestion & Delta): Map physical repo structures, boundaries, dependencies. Extract library/framework/language versions from manifests (package.json, .csproj, go.mod, Gemfile, Prisma schemas). Independently evaluate vendor support timelines and EOL status against current calendar year.
+2. PHASE 2 (Ingestion & Delta): Map physical repo structures, boundaries, dependencies. Extract domain→path mappings: identify functional domains from directory naming, route registrations, module boundaries, and entry files. Extract library/framework/language versions from manifests (package.json, .csproj, go.mod, Gemfile, Prisma schemas). Independently evaluate vendor support timelines and EOL status against current calendar year.
 3. PHASE 3 (Incremental Checkpoints): Output blueprint ONE section at a time per Rationalized Schema Structure. Before first section, announce checkpoint protocol: pause after each section; user must issue literal `move-next` to advance. Answering questions is NOT advancement. Re-render as needed until `move-next`.
 
 Directives:
@@ -24,7 +25,7 @@ Directives:
 - No Narrative Fluff.
 - Security/Governance Scope: incidental security flaw → capture in "Out-of-Scope Findings Flagged" callout at end of Section 5, recommend `audit-security-and-governance`. Never force into blueprint sections.
 - Table-First: use Markdown tables.
-- Mermaid.js exclusively for diagrams. Every diagram MUST be valid Mermaid.js markdown. One diagram topic per diagram — never conflate multiple topics onto a single diagram (e.g. no mixing class diagram with dependency diagram, flowchart with state diagram, etc.). Each sub-section (2.2, 2.3.1, 2.3.2, 2.3.4) MUST be a SEPARATE diagram.
+- Mermaid.js only. One topic per diagram — never conflate. Each sub-section (2.2, 2.3.1, 2.3.2, 2.3.4) MUST be a separate diagram.
 
 Schema & Checkpoint Sequence:
 
@@ -64,7 +65,7 @@ Goal: Reveal how Modules depend on one another and where coupling creates fragil
   | :--- | :--- | :--- | :--- | :--- |
 
 #### 2.3 Application Flow & Seam Test Topology
-Each sub-section MUST be a SEPARATE diagram. Never merge topics, themes, or diagram types (e.g. no mixing class diagram with dependency diagram, flowchart with state diagram).
+Each sub-section MUST be a separate diagram.
 
 ##### 2.3.1 View Transition / User Flow (Mermaid `stateDiagram-v2`)
 One diagram per distinct primary flow (onboarding, checkout, admin). States = Views, edges = user action/trigger.
@@ -109,6 +110,22 @@ sequenceDiagram
   PaymentAdapter--)EventBus: publish PaymentSettled
   EventBus--)FulfilmentModule: PaymentSettled (async)
 ```
+
+#### 2.4 Code Navigation Signpost
+Domain→directory routing map for targeted context retrieval. Embed as JSON code block for machine parsing, with reference table for human scanning.
+```json
+{
+  "signposts": [
+    {
+      "domain": "<functional domain>",
+      "description": "<what this domain handles>",
+      "primary_paths": ["<directory/entry files>"]
+    }
+  ]
+}
+```
+| Domain | Description | Primary Paths |
+| :--- | :--- | :--- |
 
 ### SECTION 3: Lifecycle & Ecosystem Matrix
 #### 3.1 Automated Tech Stack Lifecycle & EOL Registry
