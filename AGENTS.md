@@ -26,6 +26,9 @@ A library of Agent Skills: one `SKILL.md` per skill under `skills/<name>/`. Skil
 - Factor cross-skill rules into a **shared-contract skill** (`design-vocab`, `agent-markup`, `commentary`, `competency-profile`, `resolve-repository-platform`) rather than duplicating them.
 - Keep skills concise and high-signal; cut prose that doesn't change agent behavior.
 
+## Domain glossary maintenance
+- When adding features, modifying schemas, or introducing new domain concepts, keep `docs/domain-glossary.json` in sync. Update the glossary as you work to prevent drift between explicit `domain-glossary` invocations and the actual codebase.
+
 ## Git & PR workflow
 - Branch `feature/<slug>` off `develop`; open PRs **into `develop`** (not `main`).
 - Reference the relevant issue (`Closes #N`) and write concise, descriptive commit messages.
