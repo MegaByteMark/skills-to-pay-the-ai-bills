@@ -1,6 +1,6 @@
 ---
 name: document-a-codebase
-description: Ingests the Functional Design Specification (FDS), system blueprint, and physical codebase to generate consistent, highly structured user, technical, installation documentation, or inline code commentary based on a specified token archetype.
+description: Ingests the Functional Design Specification (FDS), system blueprint, and physical codebase to generate consistent, highly structured user, technical, installation documentation, or inline code commentary based on one or more selected token archetypes.
 license: MIT
 metadata:
   author: MegaByteMark
@@ -12,14 +12,14 @@ dependencies:
   - interview-me
 ---
 1. PHASE 1 (Contract Gate): Check `docs/requirements/functional-requirements.md` AND `docs/architecture/system-blueprint.md`.
-   - Missing → trigger `interview-me` for ONE decision:
+   - Missing AND selection includes any non-`[Doc: Commentary]` archetype → trigger `interview-me` for ONE decision:
      - GENERATE: hand off to `gather-requirements`/`analyze-a-codebase`, then proceed.
      - ABORT: stop. Ephemeral tier deliberately NOT offered — shipping docs built on non-existent spec is worse than none.
+   - Missing AND selection is ONLY `[Doc: Commentary]` → proceed without — commentary can be added from code alone.
    - ELSE: Ingest FDS + blueprint.
-   - `[Doc: Commentary]` exception: if FDS/blueprint missing, proceed without them — commentary can be added from code alone.
-2. PHASE 2 (Target Context): Identify token archetype (`[Doc: QuickStart]`, `[Doc: Technical]`, `[Doc: Troubleshooting]`, `[Doc: Installation]`, `[Doc: Commentary]`).
-   - `[Doc: Installation]`: scan for deployment assets (Dockerfiles, Terraform, cloud configs). If multiple valid paths or ambiguous hosting → `interview-me` ONE clarification. Honour `move-next` advancement.
-3. PHASE 3 (Generate):
+2. PHASE 2 (Target Context): Ask user which archetypes to generate. Multi-select via `interview-me` from `[Doc: QuickStart]`, `[Doc: Technical]`, `[Doc: Troubleshooting]`, `[Doc: Installation]`, `[Doc: Commentary]`. At least one required.
+   - `[Doc: Installation]` if selected: scan for deployment assets (Dockerfiles, Terraform, cloud configs). If multiple valid paths or ambiguous hosting → `interview-me` ONE clarification. Honour `move-next` advancement.
+3. PHASE 3 (Generate): For each selected archetype, run its generation.
    - `[Doc: QuickStart|Technical|Troubleshooting|Installation]`: Write pristine, table-heavy documentation to the domain path.
    - `[Doc: Commentary]`: Load `commentary` skill. Scan codebase. Identify code that warrants commentary per the `commentary` guidelines. Add comments. Never remove existing commentary unless it violates `commentary` prohibited rules.
 
