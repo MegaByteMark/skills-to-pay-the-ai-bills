@@ -4,7 +4,7 @@ description: Defines the strict token syntax, bracket-enclosed schema fields, an
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 ---
 All machine-readable tokens MUST be in square brackets `[...]`.
 
@@ -26,7 +26,7 @@ All machine-readable tokens MUST be in square brackets `[...]`.
 
 [Priority: MoSCoW]: [Must, Should, Could, Wont]. Written `[Priority: Must]` etc. Must = release fails without it; Should = viable workaround; Could = desirable if capacity; Wont = explicitly out-of-scope (records decision). Owned by gather-requirements PRD stream.
 
-[Doc: Archetype]: [QuickStart, Technical, Troubleshooting, Installation]. Path bindings owned by document-a-codebase.
+[Doc: Archetype]: [QuickStart, Technical, Troubleshooting, Installation, Commentary]. Path bindings owned by document-a-codebase.
 
 [Scope: Artefact]: [Release, Security-Governance, Health, Digest]. Digest = client-facing weekly progress email from client-email-digest. Extend this enumeration here when adding report-producing skills.
 
