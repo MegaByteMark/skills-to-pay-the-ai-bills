@@ -1,6 +1,10 @@
 ---
 name: dry-kiss
 description: 'Enforce baseline clean-code heuristics (DRY, KISS, YAGNI) to prevent over-engineering, code duplication, and unnecessary complexity. Apply during code generation and review.'
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 user-invocable: true
 dependencies:
   - agent-markup

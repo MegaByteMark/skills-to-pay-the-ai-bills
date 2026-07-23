@@ -1,6 +1,10 @@
 ---
 name: vibe-code-antidote
 description: 'Session overlay that fights "vibe coding" skill atrophy: hands you safe code slices to write and, at random moments, asks you to walk through code the agent just wrote. Calibrates capability and comprehension, reviews your work as a peer, and escalates skill gaps to teach-a-skill.'
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 argument-hint: 'Optional: intensity (light/normal/intense), areas to focus or avoid, and any deadline pressure'
 user-invocable: true
 dependencies:

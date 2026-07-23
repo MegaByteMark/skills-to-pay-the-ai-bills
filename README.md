@@ -47,6 +47,7 @@ Grouping is by convention only (the files stay flat for discovery).
 *Pure contracts other skills build on — no standalone workflow.*
 - **design-vocab** — a rigid architectural vocabulary (Module, Interface, Implementation, Depth, Seam, Adapter) to stop semantic drift.
 - **agent-markup** — the machine-readable bracket-token schema (`[Risk: Level]`, `[Confidence: Level]`, `[Competency: Level]`, …).
+- **commentary** — shared contract for when and how to write inline code comments: genuine complexity, architectural decisions, non-obvious workarounds, known failure points. Consumed by `document-a-codebase`.
 - **competency-profile** — the shared, out-of-tree, per-user record of a human's demonstrated skill, so calibration is continuous across skills.
 - **resolve-repository-platform** — figures out the hosting platform (GitHub/GitLab/…) before any platform-specific tooling runs.
 - **detect-test-harness** — resolves the project's test runner/framework, layout, and native test-double idiom from signal files before any test is read or written; asks one question only when inconclusive and never introduces a new framework silently.
@@ -55,6 +56,14 @@ Grouping is by convention only (the files stay flat for discovery).
 ### Requirements & discovery
 - **interview-me** — relentless one-question-at-a-time design interrogation with a recommendation on every question.
 - **gather-requirements** — drives `interview-me` across two streams: a **product stream** producing a Product Requirements Document (PRD) of vision, personas, Epics and MoSCoW-prioritised user stories that seed the backlog, then a **functional stream** producing the Functional Design Specification (FDS), with every FDS requirement traced back to its originating PRD Epic/story.
+- **business-model-canvas** — conversational wizard that walks through the 9 building blocks of the Business Model Canvas one at a time, then compiles the completed canvas into Markdown and HTML formats.
+- **value-proposition** — conversational wizard that ingests the business-model-canvas output to establish Customer Profile and Value Map context, then guides the user through the Value Proposition Canvas and compiles it into Markdown and HTML.
+- **competitor-analysis** — conversational wizard that ingests the business-model-canvas output for value proposition and target market context, profiles 3–5 competitors with strengths/weaknesses/pricing, builds a comparison matrix, and outputs a SWOT summary in Markdown and HTML.
+- **go-to-market** — conversational wizard that ingests the business-model-canvas output (Channels, Customer Relationships, Revenue Streams) and optionally the value-proposition canvas to structure a phased launch roadmap, marketing channels, sales strategy, and target KPIs, then compiles the complete GTM plan into Markdown and HTML.
+
+### Estimation & planning
+*Sizes requirements from the PRD/FDS baseline before publishing to the backlog. Produces deliverable HTML reports; never modifies the working tree.*
+- **estimation** — estimates effort for new or existing requirements in story points (agile velocity) or time (days) against a PRD/FDS baseline. Delegates delta discovery to `gather-requirements` (output-to-memory, no disk write) and sizing interviews to `interview-me`. Renders a timestamped HTML report with executive summary and per-feature breakdown.
 
 ### Backlog seeding *(publish-side of `gather-requirements`)*
 *Turn the PRD/FDS into tracked work items. Re-runnable: a second pass reconciles the tracker against amended requirements (create/update/close) via embedded stable-ID markers — never duplicating.*
@@ -64,14 +73,19 @@ Grouping is by convention only (the files stay flat for discovery).
 
 ### Architecture, analysis & documentation
 - **clean-architecture** — *prescriptive counterpart to `analyze-a-codebase`*; scaffolds and enforces a layered, dependency-inverted structure (Domain → Application → Interface Adapters → Infrastructure), mapping each artifact to a strict path and HALTing on inward-dependency violations. Speaks `design-vocab`.
-- **analyze-a-codebase** — ingests a repo and produces a structured system blueprint.
-- **document-a-codebase** — generates user / technical / installation docs from the FDS, blueprint, and code.
+- **analyze-a-codebase** — ingests a repo and produces a structured system blueprint with a code navigation signpost mapping functional domains to directory paths.
+- **domain-glossary** — generate and maintain a machine-readable glossary of core domain terms from requirements and codebase, enforce naming consistency across data contracts, and reject conflicting terminology during audit.
+- **architectural-decision-register** — generate, format, and catalog architectural decisions into a centralized registry at `docs/adr/`. Enforce ADR compliance during code review and finalize ADR status on PR merge. Speaks `design-vocab`.
+- **document-a-codebase** — generates user / technical / installation docs from the FDS, blueprint, and code. Adds inline code commentary via `[Doc: Commentary]` archetype, guided by the `commentary` shared-contract skill.
 - **db-normalisation** — turns the FDS (or a direct spec) into a fully normalised relational data model — or reverse-engineers and audits an existing database — walking `interview-me` through the normal forms (UNF→1NF→2NF→3NF, optionally BCNF), sweeping for the canonical persistence anti-patterns, and writing a Mermaid ERD plus a documented data dictionary to `docs/architecture/data-model.md`.
 
 ### Code-quality enforcement
-*Standalone review overlays — load whichever fits the codebase and task. Both audit only supplied code and calibrate every finding with `[Confidence: Level]` to curb false positives.*
+*Standalone review overlays — load whichever fits the codebase and task. Each audits only supplied code and calibrates every finding with `[Confidence: Level]` to curb false positives.*
 - **dry-kiss** — enforces DRY / KISS / YAGNI to block duplication, over-engineering, and gratuitous cleverness.
+- **refactor** — *orchestrator*; compacts code by rewriting functions, modules, or the entire codebase to fewer lines while preserving functionality, dependencies, and passing tests. Delegates enforcement to dry-kiss and solid-principles; delegates test/lint detection to detect-test-harness.
 - **solid-principles** — enforces SOLID OOP design; HALTs on God classes, tight coupling, and brittle inheritance with a `[Risk: Level]` tag.
+- **adversarial-review** — adversarial code review of working-tree changes since last push across code quality, architecture, test coverage, security, governance/GDPR, requirements alignment, style guides, and dependency health. Assumes code is guilty until proven innocent. Produces zero findings if nothing is wrong.
+- **debug** — systematic debugging workflow: reproduce, gather evidence, hypothesise, validate against spec, apply fix, write regression tests, and deploy. One hypothesis at a time, evidence before intuition.
 
 ### Audit & remediation
 - **audit-application-health** — *orchestrator*; runs the three leaf audits and synthesises one client-facing health report.
@@ -178,6 +192,13 @@ seed-backlog ──> create-epic ───────┐
              └──> create-user-story ─┴──> resolve-repository-platform  (write-side adapter)
 
 client-email-digest ──> generate-release-notes  (change-fact engine, re-voiced for the client)
+
+domain-glossary ──> gather-requirements ──┐
+               └──> analyze-a-codebase    └──> agent-markup  (domain term extraction & enforcement)
+
+architectural-decision-register ──> agent-markup / design-vocab  (ADR format & vocabulary)
+
+debug ──> agent-markup / design-vocab  (systematic debugging process)
 
 teach-me          ──> teach-a-skill ──┐
 vibe-code-antidote ──> teach-a-skill   │  (escalation leaf)

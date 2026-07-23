@@ -1,6 +1,10 @@
 ---
 name: competency-profile
 description: Shared contract for the human's competency baseline — the per-user, out-of-tree record of demonstrated skill per area. Defines canonical storage, schema, and read/merge protocol. Consumed by teach-a-skill, teach-me, and vibe-code-antidote.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - agent-markup
 ---

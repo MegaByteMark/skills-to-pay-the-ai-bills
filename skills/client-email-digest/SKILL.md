@@ -1,6 +1,10 @@
 ---
 name: client-email-digest
 description: Turns the work delivered between two git points into a client-facing weekly progress digest email — a warm, plain-language, non-technical sibling of generate-release-notes. Reuses generate-release-notes as the change-fact engine, then re-voices it for a paying client audience. Produces a fixed five-section email (TLDR, Change log as prose, Blockers, Release timeline, Upcoming leave) and maintains a lightweight, out-of-tree, per-project blocker tracker so a blockage that spans several digests reports how long it has been open. Interviews the user only for facts that cannot be inferred (release dates, comms channel, team leave) and never fabricates progress, dates, or stores.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - generate-release-notes
   - resolve-repository-platform

@@ -1,6 +1,10 @@
 ---
 name: create-user-story
 description: Renders ONE user story from a single PRD User Story Backlog entry (STORY-###), enriched with its traced FDS functional requirements and validation rules, and creates or amends it in the resolved workflow tracking system as a child of its parent epic work item. PRD-primary, FDS-enriched. Idempotent via an embedded stable-ID marker so re-runs amend in place rather than duplicate. The single-story leaf sequenced by the seed-backlog orchestrator; also invocable directly for one story.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - resolve-repository-platform
   - agent-markup

@@ -1,6 +1,10 @@
 ---
 name: detect-test-harness
 description: Shared protocol for resolving a repository's test runner/framework and existing test layout from evidence before any test is read, scaffolded, or written. Provides a signal-file -> framework inference map, a per-framework idiom adapter (run command, file naming, test-double convention), a single confirmation question when inference is inconclusive, and a hard rule against silently introducing a new framework. Consumed by any skill that discovers or authors tests (audit-test-coverage, remediate-test-coverage).
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - interview-me
   - agent-markup

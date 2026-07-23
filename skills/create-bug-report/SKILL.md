@@ -1,6 +1,10 @@
 ---
 name: create-bug-report
 description: Generates a complete, high-signal bug report by auto-capturing every field it can evidence from the codebase, git, the runtime, and any error text the user pasted, then interviewing the user one question at a time (via interview-me) for only the human-centric gaps that cannot be derived. Renders the report against a fixed schema and optionally creates or amends it as a Work Item in the resolved tracking platform. Evidence-first and anti-hallucination: every field is either evidenced, user-answered, or an explicit "Unknown — requires verification" — never invented.
+license: MIT
+metadata:
+  author: MegaByteMark
+  version: 1.0.0
 dependencies:
   - interview-me
   - resolve-repository-platform
