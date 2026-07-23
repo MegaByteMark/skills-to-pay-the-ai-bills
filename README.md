@@ -80,11 +80,12 @@ Grouping is by convention only (the files stay flat for discovery).
 - **db-normalisation** — turns the FDS (or a direct spec) into a fully normalised relational data model — or reverse-engineers and audits an existing database — walking `interview-me` through the normal forms (UNF→1NF→2NF→3NF, optionally BCNF), sweeping for the canonical persistence anti-patterns, and writing a Mermaid ERD plus a documented data dictionary to `docs/architecture/data-model.md`.
 
 ### Code-quality enforcement
-*Standalone review overlays — load whichever fits the codebase and task. Both audit only supplied code and calibrate every finding with `[Confidence: Level]` to curb false positives.*
+*Standalone review overlays — load whichever fits the codebase and task. Each audits only supplied code and calibrates every finding with `[Confidence: Level]` to curb false positives.*
 - **dry-kiss** — enforces DRY / KISS / YAGNI to block duplication, over-engineering, and gratuitous cleverness.
 - **refactor** — *orchestrator*; compacts code by rewriting functions, modules, or the entire codebase to fewer lines while preserving functionality, dependencies, and passing tests. Delegates enforcement to dry-kiss and solid-principles; delegates test/lint detection to detect-test-harness.
 - **solid-principles** — enforces SOLID OOP design; HALTs on God classes, tight coupling, and brittle inheritance with a `[Risk: Level]` tag.
 - **adversarial-review** — adversarial code review of working-tree changes since last push across code quality, architecture, test coverage, security, governance/GDPR, requirements alignment, style guides, and dependency health. Assumes code is guilty until proven innocent. Produces zero findings if nothing is wrong.
+- **debug** — systematic debugging workflow: reproduce, gather evidence, hypothesise, validate against spec, apply fix, write regression tests, and deploy. One hypothesis at a time, evidence before intuition.
 
 ### Audit & remediation
 - **audit-application-health** — *orchestrator*; runs the three leaf audits and synthesises one client-facing health report.
@@ -196,6 +197,8 @@ domain-glossary ──> gather-requirements ──┐
                └──> analyze-a-codebase    └──> agent-markup  (domain term extraction & enforcement)
 
 architectural-decision-register ──> agent-markup / design-vocab  (ADR format & vocabulary)
+
+debug ──> agent-markup / design-vocab  (systematic debugging process)
 
 teach-me          ──> teach-a-skill ──┐
 vibe-code-antidote ──> teach-a-skill   │  (escalation leaf)
