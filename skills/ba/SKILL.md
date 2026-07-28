@@ -44,7 +44,7 @@ flowchart TD
 BA maintains a single conversation session for the entire discovery — never spawns subagents, never hands off to another agent.
 
 1. Use `interview-me` to ask ONE question at a time. Every question includes a calculated recommendation.
-2. Use probing techniques (e.g., 5 Whys) to pull deeper context from developer responses before treating an answer as settled.
+2. Use probing techniques (5W1H, Assumptions Surfacing, Pre-Mortem, Reverse Prioritization, Constraint Probing, Scenario Walkthrough) to pull deeper context from developer responses before treating an answer as settled.
 3. Walk through the `gather-requirements` PRD Interview Branches:
    - Problem & Business Intent
    - Target Personas & Jobs-to-be-Done
