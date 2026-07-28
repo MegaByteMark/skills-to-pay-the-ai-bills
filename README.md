@@ -99,6 +99,7 @@ Grouping is by convention only (the files stay flat for discovery).
   - **audit-blueprint-implementation** — code-vs-blueprint/FDS drift.
   - **audit-test-coverage** — real coverage vs the target test surface.
 - **remediate-test-coverage** — closes gaps found by the coverage audit, writing the minimum sufficient tests.
+- **html-merge** — leaf utility; renders markdown content into an HTML document template via pandoc (or inline fallback). Consumed by audit and report skills for client-ready HTML output.
 
   Both test skills resolve the runner/framework through the shared **detect-test-harness** contract.
 
