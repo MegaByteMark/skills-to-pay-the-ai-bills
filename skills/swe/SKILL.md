@@ -4,7 +4,7 @@ description: 'SWE (Software Engineer) persona orchestrator. Guides feature compl
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 user-invocable: true
 dependencies:
   - clean-architecture
@@ -15,6 +15,7 @@ dependencies:
   - red-green-refactor-tdd
   - adversarial-review
   - resolve-repository-platform
+  - architectural-decision-register
 ---
 
 Load all bundled skills on invoke. Use them consistently throughout — never load skills ad-hoc mid-session.
@@ -57,6 +58,7 @@ Develop the feature using the bundled skills for guidance and enforcement:
 | `solid-principles` | OOP design: single-responsibility, open/closed interface contracts |
 | `dry-kiss` | Code quality: YAGNI during writing, DRY/KISS during cleanup |
 | `red-green-refactor-tdd` | Write tests first (Red), implement minimally (Green), clean up (Refactor) |
+| `architectural-decision-register` | Record architectural decisions during or after development |
 | `design-vocab` | Architectural vocabulary for all reasoning and output |
 | `agent-markup` | All bracket tokens from enumeration only |
 
@@ -86,8 +88,9 @@ Present the subagent's findings to the developer. Every finding must carry `[Ris
 
 ### PHASE 5 — Closure
 
-1. Persist feature artifacts (PR, requirements decisions) to the issue tracker / documentation per resolved platform. Never hand off between agents.
-2. Manual override: developer may invoke `adversarial-review` independently outside this flow at any time — the persona does not block direct invocation.
+1. If architectural decisions were made during development, invoke `architectural-decision-register` (PHASE 1 Generate) to record each decision.
+2. Persist feature artifacts (PR, requirements decisions) to the issue tracker / documentation per resolved platform. Never hand off between agents.
+3. Manual override: developer may invoke `adversarial-review` independently outside this flow at any time — the persona does not block direct invocation.
 
 ### Directives
 
