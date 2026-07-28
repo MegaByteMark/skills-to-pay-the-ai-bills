@@ -89,8 +89,9 @@ Grouping is by convention only (the files stay flat for discovery).
 - **debug** — systematic debugging workflow: reproduce, gather evidence, hypothesise, validate against spec, apply fix, write regression tests, and deploy. One hypothesis at a time, evidence before intuition.
 
 ### Persona orchestrators
-*Persona skills that bundle code-quality, architecture, and review skills into a coherent development workflow. Invocable via `/swe <context>`.*
+*Persona skills that bundle specialised skills into a coherent development workflow. Invocable via `/swe <context>` or `/ba <context>`.*
 - **swe** — SWE (Software Engineer) persona orchestrator. Guides feature completion using `clean-architecture`, `solid-principles`, `dry-kiss`, and `red-green-refactor-tdd`, then auto-spawns `adversarial-review` subagent with clean context for an adversarial gate, presenting findings in a developer decision loop (fix & re-review or accept & proceed).
+- **ba** — BA (Business Analyst) persona orchestrator. Interactive requirements discovery via `interview-me` (one question at a time) and `gather-requirements` (two-stream PRD/FDS). Single long-context session, no subagent spawning, constant developer collaboration, shared understanding checkpoint, and artifact persistence ready for `seed-backlog`.
 
 ### Audit & remediation
 - **audit-application-health** — *orchestrator*; runs the three leaf audits and synthesises one client-facing health report.
