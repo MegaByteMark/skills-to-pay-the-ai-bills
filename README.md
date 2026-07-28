@@ -88,6 +88,10 @@ Grouping is by convention only (the files stay flat for discovery).
 - **adversarial-review** — adversarial code review of working-tree changes since last push across code quality, architecture, test coverage, security, governance/GDPR, requirements alignment, style guides, and dependency health. Assumes code is guilty until proven innocent. Produces zero findings if nothing is wrong.
 - **debug** — systematic debugging workflow: reproduce, gather evidence, hypothesise, validate against spec, apply fix, write regression tests, and deploy. One hypothesis at a time, evidence before intuition.
 
+### Persona orchestrators
+*Persona skills that bundle code-quality, architecture, and review skills into a coherent development workflow. Invocable via `/swe <context>`.*
+- **swe** — SWE (Software Engineer) persona orchestrator. Guides feature completion using `clean-architecture`, `solid-principles`, `dry-kiss`, and `red-green-refactor-tdd`, then auto-spawns `adversarial-review` subagent with clean context for an adversarial gate, presenting findings in a developer decision loop (fix & re-review or accept & proceed).
+
 ### Audit & remediation
 - **audit-application-health** — *orchestrator*; runs the three leaf audits and synthesises one client-facing health report.
   - **audit-security-and-governance** — security + GDPR/data-protection scan.
