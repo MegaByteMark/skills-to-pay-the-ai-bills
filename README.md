@@ -84,6 +84,7 @@ Grouping is by convention only (the files stay flat for discovery).
 - **dry-kiss** — enforces DRY / KISS / YAGNI to block duplication, over-engineering, and gratuitous cleverness.
 - **refactor** — *orchestrator*; compacts code by rewriting functions, modules, or the entire codebase to fewer lines while preserving functionality, dependencies, and passing tests. Delegates enforcement to dry-kiss and solid-principles; delegates test/lint detection to detect-test-harness.
 - **solid-principles** — enforces SOLID OOP design; HALTs on God classes, tight coupling, and brittle inheritance with a `[Risk: Level]` tag.
+- **red-green-refactor-tdd** — enforces strict Test-Driven Development cycles (Red → Green → Refactor). Delegates code-quality enforcement to dry-kiss during Green (YAGNI) and Refactor (DRY/KISS) phases, and structural cleanup to refactor during the Refactor phase. Resolves test runner via detect-test-harness.
 - **adversarial-review** — adversarial code review of working-tree changes since last push across code quality, architecture, test coverage, security, governance/GDPR, requirements alignment, style guides, and dependency health. Assumes code is guilty until proven innocent. Produces zero findings if nothing is wrong.
 - **debug** — systematic debugging workflow: reproduce, gather evidence, hypothesise, validate against spec, apply fix, write regression tests, and deploy. One hypothesis at a time, evidence before intuition.
 
