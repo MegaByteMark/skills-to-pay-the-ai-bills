@@ -89,10 +89,11 @@ Grouping is by convention only (the files stay flat for discovery).
 - **debug** — systematic debugging workflow: reproduce, gather evidence, hypothesise, validate against spec, apply fix, write regression tests, and deploy. One hypothesis at a time, evidence before intuition.
 
 ### Persona orchestrators
-*Persona skills that bundle specialised skills into a coherent development workflow. Invocable via `/swe <context>`, `/ba <context>`, or `/qa <context>`.*
+*Persona skills that bundle specialised skills into a coherent development workflow. Invocable via `/swe <context>`, `/ba <context>`, `/qa <context>`, or `/devops <action>`.*
 - **swe** — SWE (Software Engineer) persona orchestrator. Guides feature completion using `clean-architecture`, `solid-principles`, `dry-kiss`, and `red-green-refactor-tdd`, then auto-spawns `adversarial-review` subagent with clean context for an adversarial gate, presenting findings in a developer decision loop (fix & re-review or accept & proceed).
 - **ba** — BA (Business Analyst) persona orchestrator. Interactive requirements discovery via `interview-me` (one question at a time) and `gather-requirements` (two-stream PRD/FDS). Single long-context session, no subagent spawning, constant developer collaboration, shared understanding checkpoint, and artifact persistence ready for `seed-backlog`.
 - **qa** — QA (Quality Assurance) persona orchestrator. Runs `audit-test-coverage` + `audit-security-and-governance` in parallel inside an isolated git worktree, then spawns `remediate-test-coverage` or `create-bug-report` subagents with clean context in a developer decision loop. Calibrates scope by mode: Delta (post-change, adversarial edge-case hunting) or Release-gate (full-surface regression against the resolved target test surface). Working tree never touched.
+- **devops** — DevOps persona orchestrator. Hands-off gitflow release coordination with full worktree isolation: routes `/devops release <version>`, `/devops hotfix <workitem>`, and `/devops scaffold-ci-cd` to clean-context subagents (`create-release`, `create-hotfix`, `scaffold-ci-cd`), drives the QA Release-gate for releases, and verifies CI/CD pipeline health and deploy triggers. Developer working tree never touched.
 
 ### Audit & remediation
 - **audit-application-health** — *orchestrator*; runs the three leaf audits and synthesises one client-facing health report.
@@ -113,6 +114,9 @@ Grouping is by convention only (the files stay flat for discovery).
 - **generate-release-notes** — high-density release notes from commits, diffs, and merged PR discussions.
 - **client-email-digest** — *client-facing sibling of `generate-release-notes`*; reuses it as the change-fact engine, then re-voices the work between two git points into a warm, non-technical weekly progress email (TLDR, prose change log, blockers, release timeline, upcoming leave). Keeps a lightweight, out-of-tree per-project blocker tracker so a blockage spanning several digests reports how long it's been open, and interviews only for the non-inferable inputs (release dates, comms channel, team leave).
 - **create-bug-report** — auto-captures every evidenced field (git/build version, runtime, pasted stack traces) and interviews only for the human-centric gaps, then renders a fixed bug-report schema and optionally files it as a Work Item via `resolve-repository-platform`. Evidence-first and anti-hallucination: unevidenced, unanswered fields stay `Unknown — requires verification`.
+- **scaffold-ci-cd** — *leaf*; creates or improves CI/CD pipelines (GitHub Actions, GitLab CI, Bitbucket Pipelines, self-hosted) on the resolved platform: discovers canonical build/test/lint commands, designs gitflow trigger stages (PR basic validation, develop-merge integration + testing-stage deploy, main-merge production deploy), writes config with secret-store placeholders, and emits a deployment report.
+- **create-release** — *leaf*; orchestrates ONE gitflow release: release branch from develop in an isolated worktree, semver bump, release notes via `generate-release-notes`, tag, and Change Proposals to main + develop, gated on QA Release-gate regression.
+- **create-hotfix** — *leaf*; creates and coordinates ONE gitflow hotfix from main in an isolated worktree: applies the fix, validates, tags a patch, merges back to main + develop with release notes.
 
 ---
 
@@ -213,6 +217,12 @@ qa (worktree-isolated) ──> audit-test-coverage ─┐
                      └──> remediate-test-coverage ─────────┤  (clean-context subagents)
                      └──> create-bug-report ───────────────┤
                      └──> detect-test-harness ─────────────┘
+
+devops (worktree-isolated) ──> create-release ─┐
+                         └──> create-hotfix     ├──> generate-release-notes ─┐
+                         └──> scaffold-ci-cd    │                           │
+                                               └──> resolve-repository-platform ─┤
+                                                        └──> detect-test-harness ─┘  (clean-context subagents)
 
 teach-me          ──> teach-a-skill ──┐
 vibe-code-antidote ──> teach-a-skill   │  (escalation leaf)

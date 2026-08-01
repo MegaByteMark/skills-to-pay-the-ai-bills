@@ -4,7 +4,7 @@ description: Defines the strict token syntax, bracket-enclosed schema fields, an
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.0
+  version: 1.2.0
 ---
 All machine-readable tokens MUST be in square brackets `[...]`.
 
@@ -28,6 +28,6 @@ All machine-readable tokens MUST be in square brackets `[...]`.
 
 [Doc: Archetype]: [QuickStart, Technical, Troubleshooting, Installation, Commentary]. Path bindings owned by document-a-codebase.
 
-[Scope: Artefact]: [Release, Security-Governance, Health, Digest]. Digest = client-facing weekly progress email from client-email-digest. Extend this enumeration here when adding report-producing skills.
+[Scope: Artefact]: [Release, Security-Governance, Health, Digest, Deployment]. Digest = client-facing weekly progress email from client-email-digest. Deployment = CI/CD or release coordination report from the devops persona and its leaves. Extend this enumeration here when adding report-producing skills.
 
 Output Portability: All client-facing artefacts (FDS, blueprint, audits, docs) as export-clean Markdown — standard heading hierarchy, no renderer-fragile constructs, tables degrade gracefully. PDF/branding mechanism is separate.
