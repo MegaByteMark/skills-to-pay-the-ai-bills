@@ -4,7 +4,7 @@ description: 'DevOps persona orchestrator — hands-off gitflow release coordina
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.0
+  version: 1.1.1
 user-invocable: true
 dependencies:
   - generate-release-notes
@@ -87,7 +87,7 @@ A missing leaf skill is a HALT — report and never fabricate the operation.
 
 1. Emit a deployment/release report tagged `[Scope: Artefact: Deployment]` with: version, branch/hash lineage, Change Proposals, deploy targets, pipeline status with `[Confidence: Level]`.
 2. Always remove the worktree — on completion, on error, on early termination: `git worktree remove <path> --force`. Failure → record it and delete the directory as a fallback.
-3. Developer working tree untouched; zero artifacts left in the tree.
+3. Developer working tree untouched; zero artefacts left in the tree.
 4. If architectural decisions surfaced during the run, record via `architectural-decision-register`.
 
 ### Directives

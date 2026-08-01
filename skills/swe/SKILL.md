@@ -4,7 +4,7 @@ description: 'SWE (Software Engineer) persona orchestrator. Guides feature compl
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.2.0
+  version: 1.2.1
 user-invocable: true
 dependencies:
   - clean-architecture
@@ -34,7 +34,7 @@ flowchart TD
     COMPLETE -->|Yes| SPAWN_REVIEW["Spawn adversarial-review<br>subagent (clean context)"]
     SPAWN_REVIEW --> FINDINGS{Finds issues?}
     FINDINGS -->|No| ACCEPT["Accept & proceed"]
-    ACCEPT --> PERSIST["Persist artifacts<br>via issue tracker/docs"]
+    ACCEPT --> PERSIST["Persist artefacts<br>via issue tracker/docs"]
     PERSIST --> DONE(["Done"])
     FINDINGS -->|Yes| PRESENT["Present findings<br>to developer"]
     PRESENT --> DECIDE{Developer choice?}
@@ -73,7 +73,7 @@ On feature completion, automatically spawn an `adversarial-review` subagent.
 **Clean context pass** — the subagent receives ONLY:
 - PR diff of working-tree changes since last push (or custom scope)
 - Persona instructions: a single directive "Review this diff adversarially per your standard 8-category sweep. Output findings with `[Risk: Level]` and `[Confidence: Level]`."
-- Reference links to any tracked issue or requirement artifact discovered via `resolve-repository-platform`
+- Reference links to any tracked issue or requirement artefact discovered via `resolve-repository-platform`
 
 **NEVER pass:** parent agent state, intermediate reasoning, prior conversation history, or any data beyond the three items above.
 
@@ -91,7 +91,7 @@ Present the subagent's findings to the developer. Every finding must carry `[Ris
 ### PHASE 5 — Closure
 
 1. If architectural decisions were made during development, invoke `architectural-decision-register` (PHASE 1 Generate) to record each decision.
-2. Persist feature artifacts (PR, requirements decisions) to the issue tracker / documentation per resolved platform. Never hand off between agents.
+2. Persist feature artefacts (PR, requirements decisions) to the issue tracker / documentation per resolved platform. Never hand off between agents.
 3. Manual override: developer may invoke `adversarial-review` independently outside this flow at any time — the persona does not block direct invocation.
 
 ### Directives

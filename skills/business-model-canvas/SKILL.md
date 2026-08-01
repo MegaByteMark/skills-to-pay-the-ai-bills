@@ -1,10 +1,10 @@
 ---
 name: business-model-canvas
-description: Guides a user through the 9 building blocks of the Business Model Canvas step by step, then compiles the completed canvas into both Markdown and HTML formats. Prompts for each BMC segment in sequence with explanations, allows navigation between blocks, and renders the final artifact.
+description: Guides a user through the 9 building blocks of the Business Model Canvas step by step, then compiles the completed canvas into both Markdown and HTML formats. Prompts for each BMC segment in sequence with explanations, allows navigation between blocks, and renders the final artefact.
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.0.1
 dependencies: []
 argument-hint: "[start]  # begin a new Business Model Canvas session"
 user-invocable: true

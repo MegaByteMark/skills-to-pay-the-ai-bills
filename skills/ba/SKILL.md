@@ -1,10 +1,10 @@
 ---
 name: ba
-description: 'BA (Business Analyst) persona orchestrator — interactive requirements discovery with shared understanding. Drives a single long-context session using interview-me (one question at a time) and gather-requirements (two-stream PRD/FDS) to reach aligned requirements, then persists as documented artifacts ready for the po persona to seed the backlog. No subagent spawning — BA stays engaged throughout.'
+description: 'BA (Business Analyst) persona orchestrator — interactive requirements discovery with shared understanding. Drives a single long-context session using interview-me (one question at a time) and gather-requirements (two-stream PRD/FDS) to reach aligned requirements, then persists as documented artefacts ready for the po persona to seed the backlog. No subagent spawning — BA stays engaged throughout.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.2.0
+  version: 1.2.1
 user-invocable: true
 dependencies:
   - interview-me
@@ -30,7 +30,7 @@ flowchart TD
     ALIGN -->|Yes| GATHER["Two-stream elicitation<br>via gather-requirements"]
     GATHER --> CHECK{Shared understanding<br>confirmed?}
     CHECK -->|No| DISCOVER
-    CHECK -->|Yes| PERSIST["Persist artifacts:<br>PRD + FDS"]
+    CHECK -->|Yes| PERSIST["Persist artefacts:<br>PRD + FDS"]
     PERSIST --> DONE(["Done — ready for downstream<br>(po)"])
 ```
 
@@ -69,14 +69,14 @@ Once alignment is confirmed on the product stream:
 
 ### PHASE 4 — Shared Understanding Checkpoint
 
-Before finalizing any artifact, explicitly confirm alignment:
+Before finalizing any artefact, explicitly confirm alignment:
 
 1. Present the draft PRD/FDS to the developer.
 2. Ask: "Does this capture your vision? Are there gaps or corrections?"
 3. Developer identifies gaps → loop back to PHASE 2 for affected areas.
 4. Only proceed to persistence when the developer confirms alignment.
 
-### PHASE 5 — Artifact Persistence
+### PHASE 5 — Artefact Persistence
 
 1. Write PRD to `docs/requirements/product-requirements.md`.
 2. Write FDS to `docs/requirements/functional-requirements.md`.

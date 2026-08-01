@@ -1,10 +1,10 @@
 ---
 name: estimation
-description: "Estimates effort for new or existing requirements against a PRD/FDS baseline. Sizes per Feature-### in story points (agile velocity) or time (days), captures prose rationale, and renders a timestamped HTML report with executive summary and detailed breakdown. Delegates delta discovery to gather-requirements (output-to-memory) and sizing interview to interview-me. Writes artifacts out-of-tree; never modifies the working tree."
+description: "Estimates effort for new or existing requirements against a PRD/FDS baseline. Sizes per Feature-### in story points (agile velocity) or time (days), captures prose rationale, and renders a timestamped HTML report with executive summary and detailed breakdown. Delegates delta discovery to gather-requirements (output-to-memory) and sizing interview to interview-me. Writes artefacts out-of-tree; never modifies the working tree."
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 0.1.0
+  version: 0.1.1
 dependencies: [gather-requirements, interview-me, agent-markup, design-vocab]
 user-invocable: true
 argument-hint: [point | time]
@@ -14,7 +14,7 @@ argument-hint: [point | time]
 
 ## Overview
 
-Sizes requirements against a PRD/FDS baseline. Produces a timestamped estimate (story points or time) with per-feature rationale, confidence range, and a client-ready HTML report. All artifacts are out-of-tree.
+Sizes requirements against a PRD/FDS baseline. Produces a timestamped estimate (story points or time) with per-feature rationale, confidence range, and a client-ready HTML report. All artefacts are out-of-tree.
 
 ## Workflow
 
@@ -56,7 +56,7 @@ Tag each with `[Confidence: Level]`. If user hesitates or rationale is thin, use
 
 **Rollup:** Sum Low/Best/High (time) or point values (story points). If story points, divide by velocity → sprint count. Narrow confidence range if all `[Confidence: High]`; widen if mixed.
 
-**Render two artifacts:**
+**Render two artefacts:**
 1. **Timestamped MD** at `{state_dir}/estimate-YYYYMMDD-HHMMSS.md` — disposable, overwritten next run. Per-feature breakdown, rationale, rollup, confidence.
 2. **HTML report** at `{state_dir}/estimate-YYYYMMDD-HHMMSS.html` — persistent, client-ready. Executive summary (total, sprint count, assumptions, confidence) then detailed breakdown (per Feature-### with estimates, rationale, delta marker).
 
@@ -76,4 +76,4 @@ Print the HTML report path. Offer to re-run with different scope, estimate type,
 - If `gather-requirements` is unavailable, HALT: *"gather-requirements required for delta."*
 - If `interview-me` is unavailable, fall back to manual questions.
 - All estimates must be explicitly provided by the user. Never invent.
-- All artifacts are out-of-tree. Never write to the working tree.
+- All artefacts are out-of-tree. Never write to the working tree.
