@@ -51,6 +51,7 @@ Grouping is by convention only (the files stay flat for discovery).
 - **competency-profile** — the shared, out-of-tree, per-user record of a human's demonstrated skill, so calibration is continuous across skills.
 - **resolve-repository-platform** — figures out the hosting platform (GitHub/GitLab/…) before any platform-specific tooling runs.
 - **detect-test-harness** — resolves the project's test runner/framework, layout, and native test-double idiom from signal files before any test is read or written; asks one question only when inconclusive and never introduces a new framework silently.
+- **strategic-reading** — shared contract for Strategic Literature Nudges: lead/orchestrator skills append a 2-line Strategic Anchor (a canonical book/chapter reference plus the mental model it lends to the current design trade-off) to output only when the work resolves a non-trivial architectural, schema, or process/operational design choice — never on routine tasks. Supplies the trusted-literature whitelist by domain.
 - **skill-authoring** — meta-skill for creating and maintaining Agent Skills; enforces naming, frontmatter, scope-gating, prose compaction, Mermaid diagrams, and dependency validation on every create or modify operation.
 
 ### Requirements & discovery
@@ -67,7 +68,7 @@ Grouping is by convention only (the files stay flat for discovery).
 
 ### Backlog seeding *(publish-side of `gather-requirements`)*
 *Turn the PRD/FDS into tracked work items. Re-runnable: a second pass reconciles the tracker against amended requirements (create/update/close) via embedded stable-ID markers — never duplicating.*
-- **seed-backlog** — *orchestrator*; resolves the platform once and sequences the two leaves across the whole Epic Register and Story Backlog, wiring each story to its parent epic, then emits an auditable seed report.
+- **seed-backlog** — **DEPRECATED — superseded by `po`** (ADR-0003). Retained for installed users; use `po` for new orchestration. Historic: *orchestrator* that resolved the platform once and sequenced the two leaves across the Epic Register and Story Backlog, wiring each story to its parent epic, then emitted an auditable seed report.
   - **create-epic** — *leaf*; renders/writes one epic (PRD-primary, FDS-enriched).
   - **create-user-story** — *leaf*; renders/writes one story as a child of its epic.
 
@@ -84,8 +85,17 @@ Grouping is by convention only (the files stay flat for discovery).
 - **dry-kiss** — enforces DRY / KISS / YAGNI to block duplication, over-engineering, and gratuitous cleverness.
 - **refactor** — *orchestrator*; compacts code by rewriting functions, modules, or the entire codebase to fewer lines while preserving functionality, dependencies, and passing tests. Delegates enforcement to dry-kiss and solid-principles; delegates test/lint detection to detect-test-harness.
 - **solid-principles** — enforces SOLID OOP design; HALTs on God classes, tight coupling, and brittle inheritance with a `[Risk: Level]` tag.
+- **red-green-refactor-tdd** — enforces strict Test-Driven Development cycles (Red → Green → Refactor). Delegates code-quality enforcement to dry-kiss during Green (YAGNI) and Refactor (DRY/KISS) phases, and structural cleanup to refactor during the Refactor phase. Resolves test runner via detect-test-harness.
 - **adversarial-review** — adversarial code review of working-tree changes since last push across code quality, architecture, test coverage, security, governance/GDPR, requirements alignment, style guides, and dependency health. Assumes code is guilty until proven innocent. Produces zero findings if nothing is wrong.
 - **debug** — systematic debugging workflow: reproduce, gather evidence, hypothesise, validate against spec, apply fix, write regression tests, and deploy. One hypothesis at a time, evidence before intuition.
+
+### Persona orchestrators
+*Persona skills that bundle specialised skills into a coherent development workflow. Invocable via `/swe <context>`, `/ba <context>`, `/po <context>`, `/qa <context>`, or `/devops <action>`.*
+- **swe** — SWE (Software Engineer) persona orchestrator. Guides feature completion using `clean-architecture`, `solid-principles`, `dry-kiss`, and `red-green-refactor-tdd`, then auto-spawns `adversarial-review` subagent with clean context for an adversarial gate, presenting findings in a developer decision loop (fix & re-review or accept & proceed).
+- **ba** — BA (Business Analyst) persona orchestrator. Interactive requirements discovery via `interview-me` (one question at a time) and `gather-requirements` (two-stream PRD/FDS). Single long-context session, no subagent spawning, constant developer collaboration, shared understanding checkpoint, and artifact persistence ready for `po`.
+- **po** — PO (Product Owner) persona orchestrator. Requirements-to-backlog orchestration with mandatory gap analysis: reconciles requirements against live tracker work items via stable-ID markers (create/amend/close), detects duplicate and incoherent tickets, then spawns clean-context subagents (`create-epic`, `create-user-story`, `create-bug-report`) for ticket creation/amendment and bug lifecycle. Supersedes `seed-backlog` (ADR-0003).
+- **qa** — QA (Quality Assurance) persona orchestrator. Runs `audit-test-coverage` + `audit-security-and-governance` in parallel inside an isolated git worktree, then spawns `remediate-test-coverage` or `create-bug-report` subagents with clean context in a developer decision loop. Calibrates scope by mode: Delta (post-change, adversarial edge-case hunting) or Release-gate (full-surface regression against the resolved target test surface). Working tree never touched.
+- **devops** — DevOps persona orchestrator. Hands-off gitflow release coordination with full worktree isolation: routes `/devops release <version>`, `/devops hotfix <workitem>`, and `/devops scaffold-ci-cd` to clean-context subagents (`create-release`, `create-hotfix`, `scaffold-ci-cd`), drives the QA Release-gate for releases, and verifies CI/CD pipeline health and deploy triggers. Developer working tree never touched.
 
 ### Audit & remediation
 - **audit-application-health** — *orchestrator*; runs the three leaf audits and synthesises one client-facing health report.
@@ -93,6 +103,7 @@ Grouping is by convention only (the files stay flat for discovery).
   - **audit-blueprint-implementation** — code-vs-blueprint/FDS drift.
   - **audit-test-coverage** — real coverage vs the target test surface.
 - **remediate-test-coverage** — closes gaps found by the coverage audit, writing the minimum sufficient tests.
+- **html-merge** — leaf utility; renders markdown content into an HTML document template via pandoc (or inline fallback). Consumed by audit and report skills for client-ready HTML output.
 
   Both test skills resolve the runner/framework through the shared **detect-test-harness** contract.
 
@@ -105,6 +116,9 @@ Grouping is by convention only (the files stay flat for discovery).
 - **generate-release-notes** — high-density release notes from commits, diffs, and merged PR discussions.
 - **client-email-digest** — *client-facing sibling of `generate-release-notes`*; reuses it as the change-fact engine, then re-voices the work between two git points into a warm, non-technical weekly progress email (TLDR, prose change log, blockers, release timeline, upcoming leave). Keeps a lightweight, out-of-tree per-project blocker tracker so a blockage spanning several digests reports how long it's been open, and interviews only for the non-inferable inputs (release dates, comms channel, team leave).
 - **create-bug-report** — auto-captures every evidenced field (git/build version, runtime, pasted stack traces) and interviews only for the human-centric gaps, then renders a fixed bug-report schema and optionally files it as a Work Item via `resolve-repository-platform`. Evidence-first and anti-hallucination: unevidenced, unanswered fields stay `Unknown — requires verification`.
+- **scaffold-ci-cd** — *leaf*; creates or improves CI/CD pipelines (GitHub Actions, GitLab CI, Bitbucket Pipelines, self-hosted) on the resolved platform: discovers canonical build/test/lint commands, designs gitflow trigger stages (PR basic validation, develop-merge integration + testing-stage deploy, main-merge production deploy), writes config with secret-store placeholders, and emits a deployment report.
+- **create-release** — *leaf*; orchestrates ONE gitflow release: release branch from develop in an isolated worktree, semver bump, release notes via `generate-release-notes`, tag, and Change Proposals to main + develop, gated on QA Release-gate regression.
+- **create-hotfix** — *leaf*; creates and coordinates ONE gitflow hotfix from main in an isolated worktree: applies the fix, validates, tags a patch, merges back to main + develop with release notes.
 
 ---
 
@@ -188,8 +202,9 @@ audit-application-health ──> audit-security-and-governance
                                    └──────────┬──────────────┘
                                               └──> detect-test-harness  (shared harness resolution)
 
-seed-backlog ──> create-epic ───────┐
-             └──> create-user-story ─┴──> resolve-repository-platform  (write-side adapter)
+po (supersedes seed-backlog) ──> create-epic ───────┐
+                           └──> create-user-story ──┤  (clean-context subagents)
+                           └──> create-bug-report ──┴──> resolve-repository-platform  (write-side adapter)
 
 client-email-digest ──> generate-release-notes  (change-fact engine, re-voiced for the client)
 
@@ -200,10 +215,24 @@ architectural-decision-register ──> agent-markup / design-vocab  (ADR format
 
 debug ──> agent-markup / design-vocab  (systematic debugging process)
 
+qa (worktree-isolated) ──> audit-test-coverage ─┐
+                     └──> audit-security-and-governance ─┤
+                     └──> remediate-test-coverage ─────────┤  (clean-context subagents)
+                     └──> create-bug-report ───────────────┤
+                     └──> detect-test-harness ─────────────┘
+
+devops (worktree-isolated) ──> create-release ─┐
+                         └──> create-hotfix     ├──> generate-release-notes ─┐
+                         └──> scaffold-ci-cd    │                           │
+                                               └──> resolve-repository-platform ─┤
+                                                        └──> detect-test-harness ─┘  (clean-context subagents)
+
 teach-me          ──> teach-a-skill ──┐
 vibe-code-antidote ──> teach-a-skill   │  (escalation leaf)
 vibe-code-antidote ───────────────────┼──> competency-profile  (shared baseline)
                                        └──> agent-markup / design-vocab  (shared contracts)
+
+swe · ba · po · qa · devops ──> strategic-reading  (literature nudges on non-trivial design trade-offs)
 ```
 
 State that a skill persists (course progress, competency baseline, capability profiles) always lives **outside the project tree** — it is never committed to your repo.
