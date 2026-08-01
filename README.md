@@ -89,9 +89,10 @@ Grouping is by convention only (the files stay flat for discovery).
 - **debug** — systematic debugging workflow: reproduce, gather evidence, hypothesise, validate against spec, apply fix, write regression tests, and deploy. One hypothesis at a time, evidence before intuition.
 
 ### Persona orchestrators
-*Persona skills that bundle specialised skills into a coherent development workflow. Invocable via `/swe <context>` or `/ba <context>`.*
+*Persona skills that bundle specialised skills into a coherent development workflow. Invocable via `/swe <context>`, `/ba <context>`, or `/qa <context>`.*
 - **swe** — SWE (Software Engineer) persona orchestrator. Guides feature completion using `clean-architecture`, `solid-principles`, `dry-kiss`, and `red-green-refactor-tdd`, then auto-spawns `adversarial-review` subagent with clean context for an adversarial gate, presenting findings in a developer decision loop (fix & re-review or accept & proceed).
 - **ba** — BA (Business Analyst) persona orchestrator. Interactive requirements discovery via `interview-me` (one question at a time) and `gather-requirements` (two-stream PRD/FDS). Single long-context session, no subagent spawning, constant developer collaboration, shared understanding checkpoint, and artifact persistence ready for `seed-backlog`.
+- **qa** — QA (Quality Assurance) persona orchestrator. Runs `audit-test-coverage` + `audit-security-and-governance` in parallel inside an isolated git worktree, then spawns `remediate-test-coverage` or `create-bug-report` subagents with clean context in a developer decision loop. Calibrates scope by mode: Delta (post-change, adversarial edge-case hunting) or Release-gate (full-surface regression against the resolved target test surface). Working tree never touched.
 
 ### Audit & remediation
 - **audit-application-health** — *orchestrator*; runs the three leaf audits and synthesises one client-facing health report.
@@ -206,6 +207,12 @@ domain-glossary ──> gather-requirements ──┐
 architectural-decision-register ──> agent-markup / design-vocab  (ADR format & vocabulary)
 
 debug ──> agent-markup / design-vocab  (systematic debugging process)
+
+qa (worktree-isolated) ──> audit-test-coverage ─┐
+                     └──> audit-security-and-governance ─┤
+                     └──> remediate-test-coverage ─────────┤  (clean-context subagents)
+                     └──> create-bug-report ───────────────┤
+                     └──> detect-test-harness ─────────────┘
 
 teach-me          ──> teach-a-skill ──┐
 vibe-code-antidote ──> teach-a-skill   │  (escalation leaf)
