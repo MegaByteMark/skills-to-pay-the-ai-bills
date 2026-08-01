@@ -67,7 +67,7 @@ Grouping is by convention only (the files stay flat for discovery).
 
 ### Backlog seeding *(publish-side of `gather-requirements`)*
 *Turn the PRD/FDS into tracked work items. Re-runnable: a second pass reconciles the tracker against amended requirements (create/update/close) via embedded stable-ID markers — never duplicating.*
-- **seed-backlog** — *orchestrator*; resolves the platform once and sequences the two leaves across the whole Epic Register and Story Backlog, wiring each story to its parent epic, then emits an auditable seed report.
+- **seed-backlog** — **DEPRECATED — superseded by `po`** (ADR-0003). Retained for installed users; use `po` for new orchestration. Historic: *orchestrator* that resolved the platform once and sequenced the two leaves across the Epic Register and Story Backlog, wiring each story to its parent epic, then emitted an auditable seed report.
   - **create-epic** — *leaf*; renders/writes one epic (PRD-primary, FDS-enriched).
   - **create-user-story** — *leaf*; renders/writes one story as a child of its epic.
 
@@ -89,9 +89,10 @@ Grouping is by convention only (the files stay flat for discovery).
 - **debug** — systematic debugging workflow: reproduce, gather evidence, hypothesise, validate against spec, apply fix, write regression tests, and deploy. One hypothesis at a time, evidence before intuition.
 
 ### Persona orchestrators
-*Persona skills that bundle specialised skills into a coherent development workflow. Invocable via `/swe <context>`, `/ba <context>`, `/qa <context>`, or `/devops <action>`.*
+*Persona skills that bundle specialised skills into a coherent development workflow. Invocable via `/swe <context>`, `/ba <context>`, `/po <context>`, `/qa <context>`, or `/devops <action>`.*
 - **swe** — SWE (Software Engineer) persona orchestrator. Guides feature completion using `clean-architecture`, `solid-principles`, `dry-kiss`, and `red-green-refactor-tdd`, then auto-spawns `adversarial-review` subagent with clean context for an adversarial gate, presenting findings in a developer decision loop (fix & re-review or accept & proceed).
-- **ba** — BA (Business Analyst) persona orchestrator. Interactive requirements discovery via `interview-me` (one question at a time) and `gather-requirements` (two-stream PRD/FDS). Single long-context session, no subagent spawning, constant developer collaboration, shared understanding checkpoint, and artifact persistence ready for `seed-backlog`.
+- **ba** — BA (Business Analyst) persona orchestrator. Interactive requirements discovery via `interview-me` (one question at a time) and `gather-requirements` (two-stream PRD/FDS). Single long-context session, no subagent spawning, constant developer collaboration, shared understanding checkpoint, and artifact persistence ready for `po`.
+- **po** — PO (Product Owner) persona orchestrator. Requirements-to-backlog orchestration with mandatory gap analysis: reconciles requirements against live tracker work items via stable-ID markers (create/amend/close), detects duplicate and incoherent tickets, then spawns clean-context subagents (`create-epic`, `create-user-story`, `create-bug-report`) for ticket creation/amendment and bug lifecycle. Supersedes `seed-backlog` (ADR-0003).
 - **qa** — QA (Quality Assurance) persona orchestrator. Runs `audit-test-coverage` + `audit-security-and-governance` in parallel inside an isolated git worktree, then spawns `remediate-test-coverage` or `create-bug-report` subagents with clean context in a developer decision loop. Calibrates scope by mode: Delta (post-change, adversarial edge-case hunting) or Release-gate (full-surface regression against the resolved target test surface). Working tree never touched.
 - **devops** — DevOps persona orchestrator. Hands-off gitflow release coordination with full worktree isolation: routes `/devops release <version>`, `/devops hotfix <workitem>`, and `/devops scaffold-ci-cd` to clean-context subagents (`create-release`, `create-hotfix`, `scaffold-ci-cd`), drives the QA Release-gate for releases, and verifies CI/CD pipeline health and deploy triggers. Developer working tree never touched.
 
@@ -200,8 +201,9 @@ audit-application-health ──> audit-security-and-governance
                                    └──────────┬──────────────┘
                                               └──> detect-test-harness  (shared harness resolution)
 
-seed-backlog ──> create-epic ───────┐
-             └──> create-user-story ─┴──> resolve-repository-platform  (write-side adapter)
+po (supersedes seed-backlog) ──> create-epic ───────┐
+                           └──> create-user-story ──┤  (clean-context subagents)
+                           └──> create-bug-report ──┴──> resolve-repository-platform  (write-side adapter)
 
 client-email-digest ──> generate-release-notes  (change-fact engine, re-voiced for the client)
 
