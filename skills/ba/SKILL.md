@@ -4,7 +4,7 @@ description: 'BA (Business Analyst) persona orchestrator — interactive require
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.1
+  version: 1.2.0
 user-invocable: true
 dependencies:
   - interview-me
@@ -12,6 +12,7 @@ dependencies:
   - agent-markup
   - resolve-repository-platform
   - architectural-decision-register
+  - strategic-reading
 ---
 
 Load all bundled skills on invoke. Use them consistently throughout — never load skills ad-hoc mid-session.
@@ -93,6 +94,7 @@ BA maintains long-context within a single session. If paused:
 ### Directives
 
 - Skill drift: use only the skills listed in `dependencies` for persona reasoning. If a task requires outside skill, flag to developer — do not load ad-hoc.
+- Strategic Anchors: when a deliverable resolves a non-trivial process, scope, or product trade-off (flow design, Seam decisions, schema-driven requirements), append a `strategic-reading` Strategic Anchor. Never on routine elicitation harvesting.
 - No subagent spawning: BA completes all work in the current session. Never spawn subagents for review, validation, or handoff.
 - Output determinism: same inputs produce structurally identical output. No "you may also" branches unless gated behind explicit decision.
 - Anti-hallucination: never reference non-existent files, skills, or documents. If `docs/requirements/` is absent, create it — never fabricate content.

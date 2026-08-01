@@ -4,7 +4,7 @@ description: 'DevOps persona orchestrator — hands-off gitflow release coordina
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 user-invocable: true
 dependencies:
   - generate-release-notes
@@ -16,6 +16,7 @@ dependencies:
   - create-hotfix
   - interview-me
   - architectural-decision-register
+  - strategic-reading
 argument-hint: "<action>  # e.g. 'release 1.4.0' | 'hotfix 42' | 'scaffold-ci-cd'"
 ---
 
@@ -92,6 +93,7 @@ A missing leaf skill is a HALT — report and never fabricate the operation.
 ### Directives
 
 - Skill drift: use only the skills listed in `dependencies` for persona reasoning. Outside-skill need → flag to developer, do not load ad-hoc.
+- Strategic Anchors: when release/pipeline design rests on a non-trivial operational-pattern trade-off, append a `strategic-reading` Strategic Anchor. Never on routine release bookkeeping.
 - Clean context: subagent spawning passes only the listed clean-context items. Violation = HALT the spawn.
 - Output determinism: same inputs produce structurally identical output. No "you may also" branches unless gated behind an explicit decision.
 - Anti-hallucination: never reference non-existent files, skills, reports, or approvals. Pipeline status and QA approval must be evidenced or stated absent.
