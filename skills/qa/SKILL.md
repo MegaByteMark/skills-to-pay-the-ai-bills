@@ -4,7 +4,7 @@ description: 'QA (Quality Assurance) persona orchestrator. Runs audit-test-cover
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 user-invocable: true
 dependencies:
   - audit-test-coverage
@@ -16,6 +16,7 @@ dependencies:
   - agent-markup
   - design-vocab
   - interview-me
+  - strategic-reading
 argument-hint: "<context>  # e.g. 'audit this PR for coverage + security gaps' | 'release-gate regression sweep'"
 ---
 
@@ -108,6 +109,7 @@ Present findings. Developer chooses:
 ### Directives
 
 - Skill drift: use only the skills listed in `dependencies` for persona reasoning. Outside-skill need → flag to developer, do not load ad-hoc.
+- Strategic Anchors: when synthesis resolves a non-trivial testing/surface trade-off, append a `strategic-reading` Strategic Anchor. Never on routine pass/fail reporting.
 - Clean context: subagent spawning passes only the specified clean-context items. Violation = HALT the spawn.
 - Output determinism: same inputs produce structurally identical output. No "you may also" branches unless gated behind an explicit decision.
 - Anti-hallucination: never reference non-existent files, skills, or reports. Absent baseline/contract = stated absence, never fabricated.

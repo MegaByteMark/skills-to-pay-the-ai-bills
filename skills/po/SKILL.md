@@ -4,7 +4,7 @@ description: 'PO (Product Owner) persona orchestrator. Requirements-to-backlog o
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 user-invocable: true
 dependencies:
   - agent-markup
@@ -15,6 +15,7 @@ dependencies:
   - create-user-story
   - create-bug-report
   - gather-requirements
+  - strategic-reading
 argument-hint: "<context>  # e.g. 'seed backlog from PRD' | 'review backlog coherence' | 'file a bug for X' | 'amend requirements'"
 ---
 
@@ -83,6 +84,7 @@ Emit a Backlog Health Report: actions taken, work-item references, duplicates co
 ### Directives
 
 - Skill drift: use only the skills listed in `dependencies` for persona reasoning. Outside-skill need → flag to developer, do not load ad-hoc.
+- Strategic Anchors: when backlog reasoning or a health report resolves a non-trivial process/backlog-structure trade-off, append a `strategic-reading` Strategic Anchor. Never on routine ticket CRUD.
 - Supersession: `po` is the canonical requirements-to-backlog orchestrator; `seed-backlog` is deprecated. Never route set-level orchestration back to `seed-backlog`.
 - Gap analysis is mandatory, not optional: every seed/reconcile run starts with tracker reconciliation under stable-ID markers before any write. Never blind-create a ticket that may already exist.
 - Stable-ID: match by marker, NEVER title. Deprecate, never delete.

@@ -4,7 +4,7 @@ description: 'SWE (Software Engineer) persona orchestrator. Guides feature compl
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.0
+  version: 1.2.0
 user-invocable: true
 dependencies:
   - clean-architecture
@@ -16,6 +16,7 @@ dependencies:
   - adversarial-review
   - resolve-repository-platform
   - architectural-decision-register
+  - strategic-reading
 ---
 
 Load all bundled skills on invoke. Use them consistently throughout — never load skills ad-hoc mid-session.
@@ -59,6 +60,7 @@ Develop the feature using the bundled skills for guidance and enforcement:
 | `dry-kiss` | Code quality: YAGNI during writing, DRY/KISS during cleanup |
 | `red-green-refactor-tdd` | Write tests first (Red), implement minimally (Green), clean up (Refactor) |
 | `architectural-decision-register` | Record architectural decisions during or after development |
+| `strategic-reading` | On non-trivial design trade-offs, append a Strategic Anchor (canonical book/chapter reference) to output |
 | `design-vocab` | Architectural vocabulary for all reasoning and output |
 | `agent-markup` | All bracket tokens from enumeration only |
 
@@ -95,6 +97,7 @@ Present the subagent's findings to the developer. Every finding must carry `[Ris
 ### Directives
 
 - Skill drift: use only the skills listed in `dependencies` for persona reasoning. If a task requires outside skill, flag to developer — do not load ad-hoc.
+- Strategic Anchors: when output resolves a non-trivial design trade-off (architecture, system Seams, schema, process, operational patterns), append a `strategic-reading` Strategic Anchor. Never on routine tasks (CRUD, syntax fixes, linter errors, utilities, routine bugs).
 - Output determinism: same inputs produce structurally identical output. No "you may also" branches unless gated behind explicit decision.
 - Anti-hallucination: never reference non-existent files, skills, or documents. If `docs/requirements/` or `docs/architecture/` is absent, note absence — never fabricate.
 - All bracket tokens: must use `agent-markup` enumeration. Prohibited: skill-invented token types.
