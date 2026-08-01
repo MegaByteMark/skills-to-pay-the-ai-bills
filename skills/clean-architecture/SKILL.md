@@ -1,10 +1,10 @@
 ---
 name: clean-architecture
-description: 'Scaffold, place, and enforce a layered Clean Architecture. Map each artifact (Entities, Use Cases, Interface Adapters, Infrastructure) to its layer, keep dependencies pointing INWARD via Dependency Inversion, keep the Domain/Application core framework- and DB-agnostic, and HALT on inward-dependency violations. Use when generating a new layered structure, deciding which layer code belongs in, or reviewing a layered codebase for dependency-rule breaches. Not a universal mandate — apply only to projects that have adopted (or are adopting) a layered/clean design.'
+description: 'Scaffold, place, and enforce a layered Clean Architecture. Map each artefact (Entities, Use Cases, Interface Adapters, Infrastructure) to its layer, keep dependencies pointing INWARD via Dependency Inversion, keep the Domain/Application core framework- and DB-agnostic, and HALT on inward-dependency violations. Use when generating a new layered structure, deciding which layer code belongs in, or reviewing a layered codebase for dependency-rule breaches. Not a universal mandate — apply only to projects that have adopted (or are adopting) a layered/clean design.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.0.1
 user-invocable: true
 dependencies:
   - design-vocab
@@ -26,7 +26,7 @@ design-vocab Mapping (NEVER use "boundary"):
 | :--- | :--- | :--- |
 | "boundary" between layers | Seam | physical location where Interface lives |
 | Port / boundary interface | Interface | abstract surface crossing the Seam |
-| Repository Impl / Gateway / Presenter | Adapter | concrete artifact satisfying Interface at Seam |
+| Repository Impl / Gateway / Presenter | Adapter | concrete artefact satisfying Interface at Seam |
 | inner-layer business logic | Implementation | body behind Interface |
 
 Canonical grouping (translate to language idioms — never force JS-style onto non-JS languages):

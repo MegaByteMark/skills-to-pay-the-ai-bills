@@ -4,7 +4,7 @@ description: Analyzes git commits, code deltas, and merged Change Proposal (pull
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.0.1
 dependencies:
   - design-vocab
   - interview-me
@@ -16,7 +16,7 @@ dependencies:
 4. PHASE 4 (Synthesis): Bucket into strict prefix categories. Hyper-condensed bulleted layout per schema.
 
 Directives:
-- Defacto Escape Hatch: If 100% of diff is routine patches, lint corrections, or test additions with zero structural modifications → entire output: `"Bug fixes and performance improvements."`
+- De facto Escape Hatch: If 100% of diff is routine patches, lint corrections, or test additions with zero structural modifications → entire output: `"Bug fixes and performance improvements."`
 - Category Tokens (every bullet prefixed):
   - `[feat]`: New capabilities, business logic, user-facing enhancements.
   - `[fix]`: Bug resolutions, regression fixes, broken Interface patches.

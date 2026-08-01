@@ -4,7 +4,7 @@ description: 'QA (Quality Assurance) persona orchestrator. Runs audit-test-cover
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.0
+  version: 1.1.1
 user-invocable: true
 dependencies:
   - audit-test-coverage
@@ -103,7 +103,7 @@ Present findings. Developer chooses:
 ### PHASE 7 — Clean Shutdown
 
 1. Always remove the worktree — on completion, on error, or on early termination: `git worktree remove <path> --force`. Failure to remove: record it and delete the directory as a fallback.
-2. Zero artifacts left behind in the developer's working tree. Any report lives in the worktree or as a versioned out-of-tree artifact approved by the developer.
+2. Zero artefacts left behind in the developer's working tree. Any report lives in the worktree or as a versioned out-of-tree artefact approved by the developer.
 3. If architectural decisions surfaced during the run, record via `architectural-decision-register`.
 
 ### Directives

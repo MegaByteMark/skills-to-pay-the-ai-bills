@@ -4,7 +4,7 @@ description: Enforce a rigid, shared architectural vocabulary across all skills 
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.0.1
 references:
   - "A Philosophy of Software Design (John Ousterhout) - Module, Interface, Depth, Leverage, Locality"
   - "Working Effectively with Legacy Code (Michael Feathers) - Seam"
@@ -21,7 +21,7 @@ Depth: Ratio of behavior to Interface complexity (high behavior behind a small I
 
 Seam: Physical location where an Interface lives; allows altering behavior without editing the call site. Prohibited: Boundary.
 
-Adapter: Concrete artifact satisfying an Interface at a Seam. Describes role/slot filled, not internal substance.
+Adapter: Concrete artefact satisfying an Interface at a Seam. Describes role/slot filled, not internal substance.
 
 Leverage: Caller-side benefit of Depth (more capability per unit of learned Interface).
 
