@@ -4,10 +4,10 @@ description: "Estimates effort for new or existing requirements against a PRD/FD
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 0.1.1
+  version: 0.1.2
 dependencies: [gather-requirements, interview-me, agent-markup, design-vocab]
 user-invocable: true
-argument-hint: [point | time]
+argument-hint: "[point | time]"
 ---
 
 # Skill: estimation
