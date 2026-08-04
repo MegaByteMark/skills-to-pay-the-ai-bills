@@ -1,10 +1,10 @@
 ---
 name: po
-description: 'PO (Product Owner) persona orchestrator. Requirements-to-backlog orchestration with mandatory gap analysis: capability-probes the tracker (hard gate), ingests PRD/FDS, reconciles work items via stable-ID markers (create/amend/close), plans release-aligned milestones and a persistent execution-order plan (dependency DAG → parallelisable waves), and spawns clean-context subagents (create-epic, create-user-story, create-bug-report, create-milestone). Supersedes seed-backlog. Hands-off like SWE.'
+description: 'PO (Product Owner) persona orchestrator. Requirements-to-backlog orchestration with mandatory gap analysis: capability-probes the tracker (hard gate), ingests PRD/FDS, reconciles work items via stable-ID markers (create/amend/close), plans release-aligned milestones and an in-repo execution-order roadmap (dependency DAG → parallelisable waves at docs/requirements/roadmap.md), and spawns clean-context subagents (create-epic, create-user-story, create-bug-report, create-milestone). Supersedes seed-backlog. Hands-off like SWE.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.2.0
+  version: 2.1.0
 user-invocable: true
 dependencies:
   - agent-markup
@@ -17,6 +17,7 @@ dependencies:
   - create-milestone
   - gather-requirements
   - strategic-reading
+  - agent-handoff
 argument-hint: "<context>  # e.g. 'seed backlog from PRD' | 'plan release milestones' | 'plan execution order' | 'review backlog coherence' | 'file a bug for X' | 'amend requirements'"
 ---
 
@@ -45,7 +46,7 @@ flowchart TD
     APPROVED -->|No| REVISE["Revise with developer"]
     REVISE --> PLAN
     APPROVED -->|Yes| SPAWN["PHASE 4 Spawn clean-context<br>subagents: create-epic,<br>create-user-story, create-bug-report,<br>create-milestone"]
-    SPAWN --> PERSIST["PHASE 5 Persist plan artefacts<br>+ emit Health Report"]
+    SPAWN --> PERSIST["PHASE 5 Write in-repo roadmap.md<br>+ emit Health Report to chat"]
     PERSIST --> DONE(["Done"])
 ```
 
@@ -91,8 +92,8 @@ Triggered by task types `seed/reconcile` and `plan-release-milestones`. Skip if 
 3. **Per milestone:** `MS-###` stable-ID marker, title, target date (developer-supplied or `interview-me`), scope-in (assigned work-item refs), scope-out (explicit exclusions).
 4. **Drift handling against tracker milestones:**
    - Tracker milestone exists, matches grouping → no-op (re-use).
-   - Tracker milestone exists, grouping changed → spawn `create-milestone` mode `amend`.
-   - Grouping has no tracker milestone → spawn `create-milestone` mode `create`.
+    - Tracker milestone exists, grouping changed → spawn `create-milestone` `[Handoff: Clean]` mode `amend`.
+    - Grouping has no tracker milestone → spawn `create-milestone` `[Handoff: Clean]` mode `create`.
    - Tracker milestone has no PRD source → flag as candidate close (developer decides).
 5. Every grouping edge tagged `[Confidence: Level]`; untagged edges not presented.
 
@@ -110,25 +111,44 @@ Triggered by task types `seed/reconcile` and `plan-execution-order`. Skip if the
    - Wave 1: items with no blockers (ready immediately, may run in parallel).
    - Wave N: items whose blockers all reside in waves ≤ N−1.
    - Cycles → halt with a clear list; developer resolves by removing or softening an edge.
-4. **Persist the execution-order plan** to the platform's persistent state store:
-   - macOS: `~/Library/Application Support/po/<project>/plans/<YYYY-MM-DD>-<slug>.md` and `…-plan.json`
-   - Linux: `${XDG_STATE_HOME:-$HOME/.local/state}/po/<project>/plans/…`
-   - Windows: `%LOCALAPPDATA%\po\<project>\plans\…`
-   - Schema v1: `{ project, generated, schema_version, milestones[], waves[], dependencies[], next_pickup }`. `next_pickup` is a pointer to the next ready item, designed for downstream consumers (e.g., `/swe pick up the next item from the milestone plan`).
-   - Path embedded in the Health Report header.
-5. The plan is the **authoritative execution-order record**. DO NOT mirror waves/orderings onto tracker labels — large releases explode the label list and the DAG semantics are lost. Tracker holds work items + milestone assignment only; the plan holds the sequencing.
+4. **Reconcile existing roadmap against PRD (amend/reconcile runs only).** If `docs/requirements/roadmap.md` exists, detect drift before regenerating:
+   - **Missing in roadmap** — PRD Epic `Status: Active`, no wave entry → add to correct wave.
+   - **Orphan in roadmap** — wave entry with no matching PRD Epic → flag for developer; remove or trace to deleted PRD row.
+   - **Priority mismatch** — PRD `[Priority: Should]`, roadmap places in Wave 1 (Must-tier) → surface in PHASE 3; PRD wins.
+   - **Dependency mismatch** — PRD §5 declares an edge the roadmap contradicts → PRD wins; amend roadmap.
+   - **Milestone drift** — roadmap `MS-###` scope ≠ tracker milestone assigned items → reconcile via `create-milestone` amend.
+   Rule: PRD is source of truth for *what* and *priority*; roadmap is source of truth for *when* (waves) and *how* (edges). Tag each finding `[Confidence: Level]`.
+5. **Write `docs/requirements/roadmap.md`** (in-repo, single living file, amended in place). Not dated snapshots — git history provides audit. Compact schema (agent-loaded reference material — density over prose):
+   ```
+   # Roadmap
+   generated: <ISO> · last-amended: <ISO> · derived-from: PRD §4,§5
+   # legend: ->blocks | <-blocked-by | ~>relates-to(soft)
+
+   ## Milestones
+   MS-001|v1.0|EPIC-001,EPIC-002|2026-09-01
+   MS-002|v1.1|EPIC-003|2026-10-01
+
+   ## Waves
+   ### W1
+   EPIC-001 #123
+   EPIC-002 #124 ->EPIC-004
+   ### W2
+   EPIC-003 #125 <-EPIC-001
+   ```
+   Edge tokens live on wave items: `->EPIC-X` (this item blocks X), `<-EPIC-X` (blocked by X), `~>EPIC-X` (relates-to, emitted only when it affects wave placement). No edge token = standalone. No sidecar JSON, no `next_pickup`, no `schema_version`, no per-item status — the tracker (assignee + status + milestone) is the runtime state machine; `next_pickup` is derivable as the first unassigned open item in the lowest-numbered wave whose `<-` blockers are all closed. ADR-0005 supersedes the prior out-of-tree scheme.
+6. The roadmap is the **authoritative sequencing record**. DO NOT mirror waves/orderings onto tracker labels — large releases explode the label list and the DAG semantics are lost. Tracker holds work items + milestone assignment; roadmap holds the sequencing. Platform-native roadmap views are not configured — too fragmented across platforms (see `resolve-repository-platform`); the in-repo file is the portable contract.
 
 ### PHASE 3 — Plan & Approval Gate
 
-1. Present the complete plan: per-item action (create/amend/close/consolidate), target platform, milestone grouping, execution-order waves, duplicate/coherence findings, counts, capability-probe result, persisted plan path.
+1. Present the complete plan: per-item action (create/amend/close/consolidate), target platform, milestone grouping, execution-order waves, duplicate/coherence findings, counts, capability-probe result, roadmap path, roadmap↔PRD drift findings.
 2. Require explicit developer confirmation before ANY write.
 3. Gaps present → offer fork: (a) targeted `interview-me` now, (b) `gather-requirements` `amend` then re-enter PHASE 2, (c) proceed marking affected sections `[Inferred: Unverified]`.
 
 ### PHASE 4 — Clean-Context Execution
 
-Spawn subagents with clean context only — never parent reasoning, intermediate state, or conversation history. Output consumed as-is.
+Spawn subagents with `[Handoff: Clean]` — never parent reasoning, intermediate state, or conversation history. Output consumed as-is.
 
-| Leaf | Clean context |
+| Leaf | `[Handoff: Clean]` passed |
 | :--- | :--- |
 | `create-epic` | `EPIC-###` + PRD Epic Register row + traced FDS contract + platform resolution |
 | `create-user-story` | `STORY-###` + parent `EPIC-###` + PRD story + traced FDS + platform resolution |
@@ -139,19 +159,19 @@ Sequence: epics → stories → bug reports → milestones. Milestones last so t
 
 ### PHASE 5 — Backlog Health Report
 
-Persist a Backlog Health Report to the platform's persistent state store (same path scheme as PHASE 2.7) AND echo it to chat. Report contents: capability-probe result, actions taken, work-item references, duplicates consolidated, orphans flagged, milestone grouping, execution-order waves (DAG summary + wave list), persisted plan path, blockers, `[Confidence: Level]` summary. Working tree never mutated. If architectural decisions surfaced, flag to developer to run `architectural-decision-register`.
+Echo the Backlog Health Report to chat (no out-of-tree persistence — a report is a snapshot, not state). Report contents: capability-probe result, actions taken, work-item references, duplicates consolidated, orphans flagged, milestone grouping, execution-order waves (DAG summary + wave list), `docs/requirements/roadmap.md` path, roadmap↔PRD drift findings, blockers, `[Confidence: Level]` summary. If architectural decisions surfaced, flag to developer to run `architectural-decision-register`.
 
 ### Directives
 
 - Capability probe is mandatory and hard-gating. A tracker write that fails mid-run corrupts state; never silently degrade.
-- Plan is authoritative; tracker mirrors it via marker + reference only. DO NOT mirror execution-order waves onto tracker labels.
+- Roadmap is authoritative; tracker mirrors it via marker + reference only. DO NOT mirror execution-order waves onto tracker labels.
 - Skill drift: use only the skills listed in `dependencies` for persona reasoning. Outside-skill need → flag to developer, do not load ad-hoc.
 - Strategic Anchors: when backlog reasoning or a health report resolves a non-trivial process/backlog-structure trade-off, append a `strategic-reading` Strategic Anchor. Never on routine ticket CRUD.
 - Supersession: `po` is the canonical requirements-to-backlog orchestrator; `seed-backlog` is deprecated. Never route set-level orchestration back to `seed-backlog`.
 - Gap analysis is mandatory, not optional: every seed/reconcile run starts with tracker reconciliation under stable-ID markers before any write. Never blind-create a ticket that may already exist.
 - Stable-ID: match by marker, NEVER title. Deprecate, never delete.
 - Parents before children: create epics before their stories; create epics and stories before milestones reference them.
-- Clean context: subagent spawning passes only the listed clean-context items. Violation = HALT the spawn.
+- `[Handoff: Clean]`: subagent spawning passes only the listed items. Violation = HALT the spawn. See `agent-handoff`.
 - Output determinism: same inputs produce structurally identical output. No "you may also" branches unless gated behind an explicit decision.
 - Anti-hallucination: never reference non-existent files, skills, or documents. Absent PRD/FDS → say so; affected sections `[Inferred: Unverified]`.
 - All bracket tokens: `agent-markup` enumeration only.

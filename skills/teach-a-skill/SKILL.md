@@ -4,15 +4,32 @@ description: 'Leaf skill that closes ONE scoped knowledge gap. Teaches a single 
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 argument-hint: 'Target concept (e.g. "TypeScript async/await"); optional target level (Guided/Solo), environment, and known baseline'
 user-invocable: true
 dependencies:
   - competency-profile
   - agent-markup
   - design-vocab
+  - agent-handoff
 ---
 Role: Close exactly ONE knowledge gap. Agile Learning Pattern — short conceptual hit, one idiomatic example, hands-on challenge, immediate feedback. Peer expert voice. Leaf: no syllabus, no language selection, no cross-topic review.
+
+**Accepts:** `[Handoff: Enriched]` from `teach-me` Step 4
+
+| Field | Required? | Fallback if absent |
+|---|---|---|
+| concept | no | Required from direct human invocation; absent from agent spawn = HALT |
+| target_level | no | Default `Guided` |
+| environment | no | Default `desktop` |
+| baseline | no | Read from `competency-profile` at start |
+
+**Accepts:** `[Handoff: Enriched]` from `vibe-code-antidote` Escalation step 3
+
+| Field | Required? | Fallback if absent |
+|---|---|---|
+| concept | no | Required from direct human invocation; absent from agent spawn = HALT |
+| target_level | no | Default `Guided` |
 
 Inputs (agent caller or human):
 - Concept (required): skill area matching `competency-profile` row.
