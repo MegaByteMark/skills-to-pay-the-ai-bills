@@ -4,12 +4,13 @@ description: 'Leaf skill that renders a reviewer-enablement PR body from git dif
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 dependencies:
   - resolve-repository-platform
   - interview-me
   - agent-markup
   - design-vocab
+  - agent-handoff
 argument-hint: "[since-ref]  # default: origin/<current-branch>...HEAD"
 user-invocable: true
 ---
@@ -124,19 +125,19 @@ Routine maintenance — [lint/dependency/test/format] cleanup. No structural cha
 
 Title derivation: concise imperative from Motivation section (≤72 chars). Fallback: last commit message subject if motivation is thin.
 
-### Context Bag (optional, from swe)
+### Context Bag
 
-When spawned by `swe` PHASE 5, an optional loosely-typed context bag may be passed. Treated as additional evidence — never pasted verbatim into output.
+**Accepts:** `[Handoff: Enriched]` from `swe` PHASE 5
 
-| Field | Source | Role in output |
+| Field | Required? | Fallback if absent |
 |---|---|---|
-| Task scope | swe PHASE 0/1 | Seeds Motivation section |
-| Development decisions (pre-ADR) | swe PHASE 2 | Seeds Key-Decisions section |
-| Requirements traceability | swe PHASE 0 pickup | Enriches Motivation (PRD/FDS refs) |
-| Test approach | swe PHASE 2 (TDD) | Seeds Verification section |
-| Adversarial-review findings + accept/fix decisions | swe PHASE 3-4 | Seeds Review-Focus section — accepted MUST/SHOULD findings become signposted rows |
+| task_scope | no | Inference from diff + commits |
+| development_decisions | no | Inference from ADRs + commentary |
+| requirements_traceability | no | Inference from linked issues |
+| test_approach | no | Inference from test files in diff |
+| review_findings | no | Omit Review-Focus self-review rows |
 
-Absence of any field → inference fills the gap. Absence of entire bag → full inference + interview-if-interactive.
+Whole-bag absent → full inference + interview-if-interactive. Treated as additional evidence — never pasted verbatim into output.
 
 ### Directives
 

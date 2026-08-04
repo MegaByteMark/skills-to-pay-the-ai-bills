@@ -4,14 +4,18 @@ description: Remediation counterpart to audit-test-coverage. Runs the audit to o
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.0.1
 dependencies:
   - audit-test-coverage
   - design-vocab
   - agent-markup
   - interview-me
   - detect-test-harness
+  - agent-handoff
 ---
+**Accepts:** `[Handoff: Clean]` from `qa` PHASE 6
+Accepted: coverage gap set, harness Resolution Record, directive ("close the coverage gaps per your phased approval workflow, inside the worktree").
+
 1. PHASE 1 (Gap Acquisition): Invoke `audit-test-coverage`; consume full output as single source of truth. Inherit audit's tiered missing-contract gate verbatim. Carry forward audit's fidelity marking into every artefact.
 2. PHASE 2 (Minimum-Surface Reconciliation): Classify every gap into Minimum Verification Surface Baseline tier (M1–M5, C1–C6). Prune:
    - KEEP: absent Mandatory Floor + absent Conditional with fired trigger.

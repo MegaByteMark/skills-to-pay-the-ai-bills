@@ -4,8 +4,8 @@ description: Meta-skill for creating and modifying Agent Skills in this reposito
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.0
-dependencies: [agent-markup, design-vocab]
+  version: 1.2.0
+dependencies: [agent-markup, design-vocab, agent-handoff]
 user-invocable: true
 argument-hint: create|modify skill-name
 ---
@@ -37,7 +37,9 @@ flowchart TD
     C6 -->|no| HALT5(["HALT: fix tokens to enumeration"])
     C6 -->|yes| C7{"design-vocab terms valid?"}
     C7 -->|no| HALT6(["HALT: fix vocabulary"])
-    C7 -->|yes| C8{"registered in README catalog?"}
+    C7 -->|yes| C7B{"handoff declarations<br>valid? (Rule 14)"}
+    C7B -->|no| HALT_HB(["HALT: fix handoff<br>declarations"])
+    C7B -->|yes| C8{"registered in README catalog?"}
     C8 -->|no| HALT7(["HALT: add to README"])
     C8 -->|yes| COMPACT["Run prose compaction"]
     COMPACT --> DONE(["Done"])
@@ -56,7 +58,9 @@ flowchart TD
     M7 -->|yes| SYNC["Sync README entry"]
     M7 -->|no| M8
     SYNC --> M8["Run prose compaction:<br>strip non-behavioral prose"]
-    M8 --> M9["Re-validate agent-markup<br>& design-vocab"]
+    M8 --> M8B{"handoff declarations<br>valid? (Rule 14)"}
+    M8B -->|no| HALT_HB2(["HALT: fix handoff<br>declarations"])
+    M8B -->|yes| M9["Re-validate agent-markup<br>& design-vocab"]
     M9 --> M10["Bump metadata.version<br>per semantic versioning"]
     M10 --> COMPACT
 ```
@@ -80,6 +84,7 @@ Apply on every create or modify. Halt on violation; fix before proceeding.
 | 11 | **README registration** | New skills: add to README catalog under correct category. On modify: sync entry if description or scope changed. |
 | 12 | **Challenge the human** | Reason whether request is fully thought through. Consider downstream impact. Prioritize anti-hallucination over compliance with incomplete request. |
 | 13 | **Version bumping** | Bump `metadata.version` on every modification. Use semantic versioning: major for breaking changes, minor for new features, patch for fixes and prose edits. |
+| 14 | **Handoff declarations** | Every skill that spawns a subagent MUST declare `[Handoff: Clean]` or `[Handoff: Enriched]` at the spawn site. Enriched spawns MUST include a typed field table (Field, Type, Source). The leaf skill MUST include a matching accept table (Field, Required?, Fallback if absent). Clean spawns MUST list passed items in a one-line list. Undeclared spawn sites fail. Field mismatches between orchestrator declare-table and leaf accept-table fail. Missing leaf consume blocks fail. See `agent-handoff` for the full contract. |
 
 ## Mermaid diagram rules
 

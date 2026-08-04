@@ -4,7 +4,7 @@ description: 'Leaf skill that orchestrates ONE gitflow release: creates a releas
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.0.1
 user-invocable: true
 dependencies:
   - generate-release-notes
@@ -12,12 +12,13 @@ dependencies:
   - interview-me
   - agent-markup
   - design-vocab
+  - agent-handoff
 argument-hint: "<version> <develop reference>  # e.g. 'create-release 1.4.0 from develop'"
 ---
 
 ```mermaid
 flowchart TD
-    START(["Invoke create-release"]) --> INPUT["Consume clean context:<br>version, develop ref,<br>platform"]
+    START(["Invoke create-release"]) --> INPUT["Consume [Handoff: Clean]:<br>version, develop ref,<br>platform"]
     INPUT --> VER{Bump clear?}
     VER -->|No| CLARIFY["interview-me:<br>confirm semver bump"]
     CLARIFY --> VER
@@ -35,7 +36,10 @@ flowchart TD
 
 ### PHASE 1 — Input & Isolation
 
-1. Consume clean context: target `version`, develop reference/SHA, platform resolution.
+**Accepts:** `[Handoff: Clean]` from `devops` PHASE 3
+Accepted: target version, develop reference/SHA, platform resolution, changelog baseline.
+
+1. Consume handoff: target `version`, develop reference/SHA, platform resolution.
 2. Operate inside the provided isolated worktree — never the developer's working tree. No worktree supplied → create a transient worktree (`git worktree add <path> <develop-reference>`, path under OS temp), removed on exit. Version bumps, branch, changelog, tag, and merge operations run only in the worktree.
 
 ### PHASE 2 — Version Gate
@@ -71,5 +75,5 @@ Create annotated tag `release-<version>` on the release tip.
 Directives:
 - Worktree-only mutation: never touch the developer's working tree.
 - Anti-fabrication: no prior tag / no QA return = stated absence, never invented.
-- Clean context: version + develop reference + platform only; no parent reasoning.
+- `[Handoff: Clean]`: version + develop reference + platform + changelog baseline only; no parent reasoning. See `agent-handoff`.
 - `agent-markup` tokens and `design-vocab` terms only.

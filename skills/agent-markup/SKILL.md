@@ -4,7 +4,7 @@ description: Defines the strict token syntax, bracket-enclosed schema fields, an
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.4.0
+  version: 1.5.0
 ---
 All machine-readable tokens MUST be in square brackets `[...]`.
 
@@ -37,5 +37,7 @@ All machine-readable tokens MUST be in square brackets `[...]`.
 [Section: Name]: [Motivation, Summary, Key-Decisions, Review-Focus, Verification]. Written `### [Section: Motivation]` etc. as stable machine-parseable headers. Enables AI consumers (e.g. adversarial-review) to regex-extract sections and lift `file:line` signposts into their own scope. Owned by create-pr.
 
 [Scope: Origin]: [Pre-existing, Introduced]. Pre-existing = issue surfaced but not caused by the diff under review; Introduced = issue created by the diff. Used by adversarial-review to distinguish fix-in-PR from park-behind-bug-report.
+
+[Handoff: Mode]: [Clean, Enriched]. Written `[Handoff: Clean]` or `[Handoff: Enriched]` at orchestrator spawn sites and leaf consume sites. Clean = isolation (parent context would taint the leaf); Enriched = bag (parent context enriches the leaf beyond repo artefacts). Owned by agent-handoff.
 
 Output Portability: All client-facing artefacts (FDS, blueprint, audits, docs) as export-clean Markdown — standard heading hierarchy, no renderer-fragile constructs, tables degrade gracefully. PDF/branding mechanism is separate.

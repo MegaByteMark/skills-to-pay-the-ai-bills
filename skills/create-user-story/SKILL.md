@@ -4,17 +4,21 @@ description: Renders ONE user story from a single PRD User Story Backlog entry (
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.1
+  version: 1.0.2
 dependencies:
   - resolve-repository-platform
   - agent-markup
   - create-epic
   - gather-requirements
   - interview-me
+  - agent-handoff
 argument-hint: "<STORY-###> [create | amend]  # which story; mode auto-detected from tracker when omitted"
 user-invocable: true
 ---
 Single-story leaf. Takes ONE `STORY-###`, gathers PRD story + FDS behaviour traced to it, renders, writes to tracker as child of parent epic. Set-level concerns → `po`.
+
+**Accepts:** `[Handoff: Clean]` from `po` PHASE 4
+Accepted: `STORY-###` + parent `EPIC-###` + PRD story + traced FDS + platform resolution.
 
 1. PHASE 0 (Input & Mode): Resolve target `STORY-###` from argument (required). Mode: tracker work item carries marker → `amend`; else `create`. Never blind-create duplicate.
 2. PHASE 1 (Source Ingestion): Load PRD — Backlog row for this story (As a/I want/So that, acceptance criteria, `[Priority: MoSCoW]`, parent `EPIC-###`). Load FDS — every requirement whose `Source (PRD)` traces to this story, + §3 validation rules + §4 data-sensitivity entries. FDS absent → PRD-only, mark FDS-sourced sections `[Inferred: Unverified]`.

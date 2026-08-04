@@ -4,16 +4,20 @@ description: Renders ONE epic work item from a single PRD Epic Register entry (E
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.1
+  version: 1.0.2
 dependencies:
   - resolve-repository-platform
   - agent-markup
   - gather-requirements
   - interview-me
+  - agent-handoff
 argument-hint: "<EPIC-###> [create | amend]  # which epic; mode auto-detected from tracker when omitted"
 user-invocable: true
 ---
 Single-epic leaf. Takes ONE `EPIC-###`, gathers PRD + FDS trace, renders, writes to tracker. Set-level concerns → `po`.
+
+**Accepts:** `[Handoff: Clean]` from `po` PHASE 4
+Accepted: `EPIC-###` + PRD Epic Register row + traced FDS contract + platform resolution.
 
 1. PHASE 0 (Input & Mode): Resolve target `EPIC-###` from argument (required). Mode: tracker work item already carries marker → `amend`; else `create`. Never blind-create duplicate.
 2. PHASE 1 (Source Ingestion): Load PRD at `docs/requirements/product-requirements.md` — Epic Register row + §1 vision/intent + §5 scope boundaries. Load FDS at `docs/requirements/functional-requirements.md` — select every requirement whose `Source (PRD)` traces to this epic or its stories. FDS absent → proceed PRD-only, mark FDS-sourced sections `[Inferred: Unverified]`.

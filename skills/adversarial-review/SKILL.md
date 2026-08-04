@@ -4,14 +4,18 @@ description: 'Adversarial code review of working-tree changes since last push. A
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.0.0
+  version: 2.0.1
 user-invocable: true
 dependencies:
   - interview-me
   - agent-markup
   - design-vocab
   - resolve-repository-platform
+  - agent-handoff
 ---
+
+**Accepts:** `[Handoff: Clean]` from `swe` PHASE 3
+Accepted: PR diff, persona directive, tracked issue/requirement reference links.
 
 1. PHASE 1 (Scope): Determine baseline via `interview-me`.
    - Present default: all changes since last push (`HEAD..@{push}`).

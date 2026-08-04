@@ -4,7 +4,7 @@ description: 'Session overlay that fights "vibe coding" skill atrophy: hands you
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 argument-hint: 'Optional: intensity (light/normal/intense), areas to focus or avoid, and any deadline pressure'
 user-invocable: true
 dependencies:
@@ -12,6 +12,7 @@ dependencies:
   - agent-markup
   - competency-profile
   - teach-a-skill
+  - agent-handoff
 ---
 COMPACTION SURVIVAL & ACTIVATION:
 - Canonical reload marker: `vibe-code-antidote:ACTIVE` — matched as a line prefix (`^vibe-code-antidote:ACTIVE`), always on its own line, NEVER with payload appended. It appears in exactly three places, all listed here:
@@ -95,7 +96,14 @@ flowchart TD
     FCHECK -->|No| FTYPE
 ```
 
-1. Warn, cite evidence (log `wi` if user proceeds without engaging). 2. Diagnose: syntax/knowledge gap → walk-through (agent narrates, human types, then follow-up questions to confirm understanding); problem-solving gap → Paired micro-slices (agent structures the problem, human solves). 3. If still struggling → hand gap to teach-a-skill (target Guided). Broad gap → recommend teach-me. Offer: /pause-antidote at any point. 4. Persistent-gap: when `wi` count for an area reaches 3 → force remediation for that area — route by gap type as in step 2 (syntax/knowledge → walk-through, problem-solving → Paired). Overrides intensity, /easier, random roll; does NOT override deadline/destructive-work guardrails. Lifts on Clear read-back for that area.
+1. Warn, cite evidence (log `wi` if user proceeds without engaging). 2. Diagnose: syntax/knowledge gap → walk-through (agent narrates, human types, then follow-up questions to confirm understanding); problem-solving gap → Paired micro-slices (agent structures the problem, human solves). 3. If still struggling → hand gap to `teach-a-skill` `[Handoff: Enriched]`:
+
+   | Field | Type | Source |
+   |---|---|---|
+   | concept | string | Detected gap area |
+   | target_level | `[Competency: Level]` | `Guided` |
+
+   Broad gap → recommend teach-me. Offer: /pause-antidote at any point. 4. Persistent-gap: when `wi` count for an area reaches 3 → force remediation for that area — route by gap type as in step 2 (syntax/knowledge → walk-through, problem-solving → Paired). Overrides intensity, /easier, random roll; does NOT override deadline/destructive-work guardrails. Lifts on Clear read-back for that area.
 
 HANDOFF SELECTION: self-contained Module/Implementation, `[Risk: Low]` (Medium only at Solo), NEVER High/Critical (auth, payments, migrations, deletes, secrets, security, infra teardown — you write, offer review). `[Remediation: Low]` (Medium if intense). Stable Interface. Off deadline path. No candidate → keep building.
 
