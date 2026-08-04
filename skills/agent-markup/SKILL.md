@@ -4,7 +4,7 @@ description: Defines the strict token syntax, bracket-enclosed schema fields, an
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.2.0
+  version: 1.3.0
 ---
 All machine-readable tokens MUST be in square brackets `[...]`.
 
@@ -20,14 +20,20 @@ All machine-readable tokens MUST be in square brackets `[...]`.
 
 [Remediation: Effort]: [Low, Medium, High]
 
+[Remediation: Action]: [Fix, Accept, Defer, Log, None]. Fix = resolve before proceeding; Accept = explicitly waive with recorded justification; Defer = park behind a tracked work item; Log = capture for opportunistic action; None = no action indicated. Paired with Effort when action is Fix.
+
 [Competency: Level]: [Not-Ready, Paired, Guided, Solo]. Ordered weakest-to-strongest. Solo = wrote comparable work unaided; Guided = succeeds with full spec/acceptance criteria; Paired = succeeds only with scaffold + step-by-step prompts; Not-Ready = cannot do or explain. Self-report is provisional `[Confidence: Possible]` until corroborated by observed work. Owned by competency-profile.
 
 [Inferred: Unverified]: [true]. Marks output from an ephemeral in-context baseline. Never applied to blueprint-drift findings.
 
 [Priority: MoSCoW]: [Must, Should, Could, Wont]. Written `[Priority: Must]` etc. Must = release fails without it; Should = viable workaround; Could = desirable if capacity; Wont = explicitly out-of-scope (records decision). Owned by gather-requirements PRD stream.
 
+[Review: Priority]: [Must, Should, Could, Nitpick]. Written `[Review: Must]` etc. Must = merge-blocking (breaks functionality, introduces vulnerability/violation, or regresses behaviour); Should = non-conformance with repo-resident standards; Could = opportunistic improvement within blast radius; Nitpick = trivial non-conformance (typos, inconsistency). Review-context only — never used in PRD or planning. Owned by adversarial-review.
+
 [Doc: Archetype]: [QuickStart, Technical, Troubleshooting, Installation, Commentary]. Path bindings owned by document-a-codebase.
 
 [Scope: Artefact]: [Release, Security-Governance, Health, Digest, Deployment]. Digest = client-facing weekly progress email from client-email-digest. Deployment = CI/CD or release coordination report from the devops persona and its leaves. Extend this enumeration here when adding report-producing skills.
+
+[Scope: Origin]: [Pre-existing, Introduced]. Pre-existing = issue surfaced but not caused by the diff under review; Introduced = issue created by the diff. Used by adversarial-review to distinguish fix-in-PR from park-behind-bug-report.
 
 Output Portability: All client-facing artefacts (FDS, blueprint, audits, docs) as export-clean Markdown — standard heading hierarchy, no renderer-fragile constructs, tables degrade gracefully. PDF/branding mechanism is separate.
