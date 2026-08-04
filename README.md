@@ -92,7 +92,7 @@ Grouping is by convention only (the files stay flat for discovery).
 
 ### Persona orchestrators
 *Persona skills that bundle specialised skills into a coherent development workflow. Invocable via `/swe <context>`, `/ba <context>`, `/po <context>`, `/qa <context>`, or `/devops <action>`.*
-- **swe** — SWE (Software Engineer) persona orchestrator. Guides feature completion using `clean-architecture`, `solid-principles`, `dry-kiss`, and `red-green-refactor-tdd`, then auto-spawns `adversarial-review` subagent with clean context for an adversarial gate, presenting findings in a developer decision loop (fix & re-review or accept & proceed). Plan-driven pickup: `pick up next item from plan [milestone MS-###] [wave N]` reads `docs/requirements/roadmap.md` for wave membership + DAG edges, reads the tracker for live status/assignment, resolves the next ready work item, runs the standard SWE flow, and closes the tracker item on completion.
+- **swe** — SWE (Software Engineer) persona orchestrator. Guides feature completion using `clean-architecture`, `solid-principles`, `dry-kiss`, and `red-green-refactor-tdd`, then auto-spawns `adversarial-review` subagent with clean context for an adversarial gate, presenting findings in a developer decision loop (fix & re-review or accept & proceed). At closure, spawns `create-pr` with a context bag (task scope, decisions, review findings) to raise the Change Proposal. Plan-driven pickup: `pick up next item from plan [milestone MS-###] [wave N]` reads `docs/requirements/roadmap.md` for wave membership + DAG edges, reads the tracker for live status/assignment, resolves the next ready work item, runs the standard SWE flow, and closes the tracker item on completion.
 - **ba** — BA (Business Analyst) persona orchestrator. Interactive requirements discovery via `interview-me` (one question at a time) and `gather-requirements` (two-stream PRD/FDS). Single long-context session, no subagent spawning, constant developer collaboration, shared understanding checkpoint, and artefact persistence ready for `po`.
 - **po** — PO (Product Owner) persona orchestrator. Requirements-to-backlog orchestration with mandatory gap analysis: capability-probes the tracker (hard gate), ingests PRD/FDS, reconciles work items via stable-ID markers (create/amend/close), plans release-aligned milestones and an in-repo execution-order roadmap at `docs/requirements/roadmap.md` (dependency DAG → parallelisable waves), and spawns clean-context subagents (`create-epic`, `create-user-story`, `create-bug-report`, `create-milestone`). Supersedes `seed-backlog` (ADR-0003).
 - **qa** — QA (Quality Assurance) persona orchestrator. Runs `audit-test-coverage` + `audit-security-and-governance` in parallel inside an isolated git worktree, then spawns `remediate-test-coverage` or `create-bug-report` subagents with clean context in a developer decision loop. Calibrates scope by mode: Delta (post-change, adversarial edge-case hunting) or Release-gate (full-surface regression against the resolved target test surface). Working tree never touched.
@@ -120,6 +120,7 @@ Grouping is by convention only (the files stay flat for discovery).
 - **scaffold-ci-cd** — *leaf*; creates or improves CI/CD pipelines (GitHub Actions, GitLab CI, Bitbucket Pipelines, self-hosted) on the resolved platform: discovers canonical build/test/lint commands, designs gitflow trigger stages (PR basic validation, develop-merge integration + testing-stage deploy, main-merge production deploy), writes config with secret-store placeholders, and emits a deployment report.
 - **create-release** — *leaf*; orchestrates ONE gitflow release: release branch from develop in an isolated worktree, semver bump, release notes via `generate-release-notes`, tag, and Change Proposals to main + develop, gated on QA Release-gate regression.
 - **create-hotfix** — *leaf*; creates and coordinates ONE gitflow hotfix from main in an isolated worktree: applies the fix, validates, tags a patch, merges back to main + develop with release notes.
+- **create-pr** — *leaf*; renders a reviewer-enablement PR body from git diff + repo artefacts (ADRs, inline commentary, requirements, blueprint, domain glossary) and raises the Change Proposal via the resolved platform CLI. Bridges the developer-reviewer mindset gap with a fixed 5-section schema (`[Section: Motivation/Summary/Key-Decisions/Review-Focus/Verification]`) using `file:line` signposts for dual human + AI consumption. Inference-first, interview-last for residual gaps, amend-in-place via embedded baseline marker.
 
 ---
 
@@ -235,6 +236,8 @@ vibe-code-antidote ───────────────────┼�
                                        └──> agent-markup / design-vocab  (shared contracts)
 
 swe · ba · po · qa · devops ──> strategic-reading  (literature nudges on non-trivial design trade-offs)
+
+swe ──> create-pr  (closure: raise Change Proposal with context bag)
 ```
 
 State that a skill persists (course progress, competency baseline, capability profiles) always lives **outside the project tree** — it is never committed to your repo.
