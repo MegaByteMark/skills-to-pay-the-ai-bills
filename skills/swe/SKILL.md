@@ -1,10 +1,10 @@
 ---
 name: swe
-description: 'SWE (Software Engineer) persona orchestrator. Guides feature completion using bundled code-quality and architecture skills (clean-architecture, solid-principles, dry-kiss, red-green-refactor-tdd), then auto-spawns adversarial-review subagent with clean context for an adversarial gate, presenting findings for developer decision (fix & re-review or accept & proceed). Plan-driven pickup: `pick up next item from plan [milestone MS-###] [wave N]` reads the PO execution-order plan from the persistent state store, resolves the next ready work item, runs the standard SWE flow, and updates the plan on closure.'
+description: 'SWE (Software Engineer) persona orchestrator. Guides feature completion using bundled code-quality and architecture skills (clean-architecture, solid-principles, dry-kiss, red-green-refactor-tdd), then auto-spawns adversarial-review subagent with clean context for an adversarial gate, presenting findings for developer decision (fix & re-review or accept & proceed). Plan-driven pickup: `pick up next item from plan [milestone MS-###] [wave N]` reads docs/requirements/roadmap.md for wave membership + DAG edges, reads the tracker for live status/assignment, resolves the next ready work item, runs the standard SWE flow, and closes the tracker item on completion.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.3.0
+  version: 2.0.0
 user-invocable: true
 dependencies:
   - clean-architecture
@@ -27,7 +27,7 @@ flowchart TD
     START(["Invoke /swe <context>"]) --> LOAD["Load persona:<br>all bundled skills"]
     LOAD --> INVO{Invocation form?}
     INVO -->|implement feature| PLATFORM["resolve-repository-platform"]
-    INVO -->|pick up from plan| PICKUP["PHASE 0 Plan Pickup:<br>read PO plan, resolve item"]
+    INVO -->|pick up from plan| PICKUP["PHASE 0 Plan Pickup:<br>read roadmap.md + tracker, resolve item"]
     PICKUP --> PLATFORM
     PLATFORM --> TASK{Task scope<br>confirmed?}
     TASK -->|No| CLARIFY["Interview: clarify scope"]
@@ -43,33 +43,27 @@ flowchart TD
     DECIDE -->|Fix & re-review| FIX["Implement fixes"]
     FIX --> FINDINGS
     DECIDE -->|Accept & proceed| ACCEPT
-    ACCEPT --> CLOSE["PHASE 5 Closure<br>(+ update PO plan if pickup)"]
+    ACCEPT --> CLOSE["PHASE 5 Closure<br>(+ close tracker item if pickup)"]
     CLOSE --> DONE(["Done"])
 ```
 
 ### PHASE 0 — Plan Pickup
 
-Triggered only when the invocation matches `/pick up .* from plan/`. Skip entirely for `implement <feature>` and free-form invocations. The PO execution-order plan is canonical — see PO PHASE 2.7 for the schema origin. SWE consumes a snapshot here.
+Triggered only when the invocation matches `/pick up .* from plan/`. Skip entirely for `implement <feature>` and free-form invocations. The in-repo roadmap at `docs/requirements/roadmap.md` is the sequencing source of truth (wave membership + DAG edges); the tracker (assignee + status + milestone) is the runtime state machine. See PO PHASE 2.7 for the roadmap schema and ADR-0005 for the decision.
 
-1. **Locate the plan file.** The plan lives at the platform's persistent state store under the project's plans directory:
-   - macOS: `~/Library/Application Support/po/<project>/plans/<YYYY-MM-DD>-<slug>-plan.json` (JSON is canonical; Markdown sibling `<YYYY-MM-DD>-<slug>.md` is the human-readable form PO emits alongside)
-   - Linux: `${XDG_STATE_HOME:-$HOME/.local/state}/po/<project>/plans/…`
-   - Windows: `%LOCALAPPDATA%\po\<project>\plans\…`
-   - `<project>` = repo basename from `git rev-parse --show-toplevel` (fallback: `basename $(git config --get remote.origin.url) .git`). Glob `<plans dir>/*-plan.json`, sort by mtime descending.
-2. **Disambiguate multiple matches.** 0 matches → HALT with `interview-me` recommendation to run `po plan-execution-order` first. 2+ matches → `interview-me` ONE question to pick (recommendation: newest by mtime).
-3. **Validate.** Prefer the JSON side. Markdown side is fallback only when JSON is missing or unreadable. Reject `schema_version` other than 1; HALT with the upgrade path back to PO.
-4. **Resolve the target item:**
-   - `pick up next item from plan` → `next_pickup.ready_items[0]` (PO pre-computes the lowest wave with ready items; take the first entry).
-   - `pick up next item from milestone MS-###` → filter `next_pickup.ready_items` to items whose `milestone == MS-###`. Empty filter → HALT; suggest broadening the milestone or completing current wave first.
-   - `pick up next item from plan wave N` → resolve against `waves[N-1]` items; if all done, walk forward.
-   - `pick up <EPIC-### | STORY-### | BUG-###> from plan` → load that specific item regardless of wave; if its deps are unsatisfied, HALT and surface the blocking list.
-5. **HALT conditions:**
-   - No plan file → tell developer to run `po plan-execution-order` first.
-   - All items complete or blocked → report `nothing to pick up`.
-   - Target item not present in plan → HALT; surface the missing ID.
-6. **Mark item in flight.** Set the resolved item's `status` to `in_progress` in the plan JSON. Preserve every other field. This prevents the next pickup run from re-picking the same item while it is in flight.
-7. **Atomic write-back.** Write to `<file>.tmp` then `rename(<file>.tmp, <file>)`. On rename failure (target was modified by another run), re-read, re-resolve, re-mark; if the item was already picked, HALT with the in-flight holder.
-8. **Set task scope.** The picked item ID becomes the PHASE 1 scope; skip the PHASE 1 clarifying interview (scope is unambiguous). Echo to chat: `Resolved next pickup: <ID> (wave N, milestone MS-###); proceeding with PHASE 2 development.`
+1. **Locate the roadmap.** Read `docs/requirements/roadmap.md`. Absent → HALT with `interview-me` recommendation to run `po plan-execution-order` first.
+2. **Parse waves + edges.** `## Waves` contains `### W N` sections in execution order. Each line: `<ID> <#tracker-ref> <optional edge tokens>`. Edge tokens: `->EPIC-X` (this item blocks X), `<-EPIC-X` (blocked by X), `~>EPIC-X` (relates-to, soft). Build the readiness graph: an item is ready when it is unassigned + open in the tracker AND every `<-` blocker is closed in the tracker.
+3. **Resolve the target item:**
+   - `pick up next item from plan` → lowest-numbered wave containing a ready item; take the first ready entry.
+   - `pick up next item from milestone MS-###` → filter ready items to those whose milestone (from the `## Milestones` section) is `MS-###`. Empty → HALT; suggest broadening the milestone or completing the current wave first.
+   - `pick up next item from plan wave N` → ready items in `### W N`; if all done, walk forward to W N+1.
+   - `pick up <EPIC-### | STORY-### | BUG-###> from plan` → load that specific item regardless of wave; if its `<-` blockers are not all closed, HALT and surface the blocking list.
+4. **HALT conditions:**
+   - Roadmap absent → tell developer to run `po plan-execution-order` first.
+   - No ready items (all complete or blocked) → report `nothing to pick up`.
+   - Target ID not present in roadmap → HALT; surface the missing ID.
+5. **Mark item in flight.** Assign the tracker item to self and set status to in-progress via the platform CLI (per `resolve-repository-platform`). This is the distributed lock — a second SWE agent on another host sees the assignment and skips it. No local file mutation; no write-back to the roadmap.
+6. **Set task scope.** The picked item ID becomes the PHASE 1 scope; skip the PHASE 1 clarifying interview (scope is unambiguous). Echo to chat: `Resolved next pickup: <ID> (wave N, milestone MS-###); proceeding with PHASE 2 development.`
 
 ### PHASE 1 — Onboarding
 
@@ -121,19 +115,16 @@ Present the subagent's findings to the developer. Every finding must carry `[Ris
 1. If architectural decisions were made during development, invoke `architectural-decision-register` (PHASE 1 Generate) to record each decision.
 2. Persist feature artefacts (PR, requirements decisions) to the issue tracker / documentation per resolved platform. Never hand off between agents.
 3. **Plan-pickup closure (only when invoked via PHASE 0):**
-   - Mark the in-flight item's `status` as `done` in the plan JSON.
-   - Recompute `next_pickup.ready_items` to the next lowest wave with ready items: an item is ready when its `status == "pending"` and every entry in its `depends_on` array (or referenced from the plan's `dependencies` array) has `status == "done"`. Recompute is purely mechanical; no agent judgement.
-   - Set the plan's `generated` field to `updated: <ISO-8601>`.
-   - Atomic write-back via temp-file rename (per PHASE 0 step 7).
-   - Echo to chat: `Item <ID> marked done. Next pickup: <new ready_items or "nothing — plan complete">`. Do NOT mutate the Markdown side; regenerate from JSON if the developer wants it.
+   - Close the tracker item (status → done/closed, unassign self) via the platform CLI. This is the state mutation — the tracker is the state machine.
+   - Derive next pickup by re-reading `docs/requirements/roadmap.md` + tracker: first unassigned open item in the lowest-numbered wave whose `<-` blockers are all closed. Purely mechanical; no agent judgement.
+   - Echo to chat: `Item <ID> closed. Next pickup: <next ready item or "nothing — roadmap complete">.`
    - If the picked item was a wave's last blocker and the next wave has fresh ready items, surface the wave transition to the developer with a one-line summary of the new wave's scope.
 4. Manual override: developer may invoke `adversarial-review` independently outside this flow at any time — the persona does not block direct invocation.
 
 ### Directives
 
-- Plan format canonical owner: PO PHASE 2.7. Any schema change originates in PO; SWE consumes a snapshot. SWE does NOT load PO at runtime — it operates from the inline spec above.
-- Plan mutation atomicity: write plan JSON via temp-file rename (`<file>.tmp` → `<file>`). If the rename loses to a concurrent writer, re-read and re-resolve. Never partially overwrite the plan.
-- Concurrency: in-flight items are filtered out of `ready_items` by status. Two concurrent SWE runs may resolve the same item; the second write-back fails atomically and the run re-resolves. Single-agent runs are the common case.
+- Roadmap canonical owner: PO PHASE 2.7. Any schema change originates in PO; SWE reads `docs/requirements/roadmap.md` as-is. SWE does NOT load PO at runtime — it operates from the inline spec above. ADR-0005 governs the in-repo relocation.
+- Concurrency: tracker assignment is the distributed lock. Two concurrent SWE runs on different hosts resolve via the tracker assignee field — the second sees the item already assigned and skips it. No local file mutation; no write-back to the roadmap.
 - Skill drift: use only the skills listed in `dependencies` for persona reasoning. If a task requires outside skill, flag to developer — do not load ad-hoc.
 - Strategic Anchors: when output resolves a non-trivial design trade-off (architecture, system Seams, schema, process, operational patterns), append a `strategic-reading` Strategic Anchor. Never on routine tasks (CRUD, syntax fixes, linter errors, utilities, routine bugs).
 - Output determinism: same inputs produce structurally identical output. No "you may also" branches unless gated behind explicit decision.
