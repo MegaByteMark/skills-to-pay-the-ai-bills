@@ -4,15 +4,22 @@ description: Generates a complete, high-signal bug report by auto-capturing ever
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.0.1
 dependencies:
   - interview-me
   - resolve-repository-platform
   - agent-markup
+  - agent-handoff
 argument-hint: "[title | pasted error/stack trace]  # optional seed; mode (create|amend) auto-detected from tracker"
 user-invocable: true
 ---
 Maximise auto-capture; minimise questions. NEVER fabricate a log line, version, or repro step. Unevidenced/unanswered = `Unknown — requires verification`.
+
+**Accepts:** `[Handoff: Clean]` from `po` PHASE 4
+Accepted: bug seed (title / pasted error) + evidence set + platform resolution.
+
+**Accepts:** `[Handoff: Clean]` from `qa` PHASE 6
+Accepted: security/governance / logic findings + reproduction steps + directive ("render a bug report per your schema and file it via the resolved platform").
 
 1. PHASE 0 (Input & Mode): Take seed (title or pasted error/stack trace). Once platform resolved, if Work Item already carries this report's stable-ID marker → `amend`; else `create`. Never blind-create duplicate.
 2. PHASE 1 (Evidence Auto-Capture): Silently derive: pasted error/stack → Diagnostics; manifests + `git describe`/tags/HEAD → Version; declared runtime/OS from manifests, lockfiles, CI config → Environment (host OS is agent's machine, not user's — only assert user's when stated). Tag each `[Confidence: Confirmed|Probable|Possible]`. Possible = requires-verification. Classify diagnostics `[Data: Classification]` and redact secrets/credentials/PII.

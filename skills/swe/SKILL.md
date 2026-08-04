@@ -4,7 +4,7 @@ description: 'SWE (Software Engineer) persona orchestrator. Guides feature compl
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.1.0
+  version: 2.2.0
 user-invocable: true
 dependencies:
   - clean-architecture
@@ -18,6 +18,7 @@ dependencies:
   - architectural-decision-register
   - strategic-reading
   - create-pr
+  - agent-handoff
 argument-hint: "<context>  # e.g. 'implement <feature>' | 'pick up next item from plan' | 'pick up next item from milestone MS-###' | 'pick up <EPIC-### | STORY-###> from plan'"
 ---
 
@@ -94,11 +95,11 @@ Do not skip, reorder, or substitute skills. Use them as listed.
 On feature completion, automatically spawn an `adversarial-review` subagent.
 
 **Clean context pass** — the subagent receives ONLY:
-- PR diff of working-tree changes since last push (or custom scope)
-- Persona instructions: a single directive "Review this diff adversarially per your standard 8-category sweep. Output findings with `[Risk: Level]` and `[Confidence: Level]`."
-- Reference links to any tracked issue or requirement artefact discovered via `resolve-repository-platform`
 
-**NEVER pass:** parent agent state, intermediate reasoning, prior conversation history, or any data beyond the three items above.
+**Handoff:** `[Handoff: Clean]` → `adversarial-review`
+Passed: PR diff of working-tree changes since last push (or custom scope), persona directive ("Review this diff adversarially per your standard 8-category sweep"), reference links to tracked issues/requirement artefacts.
+
+**NEVER pass:** parent agent state, intermediate reasoning, prior conversation history, or any data beyond the listed items.
 
 The subagent executes its standard PHASE 1–4 workflow independently. Its output is consumed as-is.
 
@@ -114,7 +115,19 @@ Present the subagent's findings to the developer. Every finding must carry `[Ris
 ### PHASE 5 — Closure
 
 1. If architectural decisions were made during development, invoke `architectural-decision-register` (PHASE 1 Generate) to record each decision.
-2. Spawn `create-pr` subagent with optional context bag: task scope, development decisions (pre-ADR), requirements traceability, test approach, adversarial-review findings + developer accept/fix decisions from PHASE 3-4. `create-pr` runs its standard flow (inference + interview-if-interactive + render + raise PR via platform CLI). Headless mode: interview skipped, inference-only output with `[Confidence: Inferred]` on gap-filled sections.
+2. Spawn `create-pr` subagent with context bag:
+
+   **Handoff:** `[Handoff: Enriched]` → `create-pr`
+
+   | Field | Type | Source |
+   |---|---|---|
+   | task_scope | string | PHASE 0/1 scope |
+   | development_decisions | array<decision> | PHASE 2 pre-ADR decisions |
+   | requirements_traceability | ref | PHASE 0 pickup ID |
+   | test_approach | string | PHASE 2 TDD coverage |
+   | review_findings | array<finding> | PHASE 3-4 adversarial-review findings + developer accept/fix decisions |
+
+   `create-pr` runs its standard flow (inference + interview-if-interactive + render + raise PR via platform CLI). Headless mode: interview skipped, inference-only output with `[Confidence: Inferred]` on gap-filled sections.
 3. Persist feature artefacts (requirements decisions) to the issue tracker per resolved platform. Never hand off between agents.
 4. **Plan-pickup closure (only when invoked via PHASE 0):**
    - Close the tracker item (status → done/closed, unassign self) via the platform CLI. This is the state mutation — the tracker is the state machine.

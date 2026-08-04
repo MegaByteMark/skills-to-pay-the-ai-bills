@@ -4,7 +4,7 @@ description: 'DevOps persona orchestrator — hands-off gitflow release coordina
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.1
+  version: 1.2.0
 user-invocable: true
 dependencies:
   - generate-release-notes
@@ -17,6 +17,7 @@ dependencies:
   - interview-me
   - architectural-decision-register
   - strategic-reading
+  - agent-handoff
 argument-hint: "<action>  # e.g. 'release 1.4.0' | 'hotfix 42' | 'scaffold-ci-cd'"
 ---
 
@@ -60,11 +61,11 @@ flowchart TD
 1. Create a dedicated transient git worktree for this session: `git worktree add <path> <base>` where `<path>` is under OS temp (`/tmp/devops-<session-id>`), session-id unique per invocation. Transient execution context, not persistent state (ADR-0002). Never the developer's tree.
 2. Materialise the relevant base (develop | main) inside the worktree. All branch, version, changelog, tag, and merge operations run only in the worktree.
 
-### PHASE 3 — Action Routing (clean-context subagents)
+### PHASE 3 — Action Routing (`[Handoff: Clean]` subagents)
 
-Spawn subagents with clean context only — never parent reasoning, conversation history, or data beyond the listed items. Output consumed as-is.
+Spawn subagents with `[Handoff: Clean]` — never parent reasoning, conversation history, or data beyond the listed items. Output consumed as-is.
 
-| Action | Spawn | Clean context |
+| Action | Spawn | `[Handoff: Clean]` passed |
 |---|---|---|
 | `scaffold-ci-cd` | `scaffold-ci-cd` | platform resolution, repo root, canonical build/test/lint command set, requested stage list |
 | `release <version>` | `create-release` | target version, develop reference, platform, changelog baseline (last release tag) |
@@ -94,7 +95,7 @@ A missing leaf skill is a HALT — report and never fabricate the operation.
 
 - Skill drift: use only the skills listed in `dependencies` for persona reasoning. Outside-skill need → flag to developer, do not load ad-hoc.
 - Strategic Anchors: when release/pipeline design rests on a non-trivial operational-pattern trade-off, append a `strategic-reading` Strategic Anchor. Never on routine release bookkeeping.
-- Clean context: subagent spawning passes only the listed clean-context items. Violation = HALT the spawn.
+- `[Handoff: Clean]`: subagent spawning passes only the listed items. Violation = HALT the spawn. See `agent-handoff`.
 - Output determinism: same inputs produce structurally identical output. No "you may also" branches unless gated behind an explicit decision.
 - Anti-hallucination: never reference non-existent files, skills, reports, or approvals. Pipeline status and QA approval must be evidenced or stated absent.
 - All bracket tokens: `agent-markup` enumeration only.

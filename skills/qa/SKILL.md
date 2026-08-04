@@ -4,7 +4,7 @@ description: 'QA (Quality Assurance) persona orchestrator. Runs audit-test-cover
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.1
+  version: 1.2.0
 user-invocable: true
 dependencies:
   - audit-test-coverage
@@ -17,6 +17,7 @@ dependencies:
   - design-vocab
   - interview-me
   - strategic-reading
+  - agent-handoff
 argument-hint: "<context>  # e.g. 'audit this PR for coverage + security gaps' | 'release-gate regression sweep'"
 ---
 
@@ -93,12 +94,12 @@ Present findings. Developer chooses:
 
 | Choice | Behavior |
 |---|---|
-| **Remediate coverage** | Spawn `remediate-test-coverage` subagent — **clean context only**: coverage gap set + harness Resolution Record + the directive "close the coverage gaps per your phased approval workflow, inside the worktree". Output consumed as-is. Re-evaluate at the issues gate. |
-| **File bug report** | Spawn `create-bug-report` subagent — **clean context only**: security/governance / logic findings + reproduction steps from PHASE 4 + the directive "render a bug report per your schema and file it via the resolved platform". Output consumed as-is. Re-evaluate at the issues gate. |
+| **Remediate coverage** | Spawn `remediate-test-coverage` `[Handoff: Clean]`: coverage gap set + harness Resolution Record + directive "close the coverage gaps per your phased approval workflow, inside the worktree". Output consumed as-is. Re-evaluate at the issues gate. |
+| **File bug report** | Spawn `create-bug-report` `[Handoff: Clean]`: security/governance / logic findings + reproduction steps from PHASE 4 + directive "render a bug report per your schema and file it via the resolved platform". Output consumed as-is. Re-evaluate at the issues gate. |
 | **Deepen investigation** | Re-run PHASE 3–4 with expanded scope and re-enter the loop. |
 | **Accept & proceed** | Exit the loop; proceed to PHASE 7. |
 
-**NEVER pass** parent-agent reasoning, prior conversation history, or data beyond the listed clean-context items. No parent reasoning bleeds into subagent context.
+**NEVER pass** parent-agent reasoning, prior conversation history, or data beyond the listed `[Handoff: Clean]` items. No parent reasoning bleeds into subagent context.
 
 ### PHASE 7 — Clean Shutdown
 
@@ -110,7 +111,7 @@ Present findings. Developer chooses:
 
 - Skill drift: use only the skills listed in `dependencies` for persona reasoning. Outside-skill need → flag to developer, do not load ad-hoc.
 - Strategic Anchors: when synthesis resolves a non-trivial testing/surface trade-off, append a `strategic-reading` Strategic Anchor. Never on routine pass/fail reporting.
-- Clean context: subagent spawning passes only the specified clean-context items. Violation = HALT the spawn.
+- `[Handoff: Clean]`: subagent spawning passes only the specified items. Violation = HALT the spawn. See `agent-handoff`.
 - Output determinism: same inputs produce structurally identical output. No "you may also" branches unless gated behind an explicit decision.
 - Anti-hallucination: never reference non-existent files, skills, or reports. Absent baseline/contract = stated absence, never fabricated.
 - All bracket tokens: `agent-markup` enumeration only. Prohibited: skill-invented token types.

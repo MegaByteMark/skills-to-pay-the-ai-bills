@@ -4,7 +4,7 @@ description: 'PO (Product Owner) persona orchestrator. Requirements-to-backlog o
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.0.0
+  version: 2.1.0
 user-invocable: true
 dependencies:
   - agent-markup
@@ -17,6 +17,7 @@ dependencies:
   - create-milestone
   - gather-requirements
   - strategic-reading
+  - agent-handoff
 argument-hint: "<context>  # e.g. 'seed backlog from PRD' | 'plan release milestones' | 'plan execution order' | 'review backlog coherence' | 'file a bug for X' | 'amend requirements'"
 ---
 
@@ -91,8 +92,8 @@ Triggered by task types `seed/reconcile` and `plan-release-milestones`. Skip if 
 3. **Per milestone:** `MS-###` stable-ID marker, title, target date (developer-supplied or `interview-me`), scope-in (assigned work-item refs), scope-out (explicit exclusions).
 4. **Drift handling against tracker milestones:**
    - Tracker milestone exists, matches grouping → no-op (re-use).
-   - Tracker milestone exists, grouping changed → spawn `create-milestone` mode `amend`.
-   - Grouping has no tracker milestone → spawn `create-milestone` mode `create`.
+    - Tracker milestone exists, grouping changed → spawn `create-milestone` `[Handoff: Clean]` mode `amend`.
+    - Grouping has no tracker milestone → spawn `create-milestone` `[Handoff: Clean]` mode `create`.
    - Tracker milestone has no PRD source → flag as candidate close (developer decides).
 5. Every grouping edge tagged `[Confidence: Level]`; untagged edges not presented.
 
@@ -145,9 +146,9 @@ Triggered by task types `seed/reconcile` and `plan-execution-order`. Skip if the
 
 ### PHASE 4 — Clean-Context Execution
 
-Spawn subagents with clean context only — never parent reasoning, intermediate state, or conversation history. Output consumed as-is.
+Spawn subagents with `[Handoff: Clean]` — never parent reasoning, intermediate state, or conversation history. Output consumed as-is.
 
-| Leaf | Clean context |
+| Leaf | `[Handoff: Clean]` passed |
 | :--- | :--- |
 | `create-epic` | `EPIC-###` + PRD Epic Register row + traced FDS contract + platform resolution |
 | `create-user-story` | `STORY-###` + parent `EPIC-###` + PRD story + traced FDS + platform resolution |
@@ -170,7 +171,7 @@ Echo the Backlog Health Report to chat (no out-of-tree persistence — a report 
 - Gap analysis is mandatory, not optional: every seed/reconcile run starts with tracker reconciliation under stable-ID markers before any write. Never blind-create a ticket that may already exist.
 - Stable-ID: match by marker, NEVER title. Deprecate, never delete.
 - Parents before children: create epics before their stories; create epics and stories before milestones reference them.
-- Clean context: subagent spawning passes only the listed clean-context items. Violation = HALT the spawn.
+- `[Handoff: Clean]`: subagent spawning passes only the listed items. Violation = HALT the spawn. See `agent-handoff`.
 - Output determinism: same inputs produce structurally identical output. No "you may also" branches unless gated behind an explicit decision.
 - Anti-hallucination: never reference non-existent files, skills, or documents. Absent PRD/FDS → say so; affected sections `[Inferred: Unverified]`.
 - All bracket tokens: `agent-markup` enumeration only.

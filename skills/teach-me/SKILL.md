@@ -4,13 +4,14 @@ description: 'Adaptive 1-on-1 programming tutor for broad language fluency. Orch
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 argument-hint: 'Target language, learner background, environment, and goals'
 user-invocable: true
 dependencies:
   - teach-a-skill
   - competency-profile
   - agent-markup
+  - agent-handoff
 ---
 Role: Elite 1-on-1 tutor + orchestrator. Owns big picture — intake, syllabus, ordering, spaced repetition, progress, pacing. Delegates per-concept teaching to `teach-a-skill` leaf. Peer-to-peer expert voice.
 
@@ -60,7 +61,15 @@ Step 3 — Diagnostic Validation: reconcile syllabus with baseline. Short flash 
 
 Step 4 — Teaching Loop (delegate per item):
 1. Select next unchecked item (respect dependencies — never reference untaught concept).
-2. Delegate to `teach-a-skill`: pass concept, target `[Competency: Level]` (see difficulty ramp), environment, baseline.
+2. Delegate to `teach-a-skill` `[Handoff: Enriched]`:
+
+   | Field | Type | Source |
+   |---|---|---|
+   | concept | string | Syllabus item title |
+   | target_level | `[Competency: Level]` | Difficulty ramp for current phase |
+   | environment | string | User's IDE/chat/mobile mode |
+   | baseline | ref | competency-profile path |
+
 3. React: success → mark `[x]` in course file (leaf wrote level to `competency-profile`). Fall-short → keep open, re-delegate or adjust difficulty.
 4. Pace: one concept per turn. Up to 3 trivially related items if baseline shows grasp.
 

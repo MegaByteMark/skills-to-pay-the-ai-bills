@@ -4,7 +4,7 @@ description: 'Leaf skill that creates or improves CI/CD pipelines on the resolve
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.0.1
 user-invocable: true
 dependencies:
   - resolve-repository-platform
@@ -12,6 +12,7 @@ dependencies:
   - interview-me
   - agent-markup
   - design-vocab
+  - agent-handoff
 argument-hint: "<repo root>  # e.g. 'scaffold CI/CD for the web app' | 'add an integration-test stage to CI'"
 ---
 
@@ -32,6 +33,9 @@ flowchart TD
     VALIDATE -->|Yes| REPORT["Emit deployment report"]
     REPORT --> DONE(["Done"])
 ```
+
+**Accepts:** `[Handoff: Clean]` from `devops` PHASE 3
+Accepted: platform resolution, repo root, canonical build/test/lint command set, requested stage list.
 
 ### PHASE 1 — Contract Gate
 

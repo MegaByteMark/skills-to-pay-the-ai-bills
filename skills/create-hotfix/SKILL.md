@@ -4,7 +4,7 @@ description: 'Leaf skill that creates and coordinates ONE gitflow hotfix: create
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.0.1
 user-invocable: true
 dependencies:
   - generate-release-notes
@@ -13,12 +13,13 @@ dependencies:
   - interview-me
   - agent-markup
   - design-vocab
+  - agent-handoff
 argument-hint: "<Work Item reference>  # e.g. 'create-hotfix 42' | 'create-hotfix <commit SHA>'"
 ---
 
 ```mermaid
 flowchart TD
-    START(["Invoke create-hotfix"]) --> INPUT["Consume clean context:<br>Work Item ref, main ref,<br>platform"]
+    START(["Invoke create-hotfix"]) --> INPUT["Consume [Handoff: Clean]:<br>Work Item ref, main ref,<br>platform"]
     INPUT --> BRANCH["Create hotfix branch<br>from main (worktree)"]
     BRANCH --> FIX{Fix source<br>available?}
     FIX -->|No| ASK["interview-me:<br>locate fix source"]
@@ -33,7 +34,10 @@ flowchart TD
 
 ### PHASE 1 — Input & Isolation
 
-1. Consume clean context: Work Item reference (or patch source), main reference/SHA, platform resolution.
+**Accepts:** `[Handoff: Clean]` from `devops` PHASE 3
+Accepted: Work Item reference (or patch source), main reference/SHA, platform resolution.
+
+1. Consume handoff: Work Item reference (or patch source), main reference/SHA, platform resolution.
 2. Operate inside the provided isolated worktree — never the developer's working tree. No worktree supplied → create a transient worktree (`git worktree add <path> <main-reference>`, path under OS temp), removed on exit. Branch, fix, tag, and merge operations run only in the worktree.
 
 ### PHASE 2 — Hotfix Branch
@@ -63,5 +67,5 @@ Create annotated patch tag on the hotfix tip.
 Directives:
 - Worktree-only mutation: never touch the developer's working tree.
 - Anti-fabrication: no fix source / no validation run = stated absence, never invented.
-- Clean context: Work Item ref + main reference + platform only; no parent reasoning.
+- `[Handoff: Clean]`: Work Item ref + main reference + platform only; no parent reasoning. See `agent-handoff`.
 - `agent-markup` tokens and `design-vocab` terms only.

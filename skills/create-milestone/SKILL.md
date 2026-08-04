@@ -4,15 +4,19 @@ description: Renders ONE release-aligned milestone work item from a single PO Re
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.1
+  version: 1.0.2
 dependencies:
   - resolve-repository-platform
   - agent-markup
   - interview-me
+  - agent-handoff
 argument-hint: "<MS-###> [create | amend | close]  # which milestone; mode auto-detected from tracker when omitted"
 user-invocable: true
 ---
 Single-milestone leaf. Takes ONE `MS-###`, gathers the PO Release-Alignment plan entry + assigned work-item refs, renders, writes to tracker. Set-level concerns → `po`.
+
+**Accepts:** `[Handoff: Clean]` from `po` PHASE 4
+Accepted: `MS-###` + milestone scope-in/scope-out + target date + assigned work-item references + platform resolution.
 
 1. PHASE 0 (Input & Mode): Resolve target `MS-###` from argument (required). Mode: tracker milestone already carries marker → `amend`; explicit `close` arg → `close`; else `create`. Never blind-create duplicate.
 2. PHASE 1 (Source Ingestion): Receive the PO Release-Alignment plan entry via clean-context payload (MS-### + scope-in/scope-out + target date + assigned work-item references). Direct invocation without a plan entry → HALT and route to `po plan-release-milestones`.

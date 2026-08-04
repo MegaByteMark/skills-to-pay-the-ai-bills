@@ -51,6 +51,7 @@ Grouping is by convention only (the files stay flat for discovery).
 - **competency-profile** — the shared, out-of-tree, per-user record of a human's demonstrated skill, so calibration is continuous across skills.
 - **resolve-repository-platform** — figures out the hosting platform (GitHub/GitLab/…) before any platform-specific tooling runs.
 - **detect-test-harness** — resolves the project's test runner/framework, layout, and native test-double idiom from signal files before any test is read or written; asks one question only when inconclusive and never introduces a new framework silently.
+- **agent-handoff** — shared contract for agent-to-agent context handoffs at spawn sites. Defines two modes: `[Handoff: Clean]` (isolation — parent context would taint the leaf, e.g. reviews/audits) and `[Handoff: Enriched]` (bag — parent context enriches the leaf beyond repo artefacts, e.g. PR creation, teaching). Includes declaration syntax, validation rules (undeclared fields = HALT), and mode selection rule. Enforced by skill-authoring Rule 14.
 - **strategic-reading** — shared contract for Strategic Literature Nudges: lead/orchestrator skills append a 2-line Strategic Anchor (a canonical book/chapter reference plus the mental model it lends to the current design trade-off) to output only when the work resolves a non-trivial architectural, schema, or process/operational design choice — never on routine tasks. Supplies the trusted-literature whitelist by domain.
 - **skill-authoring** — meta-skill for creating and maintaining Agent Skills; enforces naming, frontmatter, scope-gating, prose compaction, Mermaid diagrams, and dependency validation on every create or modify operation.
 
@@ -238,6 +239,8 @@ vibe-code-antidote ───────────────────┼�
 swe · ba · po · qa · devops ──> strategic-reading  (literature nudges on non-trivial design trade-offs)
 
 swe ──> create-pr  (closure: raise Change Proposal with context bag)
+
+all orchestrators ──> agent-handoff  (shared handoff contract: [Handoff: Clean] | [Handoff: Enriched])
 ```
 
 State that a skill persists (course progress, competency baseline, capability profiles) always lives **outside the project tree** — it is never committed to your repo.
