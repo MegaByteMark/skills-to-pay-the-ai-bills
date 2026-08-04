@@ -4,7 +4,7 @@ description: 'SWE (Software Engineer) persona orchestrator. Guides feature compl
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.0.0
+  version: 2.1.0
 user-invocable: true
 dependencies:
   - clean-architecture
@@ -17,6 +17,7 @@ dependencies:
   - resolve-repository-platform
   - architectural-decision-register
   - strategic-reading
+  - create-pr
 argument-hint: "<context>  # e.g. 'implement <feature>' | 'pick up next item from plan' | 'pick up next item from milestone MS-###' | 'pick up <EPIC-### | STORY-###> from plan'"
 ---
 
@@ -113,13 +114,14 @@ Present the subagent's findings to the developer. Every finding must carry `[Ris
 ### PHASE 5 — Closure
 
 1. If architectural decisions were made during development, invoke `architectural-decision-register` (PHASE 1 Generate) to record each decision.
-2. Persist feature artefacts (PR, requirements decisions) to the issue tracker / documentation per resolved platform. Never hand off between agents.
-3. **Plan-pickup closure (only when invoked via PHASE 0):**
+2. Spawn `create-pr` subagent with optional context bag: task scope, development decisions (pre-ADR), requirements traceability, test approach, adversarial-review findings + developer accept/fix decisions from PHASE 3-4. `create-pr` runs its standard flow (inference + interview-if-interactive + render + raise PR via platform CLI). Headless mode: interview skipped, inference-only output with `[Confidence: Inferred]` on gap-filled sections.
+3. Persist feature artefacts (requirements decisions) to the issue tracker per resolved platform. Never hand off between agents.
+4. **Plan-pickup closure (only when invoked via PHASE 0):**
    - Close the tracker item (status → done/closed, unassign self) via the platform CLI. This is the state mutation — the tracker is the state machine.
    - Derive next pickup by re-reading `docs/requirements/roadmap.md` + tracker: first unassigned open item in the lowest-numbered wave whose `<-` blockers are all closed. Purely mechanical; no agent judgement.
    - Echo to chat: `Item <ID> closed. Next pickup: <next ready item or "nothing — roadmap complete">.`
    - If the picked item was a wave's last blocker and the next wave has fresh ready items, surface the wave transition to the developer with a one-line summary of the new wave's scope.
-4. Manual override: developer may invoke `adversarial-review` independently outside this flow at any time — the persona does not block direct invocation.
+5. Manual override: developer may invoke `adversarial-review` or `create-pr` independently outside this flow at any time — the persona does not block direct invocation.
 
 ### Directives
 

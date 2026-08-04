@@ -4,7 +4,7 @@ description: Defines the strict token syntax, bracket-enclosed schema fields, an
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.3.0
+  version: 1.4.0
 ---
 All machine-readable tokens MUST be in square brackets `[...]`.
 
@@ -32,7 +32,9 @@ All machine-readable tokens MUST be in square brackets `[...]`.
 
 [Doc: Archetype]: [QuickStart, Technical, Troubleshooting, Installation, Commentary]. Path bindings owned by document-a-codebase.
 
-[Scope: Artefact]: [Release, Security-Governance, Health, Digest, Deployment]. Digest = client-facing weekly progress email from client-email-digest. Deployment = CI/CD or release coordination report from the devops persona and its leaves. Extend this enumeration here when adding report-producing skills.
+[Scope: Artefact]: [Release, Security-Governance, Health, Digest, Deployment, Change-Proposal]. Digest = client-facing weekly progress email from client-email-digest. Deployment = CI/CD or release coordination report from the devops persona and its leaves. Change-Proposal = PR/MR body from create-pr. Extend this enumeration here when adding report-producing skills.
+
+[Section: Name]: [Motivation, Summary, Key-Decisions, Review-Focus, Verification]. Written `### [Section: Motivation]` etc. as stable machine-parseable headers. Enables AI consumers (e.g. adversarial-review) to regex-extract sections and lift `file:line` signposts into their own scope. Owned by create-pr.
 
 [Scope: Origin]: [Pre-existing, Introduced]. Pre-existing = issue surfaced but not caused by the diff under review; Introduced = issue created by the diff. Used by adversarial-review to distinguish fix-in-PR from park-behind-bug-report.
 
