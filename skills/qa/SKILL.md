@@ -4,7 +4,7 @@ description: 'QA (Quality Assurance) persona orchestrator. Runs audit-test-cover
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.2.0
+  version: 1.3.0
 user-invocable: true
 dependencies:
   - audit-test-coverage
@@ -72,6 +72,7 @@ flowchart TD
 Run `audit-test-coverage` and `audit-security-and-governance` in parallel (sequential if resource-constrained). Consume each leaf's output as-is; do not re-run or summarise away leaf analysis.
 
 - Missing contracts: do NOT pull in `analyze-a-codebase` / blueprints. `audit-test-coverage`'s equivalent gate resolves to **EPHEMERAL** (in-context minimalist FDS, `[Inferred: Unverified]`, down-weighted `[Confidence: Level]`). `audit-security-and-governance` runs standalone with a "no contract baseline" notice.
+- When `docs/architecture/system-blueprint.md` is present: consume its Seam test topologies (§2.3.2) and data isolation models (§5.2) to inform high-leverage verification surfaces without regenerating the blueprint.
 - QA operates independently on current code state only.
 
 ### PHASE 4 — Adversarial Hunting
