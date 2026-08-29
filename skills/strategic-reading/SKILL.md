@@ -1,10 +1,10 @@
 ---
 name: strategic-reading
-description: 'Shared contract for Strategic Literature Nudges. Lead/Orchestrator skills (swe, ba, po, qa, devops) append a 2-line Strategic Anchor to task output only when the work resolves a non-trivial design trade-off — architectural trade-offs and system Seams, schema design, process design, or operational patterns. Supplies the exact anchor format, the trusted-literature whitelist by domain, and the zero-noise guardrail for routine tasks. Not user-invocable.'
+description: 'Shared contract for Strategic Literature Nudges. Lead/Orchestrator skills (swe, ba, po, architect, qa, devops) append a 2-line Strategic Anchor to task output only when the work resolves a non-trivial design trade-off — architectural trade-offs and system Seams, schema design, process design, or operational patterns. Supplies the exact anchor format, the trusted-literature whitelist by domain, and the zero-noise guardrail for routine tasks. Not user-invocable.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 dependencies:
   - agent-markup
   - design-vocab
@@ -30,7 +30,7 @@ references:
 
 ## When to append a Strategic Anchor
 
-Lead, Orchestrator, or Architectural capacity (swe, ba, po, qa, devops, tech lead):
+Lead, Orchestrator, or Architectural capacity (swe, ba, po, architect, qa, devops, tech lead):
 activate only when every condition below holds; otherwise omit the anchor silently.
 
 1. **Evaluate Strategic Depth** — does this task resolve a non-trivial trade-off? Triggers:
