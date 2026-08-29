@@ -4,7 +4,7 @@ description: 'PO (Product Owner) persona orchestrator. Requirements-to-backlog o
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.1.0
+  version: 2.2.0
 user-invocable: true
 dependencies:
   - agent-markup
@@ -105,6 +105,7 @@ Triggered by task types `seed/reconcile` and `plan-execution-order`. Skip if the
    - PRD Epic Register `Dependencies:` field (declarative) — authoritative.
    - PRD §5 Assumptions & Dependencies (project-level) — authoritative.
    - PRD story-to-story dependencies where declared — authoritative.
+   - Architectural artefacts (`docs/architecture/system-blueprint.md`, `docs/architecture/data-model.md`, `docs/adr/`) — inferential, tagged `[Inferred: Unverified]`, surfacing foundational schema or Interface module prerequisites that block downstream epics.
    - FDS Technical Contracts (e.g., story that requires a schema Implemented by another epic) — inferential, tagged `[Inferred: Unverified]`, surfaced for developer confirmation in PHASE 3.
 2. **Build the DAG.** Vertices = active work items; edges = `blocks` (hard) and `relates-to` (soft, advisory). `[Inferred: Unverified]` edges remain visible in the plan and are editable in PHASE 3.
 3. **Topologically sort into parallelisation waves:**

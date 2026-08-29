@@ -4,7 +4,7 @@ description: 'Shared contract defining the two modes of agent-to-agent context h
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 dependencies:
   - agent-markup
   - design-vocab
@@ -86,6 +86,7 @@ The following spawn sites were retrofitted from informal prose to formal `[Hando
 **Clean mode:**
 - `swe` → `adversarial-review` (PHASE 3)
 - `po` → `create-epic`, `create-user-story`, `create-bug-report`, `create-milestone` (PHASE 4)
+- `architect` → `analyze-a-codebase`, `audit-blueprint-implementation` (PHASE 2)
 - `qa` → `remediate-test-coverage`, `create-bug-report` (PHASE 6)
 - `devops` → `create-release`, `create-hotfix`, `scaffold-ci-cd` (PHASE 3)
 
