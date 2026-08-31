@@ -4,7 +4,7 @@ description: 'PO (Product Owner) persona orchestrator. Requirements-to-backlog o
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.2.0
+  version: 2.3.0
 user-invocable: true
 dependencies:
   - agent-markup
@@ -73,12 +73,12 @@ Fail → `interview-me` ONE question per missing capability, with a recommendati
 
 ### PHASE 2 — Gap Analysis & Coherence
 
-1. Ingest requirements: PRD at `docs/requirements/product-requirements.md` (Epic Register + User Story Backlog) required for seed/reconcile; FDS at `docs/requirements/functional-requirements.md` optional. PRD absent → `interview-me` ONE decision to generate via `gather-requirements` (or hand to `ba`); No → halt.
+1. Ingest requirements and design artifacts: PRD at `docs/requirements/product-requirements.md` (Epic Register + User Story Backlog) required for seed/reconcile; FDS at `docs/requirements/functional-requirements.md` optional; Design Register at `docs/design/design-register.md` and UI design gap outputs from `designer` optional. PRD absent → `interview-me` ONE decision to generate via `gather-requirements` (or hand to `ba`); No → halt.
 2. Query tracker for work items carrying `skills:work-item` markers. Match by marker, NEVER title.
 3. Detect:
-   - **Missing** — requirement `Status: Active`, no matching tracker marker → create.
+   - **Missing** — requirement `Status: Active` or deferred UI design gap (`[Remediation: Defer]`), no matching tracker marker → create.
    - **Duplicate** — two+ tracker items claiming the same requirement or same intent under different markers → consolidate: pick canonical, deprecate the rest.
-   - **Drift** — tracker item content diverges from current PRD/FDS → amend.
+   - **Drift** — tracker item content diverges from current PRD/FDS/Design contracts → amend.
    - **Orphan** — story tracked without parent epic marker → flag; epic must exist before its stories.
    - **Deprecated** — `[Priority: Wont]` / `Status: Deprecated` with a live tracker item → close (never delete).
 4. Tag every finding `[Confidence: Level]`. Untagged findings are not presented.
