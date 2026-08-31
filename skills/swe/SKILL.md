@@ -4,7 +4,7 @@ description: 'SWE (Software Engineer) persona orchestrator. Guides feature compl
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.3.0
+  version: 2.4.0
 user-invocable: true
 dependencies:
   - clean-architecture
@@ -75,7 +75,7 @@ Triggered only when the invocation matches `/pick up .* from plan/`. Skip entire
 
 ### PHASE 2 — Feature Development
 
-Develop the feature using the bundled skills for guidance and enforcement. Ingest active ADRs (`docs/adr/`), `docs/architecture/system-blueprint.md`, and `docs/architecture/data-model.md` when present, adhering strictly to established Module structures, Interface contracts across Seams, and Adapter placements:
+Develop the feature using the bundled skills for guidance and enforcement. Ingest active ADRs (`docs/adr/`), `docs/architecture/system-blueprint.md`, `docs/architecture/data-model.md`, approved UI prototypes (`docs/design/approved/`), and pinned design systems (`docs/design/system/vX/`) when present, adhering strictly to established Module structures, Interface contracts across Seams, Adapter placements, and validated UI designs:
 
 | Skill | Role in SWE persona |
 |---|---|
