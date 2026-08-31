@@ -1,43 +1,84 @@
 ---
 name: value-proposition
-description: Guides a user through the Value Proposition Canvas, ingesting the business-model-canvas output to establish Customer Profile and Value Map context, then compiles the completed canvas into Markdown and HTML. Only asks for detail beyond what the BMC already captured — never re-asks for redundant information.
+description: Guides a user through the Value Proposition Canvas. Ingests business-model-canvas context, resolves gaps via interview-me, presents recommendation baselines across Customer Profile and Value Map blocks one by one, refines with the user, and compiles to Markdown and HTML on explicit move-next advancement.
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 dependencies:
   - business-model-canvas
+  - interview-me
 argument-hint: "[path/to/bmc-markdown.md]  # optional; defaults to docs/business-model-canvas/"
 user-invocable: true
 ---
-Cross-skill integration: load BMC context before prompting. NEVER re-ask what the BMC already provided. NEVER fabricate BMC content — if BMC output is absent, report gracefully and halt.
+Cross-skill integration: load BMC context before prompting. NEVER re-ask what the BMC already provided. All 6 blocks (Customer Profile + Value Map) MUST exist in the output in fixed order to guarantee consistent schema. NEVER fabricate facts — unresolved fields stay empty.
 
-1. PHASE 0 (Load BMC Context): Resolve BMC output. Check `docs/business-model-canvas/` for markdown output file. If argument provided, use that path. Parse the document to extract **Customer Segments** and **Value Propositions** content. If no BMC output found: report `BMC output not found — run business-model-canvas first` and halt. Display the extracted BMC segments to the user as established baseline.
+```mermaid
+flowchart TD
+    START(["Invoke value-proposition"]) --> D1{"BMC output present?"}
+    D1 -->|Yes| P1["Load BMC Customer Segments\n& Value Propositions"]
+    D1 -->|No| D_GEN{"Generate BMC first?"}
+    D_GEN -->|Yes| P_HALT(["HALT: run business-model-canvas"])
+    D_GEN -->|No| P2["Elicit segment context\nvia interview-me"]
+    P1 --> D2{"Context gaps remain?"}
+    P2 --> D2
+    D2 -->|Yes| P3["interview-me: ask 1 question\nwith baseline recommendation"]
+    P3 --> D2
+    D2 -->|No| P4["Announce move-next protocol\nand set Block Index = 0"]
+    P4 --> D_BLK{"Block Index < 6?"}
+    D_BLK -->|Yes| P5["Draft & present recommendation\nfor Block Index"]
+    P5 --> D_ADV{"Input == move-next or /next?"}
+    D_ADV -->|No| P6["Refine draft in-memory\nper user feedback"]
+    P6 --> D_ADV
+    D_ADV -->|Yes| P7["Lock block content and\nincrement Block Index"]
+    P7 --> D_BLK
+    D_BLK -->|No| P8["Render Markdown + HTML\n[Scope: VP]"]
+    P8 --> D_WRT{"User confirms write?"}
+    D_WRT -->|Yes| P9["Write to docs/value-proposition-canvas/"]
+    D_WRT -->|No| P10["Emit inline to chat"]
+    P9 --> DONE(["Done"])
+    P10 --> DONE
+```
 
-2. PHASE 1 (Elicit — Customer Profile): Walk through the 3 Customer Profile blocks in fixed order. Present each with a prompt tying it back to the BMC Customer Segments baseline. Wait for user content. Advance after receiving input. Support interactive commands: `/next`, `/back`, `/edit <block>`, `/done`, `/status`.
-   - **Customer Jobs** — What functional, social, and emotional tasks are these customers trying to perform? (Context: BMC Customer Segments)
-   - **Pains** — What negative emotions, undesired costs, and risks do they experience before, during, or after getting the job done?
-   - **Gains** — What benefits do they expect, desire, or would be surprised by?
+1. PHASE 0 (Context Discovery & Gap Interview):
+   - Resolve BMC output from `docs/business-model-canvas/` or supplied path. Extract **Customer Segments** and **Value Propositions**.
+   - If BMC output is missing: ask ONE `interview-me` decision to generate with `business-model-canvas` first or elicit baseline segments interactively.
+   - Inspect context for gaps across Customer Profile and Value Map dimensions.
+   - For missing context: drive `interview-me` asking ONE question at a time, each with a calculated baseline recommendation, until shared understanding is reached.
+   - Announce advancement protocol: answering questions or refining is NOT advancement. Only literal `move-next` or `/next` locks a section and advances.
 
-3. PHASE 2 (Elicit — Value Map): Walk through the 3 Value Map blocks in fixed order. Present each with a prompt tying it back to the BMC Value Propositions baseline. Support same interactive commands.
-   - **Products & Services** — What does the business offer to help customers get the job done?
-   - **Pain Relievers** — How do these offerings alleviate specific customer pains?
-   - **Gain Creators** — How do these offerings create customer gains?
+2. PHASE 1 (Recommendation-Led Section Walkthrough):
+   - Walk through the 6 blocks in fixed sequence across Customer Profile and Value Map.
+   - For each block: present a synthesized, calculated recommendation draft tied directly to the BMC baseline.
+   - User may critique, question, or request adjustments. Refine the draft in-memory. Answering or discussing does NOT advance.
+   - Advance to next block ONLY when the user issues `move-next` or `/next`.
+   - Support interactive commands: `move-next` / `/next`, `/back`, `/edit <block>`, `/done`, `/status`.
 
-4. PHASE 3 (Render): Compile the Value Proposition Canvas into two formats:
-   - **Markdown** — structured document with Customer Profile and Value Map sections, each block as a sub-heading. Include the imported BMC segments as a preamble.
-   - **HTML** — self-contained page with inline styles rendering a two-column layout (Customer Profile | Value Map) with sub-block cells. Tag `[Scope: VP]`.
+   Block sequence and definitions:
+   **Customer Profile:**
+   1. **Customer Jobs** — Functional, social, and emotional tasks target customers seek to accomplish.
+   2. **Pains** — Undesired costs, risks, frustrations, and obstacles experienced around jobs.
+   3. **Gains** — Expected, desired, or unexpected benefits and positive outcomes sought.
 
-5. PHASE 4 (Output): Present both outputs. Offer to write to `docs/value-proposition-canvas/`. Do not write without explicit confirmation. Chat-only fallback: display inline.
+   **Value Map:**
+   4. **Products & Services** — Specific products, features, and offerings that help execute jobs.
+   5. **Pain Relievers** — Concrete mechanisms explaining how offerings eliminate or reduce specific customer pains.
+   6. **Gain Creators** — Explicit ways offerings produce required, expected, or surprising customer gains.
+
+3. PHASE 2 (Render): Compile the Value Proposition Canvas into two formats:
+   - **Markdown** — structured document with Customer Profile and Value Map sections, each block as a sub-heading. Include imported BMC baseline as preamble. All 6 block sub-headings MUST be present.
+   - **HTML** — self-contained page with inline styles rendering a two-column layout (Customer Profile | Value Map) with sub-block cards. All 6 block cards MUST be rendered. Tag `[Scope: VP]`.
+
+4. PHASE 3 (Output): Present outputs. Offer to write to `docs/value-proposition-canvas/`. Do not write without explicit confirmation. Fallback: inline display.
 
 Directives:
-- BMC-First: Always establish BMC context before the first VP prompt. Display what the BMC already says about Customer Segments and Value Propositions.
-- No Redundancy: Never ask the user to re-state content already captured in the BMC. Reference it. Each VP prompt must assume the BMC baseline is known.
-- One Block Per Interaction: Present exactly one block per turn.
-- Content-First: User's natural-language response IS the block content. Store verbatim.
-- Empty Blocks: `/next` with no content stores empty string. Do not re-prompt unless `/edit`.
-- Anti-Fabrication: Never invent BMC or VP content. Unanswered = empty cell.
-- Graceful Degradation: No BMC output found = halt with clear instruction. No silent fallback.
+- Complete 6-Block Coverage: Every output canvas MUST contain all 6 blocks in fixed sequence to guarantee consistent schema and visual structure. Unanswered blocks render as "(not defined)".
+- BMC-First: Establish BMC baseline before presenting first block recommendation.
+- No Redundancy: Never ask the user to restate established BMC content. Reference it.
+- Recommendation-First: Every section begins with the agent's drafted recommendation baseline based on discovered context.
+- Strict Advancement: Advancing requires literal `move-next` or `/next`. Never auto-advance on conversational feedback.
+- Anti-Fabrication: Unanswered blocks render as "(not defined)".
+- Output Portability: HTML self-contained with inline styles. Markdown valid CommonMark.
 
 Schema `[Scope: VP]`:
 
