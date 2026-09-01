@@ -4,7 +4,7 @@ description: 'Generates self-contained, interactive flat HTML/CSS/JS prototypes 
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 user-invocable: true
 dependencies:
   - design-vocab
@@ -45,19 +45,23 @@ flowchart TD
 
 1. **Self-Contained & Zero Build:**
    - Every prototype must open cleanly via direct filesystem navigation (`file://`) and local HTTP servers with zero build, bundling, or compilation steps.
-   - Zero CDN dependencies: Use system font stacks (`system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`), relative local CSS links, and inline SVG or local relative sprite assets.
+   - Zero CDN dependencies: Use modern system font stacks (`system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`) or local `@font-face` assets, relative local CSS links, and inline SVG or local relative sprite assets. Never inject remote Google Fonts or CDN stylesheets.
 
-2. **Semantic & Accessible by Construction:**
+2. **Tailwind-Compatible Utilities & Semantic Classes:**
+   - Use standard utility classes (`flex`, `grid`, `gap-*`, `p-*`, `m-*`, `rounded-*`, `shadow-*`, `text-*`, `bg-*`) and semantic component classes (`.btn`, `.btn-primary`, `.form-input`, `.modal`, `.card`, `.badge`).
+   - When linked to a design system, reference `design-system.css` and `tokens.css`. When invoked standalone, inject an inline fallback block containing these core tokens and utilities.
+
+3. **Semantic & Accessible by Construction:**
    - Use landmark elements: `<header>`, `<nav>`, `<main>`, `<aside>`, `<footer>`, `<section aria-labelledby="...">`.
    - Provide a top-level skip link: `<a href="#main-content" class="skip-link">Skip to main content</a>`.
    - Accessible Forms: Every input must have an explicit `<label for="...">`, associated `aria-describedby` for helper/error text, and `aria-invalid="true"` on error states.
    - Keyboard Navigation: Visible high-contrast `:focus-visible` outlines on all interactive elements. Escape key closes open dialogs/modals. Logical tab sequence.
    - Contrast Ratios: Minimum 4.5:1 for normal text, 3:1 for large text and UI boundaries against their backgrounds.
 
-3. **Interaction & State Simulation:**
+4. **Interaction & State Simulation:**
    - Implement interactive state switches (e.g. error banner toggle, modal open/close, tab panel switching, empty state simulation) using plain vanilla JavaScript (`addEventListener`).
    - For multi-screen flows, link screens via relative anchor tags (`href="./screen-02-summary.html"`).
 
-4. **Output Location:**
+5. **Output Location:**
    - When spawned by `designer`: Write to target path passed in handoff (e.g. `docs/design/drafts/<flow-name>/<screen-name>.html`).
    - When invoked directly: Write to `docs/design/drafts/adhoc/<screen-name>.html` (or display directly to user if repo has no design directory).

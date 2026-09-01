@@ -4,7 +4,7 @@ description: 'Designer persona orchestrator — UI/UX flow prototyping, versione
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 user-invocable: true
 dependencies:
   - interview-me
@@ -75,14 +75,16 @@ flowchart TD
 - Canonical location: `docs/design/system/v<N>/`.
 - Files scaffolded:
   - `tokens.css`: Core design variables (color palette, typography scale, spacing units, elevation/shadows, focus states, border radii).
-  - `design-system.css`: Base layout, typography rules, skip link styles, focus ring defaults, and utility classes.
-  - `component-catalog.html`: Living pattern library displaying all standard components (buttons, text inputs, selects, date pickers, tables, modals, alerts, badges, tabs) in their default, hover, focus, active, disabled, and error states.
+  - `design-system.css`: Tailwind-compatible utility classes (`flex`, `grid`, `gap-*`, `p-*`, `m-*`, `rounded-*`, `shadow-*`, `text-*`, `bg-*`) paired with semantic accessible component classes (`.btn`, `.btn-primary`, `.form-input`, `.modal`, `.badge`, `.card`, `.table`), base layout, and skip-link styles.
+  - `component-catalog.html`: Living pattern library displaying all standard components in their default, hover, focus, active, disabled, and error states.
   - `assets/icons.svg`: Bundled local SVG icon sprite sheet for offline zero-CDN resilience.
+  - `assets/fonts/`: Optional directory for local `.woff2` font files referenced via relative `@font-face` rules. Defaults to modern system font stack (`system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`) with zero network overhead.
 
 #### 2b. Design & Prototype Mode
 - Ingest target item (`EPIC-###` or `STORY-###`) from `docs/requirements/product-requirements.md` and `docs/requirements/functional-requirements.md`.
 - Resolve pinned design system version (e.g. `docs/design/system/v1/`). If none exists, run PHASE 2a first.
 - Map screen journey and interaction states (default, active, validation error, empty state, success modal).
+- Standardise screen markup on Tailwind-compatible utilities and semantic component classes from the design system to prevent styling drift across screens.
 - Spawn `prototype-ui` subagent for each screen in the flow:
 
   **Handoff:** `[Handoff: Enriched]` → `prototype-ui`
