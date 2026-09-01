@@ -58,10 +58,10 @@ Grouping is by convention only (the files stay flat for discovery).
 ### Requirements & discovery
 - **interview-me** — relentless one-question-at-a-time design interrogation with a recommendation on every question.
 - **gather-requirements** — drives `interview-me` across two streams: a **product stream** producing a Product Requirements Document (PRD) of vision, personas, Epics and MoSCoW-prioritised user stories that seed the backlog, then a **functional stream** producing the Functional Design Specification (FDS), with every FDS requirement traced back to its originating PRD Epic/story.
-- **business-model-canvas** — conversational wizard that walks through the 9 building blocks of the Business Model Canvas one at a time, then compiles the completed canvas into Markdown and HTML formats.
-- **value-proposition** — conversational wizard that ingests the business-model-canvas output to establish Customer Profile and Value Map context, then guides the user through the Value Proposition Canvas and compiles it into Markdown and HTML.
-- **competitor-analysis** — conversational wizard that ingests the business-model-canvas output for value proposition and target market context, profiles 3–5 competitors with strengths/weaknesses/pricing, builds a comparison matrix, and outputs a SWOT summary in Markdown and HTML.
-- **go-to-market** — conversational wizard that ingests the business-model-canvas output (Channels, Customer Relationships, Revenue Streams) and optionally the value-proposition canvas to structure a phased launch roadmap, marketing channels, sales strategy, and target KPIs, then compiles the complete GTM plan into Markdown and HTML.
+- **business-model-canvas** — discovers repo context, resolves gaps via `interview-me`, presents recommendation baselines for all 9 building blocks one by one, refines with the user, and compiles to Markdown and HTML on explicit `move-next` advancement.
+- **value-proposition** — ingests `business-model-canvas` context, resolves gaps via `interview-me`, presents recommendation baselines across Customer Profile and Value Map blocks one by one, refines with the user, and compiles to Markdown and HTML on explicit `move-next` advancement.
+- **competitor-analysis** — ingests `business-model-canvas` context, identifies competitors via `interview-me`, presents recommendation baselines across competitor profiles, comparison matrix, and SWOT summary, refines with the user, and compiles to Markdown and HTML on explicit `move-next` advancement.
+- **go-to-market** — ingests `business-model-canvas` and optional `value-proposition` context, resolves gaps via `interview-me`, presents recommendation baselines across launch timeline, marketing channels, sales strategy, and target KPIs, refines with the user, and compiles to Markdown and HTML on explicit `move-next` advancement.
 
 ### Estimation & planning
 *Sizes requirements from the PRD/FDS baseline before publishing to the backlog. Produces deliverable HTML reports; never modifies the working tree.*
@@ -82,6 +82,10 @@ Grouping is by convention only (the files stay flat for discovery).
 - **document-a-codebase** — generates user / technical / installation docs from the FDS, blueprint, and code. Adds inline code commentary via `[Doc: Commentary]` archetype, guided by the `commentary` shared-contract skill.
 - **db-normalisation** — turns the FDS (or a direct spec) into a fully normalised relational data model — or reverse-engineers and audits an existing database — walking `interview-me` through the normal forms (UNF→1NF→2NF→3NF, optionally BCNF), sweeping for the canonical persistence anti-patterns, and writing a Mermaid ERD plus a documented data dictionary to `docs/architecture/data-model.md`.
 
+### UI/UX & prototyping
+*Rapid interface prototyping, design system governance, and WCAG accessibility verification.*
+- **prototype-ui** — *leaf*; generates self-contained, interactive flat HTML/CSS/JS prototypes on demand for rapid UI/UX experimentation, screen design, and flow exploration. Zero-build and offline-resilient with WCAG 2.2 accessibility by construction. Invocable standalone or spawned by `designer`.
+
 ### Code-quality enforcement
 *Standalone review overlays — load whichever fits the codebase and task. Each audits only supplied code and calibrates every finding with `[Confidence: Level]` to curb false positives.*
 - **dry-kiss** — enforces DRY / KISS / YAGNI to block duplication, over-engineering, and gratuitous cleverness.
@@ -92,11 +96,12 @@ Grouping is by convention only (the files stay flat for discovery).
 - **debug** — systematic debugging workflow: reproduce, gather evidence, hypothesise, validate against spec, apply fix, write regression tests, and deploy. One hypothesis at a time, evidence before intuition.
 
 ### Persona orchestrators
-*Persona skills that bundle specialised skills into a coherent development workflow. Invocable via `/swe <context>`, `/ba <context>`, `/po <context>`, `/architect <context>`, `/qa <context>`, or `/devops <action>`.*
+*Persona skills that bundle specialised skills into a coherent development workflow. Invocable via `/swe <context>`, `/ba <context>`, `/po <context>`, `/architect <context>`, `/designer <context>`, `/qa <context>`, or `/devops <action>`.*
 - **swe** — SWE (Software Engineer) persona orchestrator. Guides feature completion using `clean-architecture`, `solid-principles`, `dry-kiss`, and `red-green-refactor-tdd`, then auto-spawns `adversarial-review` subagent with clean context for an adversarial gate, presenting findings in a developer decision loop (fix & re-review or accept & proceed). At closure, spawns `create-pr` with a context bag (task scope, decisions, review findings) to raise the Change Proposal. Plan-driven pickup: `pick up next item from plan [milestone MS-###] [wave N]` reads `docs/requirements/roadmap.md` for wave membership + DAG edges, reads the tracker for live status/assignment, resolves the next ready work item, runs the standard SWE flow, and closes the tracker item on completion.
 - **ba** — BA (Business Analyst) persona orchestrator. Interactive requirements discovery via `interview-me` (one question at a time) and `gather-requirements` (two-stream PRD/FDS). Single long-context session, no subagent spawning, constant developer collaboration, shared understanding checkpoint, and artefact persistence ready for `po`.
 - **po** — PO (Product Owner) persona orchestrator. Requirements-to-backlog orchestration with mandatory gap analysis: capability-probes the tracker (hard gate), ingests PRD/FDS, reconciles work items via stable-ID markers (create/amend/close), plans release-aligned milestones and an in-repo execution-order roadmap at `docs/requirements/roadmap.md` (dependency DAG → parallelisable waves), and spawns clean-context subagents (`create-epic`, `create-user-story`, `create-bug-report`, `create-milestone`). Supersedes `seed-backlog` (ADR-0003).
 - **architect** — Architect persona orchestrator. Drives system blueprinting, architectural decision governance (`docs/adr/`), relational data modeling (`db-normalisation` → `docs/architecture/data-model.md`), and technical design decomposition for epics and stories. Dual-mode execution: macro system architecture (`/architect blueprint` or `/architect analyze`) vs micro item design (`/architect design <EPIC-### | STORY-###>`), plus drift auditing (`/architect audit`). Holds all generated artefacts in memory until explicit developer approval before persisting to in-repo locations.
+- **designer** — Designer persona orchestrator. Drives UI/UX flow prototyping, versioned in-repo design system governance (`docs/design/system/vX/`), adversarial accessibility gates (WCAG 2.2 / Lighthouse 100), interactive screen walkthroughs, and downstream backlog integration. Ingests PRD/FDS requirements to produce and maintain versioned design assets in `docs/design/system/vX/`, drafts in `docs/design/drafts/`, and validated prototypes in `docs/design/approved/`. Enriches FDS with verified interaction states and hands off UI gaps to `po`.
 - **qa** — QA (Quality Assurance) persona orchestrator. Runs `audit-test-coverage` + `audit-security-and-governance` in parallel inside an isolated git worktree, then spawns `remediate-test-coverage` or `create-bug-report` subagents with clean context in a developer decision loop. Calibrates scope by mode: Delta (post-change, adversarial edge-case hunting) or Release-gate (full-surface regression against the resolved target test surface). Working tree never touched.
 - **devops** — DevOps persona orchestrator. Hands-off gitflow release coordination with full worktree isolation: routes `/devops release <version>`, `/devops hotfix <workitem>`, and `/devops scaffold-ci-cd` to clean-context subagents (`create-release`, `create-hotfix`, `scaffold-ci-cd`), drives the QA Release-gate for releases, and verifies CI/CD pipeline health and deploy triggers. Developer working tree never touched.
 
@@ -239,12 +244,14 @@ architect ──> analyze-a-codebase ────────┐
           ├──> solid-principles
           └──> architectural-decision-register
 
+designer ──> prototype-ui  (enriched-context subagent)
+
 teach-me          ──> teach-a-skill ──┐
 vibe-code-antidote ──> teach-a-skill   │  (escalation leaf)
 vibe-code-antidote ───────────────────┼──> competency-profile  (shared baseline)
                                        └──> agent-markup / design-vocab  (shared contracts)
 
-swe · ba · po · architect · qa · devops ──> strategic-reading  (literature nudges on non-trivial design trade-offs)
+swe · ba · po · architect · designer · qa · devops ──> strategic-reading  (literature nudges on non-trivial design trade-offs)
 
 swe ──> create-pr  (closure: raise Change Proposal with context bag)
 
