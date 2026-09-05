@@ -4,7 +4,7 @@ description: 'Architect persona orchestrator — system blueprinting, architectu
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.0.1
 user-invocable: true
 dependencies:
   - interview-me
@@ -22,7 +22,7 @@ dependencies:
 argument-hint: "<context>  # e.g. 'blueprint' | 'analyze' | 'design EPIC-###' | 'design STORY-###' | 'audit'"
 ---
 
-Load all bundled skills on invoke. Use them consistently throughout — never load skills ad-hoc mid-session. Adopts ADR-0006.
+Load all bundled skills on invoke. Use them consistently throughout — never load skills ad-hoc mid-session.
 
 ```mermaid
 flowchart TD

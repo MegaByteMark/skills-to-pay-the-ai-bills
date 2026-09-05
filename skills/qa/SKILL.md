@@ -4,7 +4,7 @@ description: 'QA (Quality Assurance) persona orchestrator. Runs audit-test-cover
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.3.0
+  version: 1.3.1
 user-invocable: true
 dependencies:
   - audit-test-coverage
@@ -21,7 +21,7 @@ dependencies:
 argument-hint: "<context>  # e.g. 'audit this PR for coverage + security gaps' | 'release-gate regression sweep'"
 ---
 
-Load all bundled skills on invoke. Use them consistently throughout — never load skills ad-hoc mid-session. Adopts ADR-0001 (scope modes + transient worktree execution).
+Load all bundled skills on invoke. Use them consistently throughout — never load skills ad-hoc mid-session.
 
 ```mermaid
 flowchart TD
@@ -63,7 +63,7 @@ flowchart TD
 ### PHASE 2 — Isolation (Worktree)
 
 1. Create a dedicated git worktree for this session: `git worktree add <path> <base>` where `<path>` is under OS temp (e.g. `/tmp/qa-<session-id>`). Session-id is unique per invocation.
-   - Worktree is **transient execution context, not persistent state** (ADR-0001). The AGENTS.md volatile-temp prohibition governs the persistent state store (escalation/competency/progress) — never the execution sandbox. The worktree is removed in PHASE 7.
+   - Worktree is **transient execution context, not persistent state**: the volatile-temp prohibition governs the persistent state store (escalation/competency/progress) — never the short-lived execution sandbox. The worktree is removed in PHASE 7.
 2. Materialise the code under test inside the worktree (checkout `<base>`; apply the change by commit or patch). Never touch the developer's working tree — audits, tests, simulations, and remediation run only inside the worktree.
 3. Run `detect-test-harness` inside the worktree before any test is read or run. Carry the Resolution Record into every subsequent phase.
 
