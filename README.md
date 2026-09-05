@@ -92,15 +92,16 @@ When starting a project from scratch, follow this exact sequence:
 
 2. **System Architecture & Data Modeling (`/architect blueprint`)**
    - Ingests PRD and FDS.
-   - Normalises the persistence layer using `db-normalisation` (UNF → 3NF/BCNF) into `docs/architecture/data-model.md` with Mermaid ER diagrams and data dictionaries.
-   - Decomposes Module topology, assigns Clean Architecture layers, identifies external Seams and Adapters, and logs project ADRs (`docs/adr/ADR-XXXX.md`).
-   - Enriches the FDS technical contracts with concrete architectural boundaries.
+   - **System Blueprint:** Decomposes Module topology, assigns Clean Architecture layers, identifies external Seams and Adapters, and persists the macro architecture to `docs/architecture/system-blueprint.md` (featuring the Module Interdependency Map §2.2 and Seam Topology & Test Placement §2.3.2).
+   - **Data Model:** Normalises the persistence layer using `db-normalisation` (UNF → 3NF/BCNF) into `docs/architecture/data-model.md` with Mermaid ER diagrams and data dictionaries.
+   - **Decisions & Contracts:** Logs project ADRs (`docs/adr/ADR-XXXX.md`) and enriches `docs/requirements/functional-requirements.md` technical contracts with resolved Module paths and Seam Adapter interfaces.
 
 > **Decision Point: Why `/architect` (and `/designer`) before `/po`?**
 >
 > If you have just completed `/ba`, **always run `/architect` (and `/designer` if building a UI) before invoking `/po`**.
 >
-> - **Enriched Issue Bodies:** When `/po` seeds work items (`create-epic` and `create-user-story`), it enriches tracker descriptions with the traced FDS technical contracts. Running `/architect` first means your tickets in GitHub/GitLab carry concrete database schemas, Module boundaries, and Seam Interface contracts rather than abstract functional text.
+> - **Enriched Issue Bodies without Drift:** When `/po` seeds work items (`create-epic` and `create-user-story`), it copies the traced FDS technical contracts directly into the issue description. Because `/architect` already persisted the Module boundaries, Seam interfaces, and schemas into `system-blueprint.md` and `data-model.md`, the PO does not infer anything—tickets carry authoritative contracts from day one.
+> - **SWE Ingests Authoritative Files Directly:** When `/swe` implements a story, it does not rely solely on tracker ticket descriptions. SWE directly loads `docs/architecture/system-blueprint.md`, `docs/architecture/data-model.md`, and `docs/adr/` from the repository, ensuring zero drift between macro design and code.
 > - **Accurate Execution Ordering:** When `/po` plans execution waves (`docs/requirements/roadmap.md`), knowing the data model and architecture allows the dependency DAG to correctly place foundational persistence and schemas into Wave 1, core domain logic into Wave 2, and dependent integration layers into later waves.
 > - **Idempotence Safety Net:** If you accidentally run `/po` first, nothing is broken: all persona skills use stable-ID markers (`skills:work-item`) and amend items in-place on subsequent runs without creating duplicate tickets.
 
