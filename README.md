@@ -39,6 +39,156 @@ Rules that matter for discovery:
 
 ---
 
+## Development lifecycle & persona workflows
+
+The persona orchestrators (`ba`, `architect`, `designer`, `po`, `swe`, `qa`, `devops`) form a structured, end-to-end software delivery pipeline. Rather than guessing which skill to invoke next, follow the lifecycle sequences below for greenfield builds, brownfield systems, scope changes, and hotfixes.
+
+### The persona chain at a glance
+
+```mermaid
+flowchart TD
+    subgraph Discovery ["1. Discovery & Design"]
+        BA["/ba<br>Requirements (PRD + FDS)"]
+        ARCH["/architect blueprint<br>Data Model, Blueprint, ADRs"]
+        DES["/designer<br>Design System, Prototypes"]
+        BA --> ARCH
+        BA --> DES
+    end
+
+    subgraph Backlog ["2. Backlog & Planning"]
+        PO["/po<br>Tracker Seeding, Milestones,<br>Roadmap Waves (DAG)"]
+        ARCH --> PO
+        DES --> PO
+    end
+
+    subgraph Implementation ["3. Implementation Loop"]
+        SWE["/swe pick up next item<br>TDD + Clean Architecture"]
+        REV["adversarial-review<br>(Clean Context Gate)"]
+        PR["create-pr<br>Reviewer-Enablement PR"]
+        SWE --> REV
+        REV -->|Pass / Accepted| PR
+        REV -->|Fix Needed| SWE
+    end
+
+    subgraph Verification ["4. Quality & Release"]
+        QA["/qa release-gate<br>(Worktree Isolation)"]
+        DEVOPS["/devops release<br>(Worktree Isolation)"]
+        QA --> DEVOPS
+    end
+
+    PO --> SWE
+    PR --> QA
+```
+
+---
+
+### 1. Greenfield workflow (zero to production)
+
+When starting a project from scratch, follow this exact sequence:
+
+1. **Requirements Discovery (`/ba <project idea>`)**
+   - Conducts single-session interactive elicitation via `interview-me` and two-stream discovery via `gather-requirements`.
+   - Produces `docs/requirements/product-requirements.md` (PRD with Epics, User Stories, and MoSCoW priorities) and `docs/requirements/functional-requirements.md` (FDS with validation rules, exceptions, and behavioural contracts).
+
+2. **System Architecture & Data Modeling (`/architect blueprint`)**
+   - Ingests PRD and FDS.
+   - Normalises the persistence layer using `db-normalisation` (UNF → 3NF/BCNF) into `docs/architecture/data-model.md` with Mermaid ER diagrams and data dictionaries.
+   - Decomposes Module topology, assigns Clean Architecture layers, identifies external Seams and Adapters, and logs project ADRs (`docs/adr/ADR-XXXX.md`).
+   - Enriches the FDS technical contracts with concrete architectural boundaries.
+
+> **Decision Point: Why `/architect` (and `/designer`) before `/po`?**
+>
+> If you have just completed `/ba`, **always run `/architect` (and `/designer` if building a UI) before invoking `/po`**.
+>
+> - **Enriched Issue Bodies:** When `/po` seeds work items (`create-epic` and `create-user-story`), it enriches tracker descriptions with the traced FDS technical contracts. Running `/architect` first means your tickets in GitHub/GitLab carry concrete database schemas, Module boundaries, and Seam Interface contracts rather than abstract functional text.
+> - **Accurate Execution Ordering:** When `/po` plans execution waves (`docs/requirements/roadmap.md`), knowing the data model and architecture allows the dependency DAG to correctly place foundational persistence and schemas into Wave 1, core domain logic into Wave 2, and dependent integration layers into later waves.
+> - **Idempotence Safety Net:** If you accidentally run `/po` first, nothing is broken: all persona skills use stable-ID markers (`skills:work-item`) and amend items in-place on subsequent runs without creating duplicate tickets.
+
+3. **Design System & Interactive Prototypes (`/designer` — *if frontend/UI exists*)**
+   - `/designer system init`: Establishes offline design tokens, stylesheets, icon sprites, and component catalogs in `docs/design/system/v1/`.
+   - `/designer design <EPIC-### | STORY-###>`: Synthesises self-contained accessible prototypes (`prototype-ui`), conducts interactive screen walkthroughs, passes the WCAG 2.2 accessibility gate, promotes to `docs/design/approved/`, and hands off UI edge-case gaps to the backlog.
+
+4. **Backlog Seeding & Roadmap Sequencing (`/po`)**
+   - Run `/po seed backlog from PRD` and `/po plan execution order`.
+   - Probes tracker platform capabilities (GitHub, GitLab, etc.) via `resolve-repository-platform`.
+   - Reads PRD, FDS, data model, and approved designs to seed or reconcile Epics (`create-epic`), User Stories (`create-user-story`), and release Milestones (`create-milestone`).
+   - Produces `docs/requirements/roadmap.md` with strict dependency DAG edges (`->`, `<-`, `~>`) grouped into parallelisable execution waves (`### W 1`, `### W 2`, …).
+
+5. **Implementation Loop (`/swe`)**
+   - Run `/swe pick up next item from plan` (or filter by milestone: `/swe pick up next item from milestone MS-001`).
+   - Acquires distributed lock on the tracker work item, reviews architectural contracts and prototypes, and implements the feature using `red-green-refactor-tdd`, `clean-architecture`, and `solid-principles`.
+   - Auto-spawns `adversarial-review` in clean context. Surfaces findings for developer decision (fix & re-review or accept & proceed).
+   - Spawns `create-pr` to raise an evidence-backed Change Proposal on the platform.
+   - Closes the tracker work item upon successful completion.
+
+6. **Quality Assurance Gate (`/qa release-gate`)**
+   - Operates entirely inside an isolated git worktree so your working tree is untouched.
+   - Runs `audit-test-coverage` and `audit-security-and-governance` in parallel to verify total surface coverage, Seam mocking, and OWASP/GDPR compliance.
+
+7. **Release & Deployment (`/devops release <version>`)**
+   - Operates in an isolated git worktree.
+   - Bumps version files, generates high-density release notes via `generate-release-notes`, tags the release, verifies CI/CD pipeline triggers, and raises Change Proposals merging the release into `main` and `develop`.
+
+---
+
+### 2. Brownfield workflow (existing or inherited codebases)
+
+When bringing an existing codebase under structured governance or before embarking on major feature work:
+
+1. **System Blueprinting (`/architect analyze`)**
+   - Spawns `analyze-a-codebase` to reverse-engineer physical source code into `docs/architecture/system-blueprint.md`, mapping functional domains to directories and documenting existing Seams.
+
+2. **Quality & Security Baseline (`/qa release-gate`)**
+   - Runs in an isolated worktree to baseline existing test coverage deficits, brittle tests, secret leaks, and security exposures without risking changes to active files.
+
+3. **Requirements Reconstruction (`/ba`)**
+   - Runs `gather-requirements` in reverse-engineer origin.
+   - Parses source code, commit history, and existing issue trackers to synthesize draft PRD and FDS documents. Every item carries a `[Confidence: Level]` tag and source provenance.
+   - Conducts a targeted confirmation interview solely on low-confidence findings and gaps.
+
+4. **Backlog Reconciliation & Remediation Roadmap (`/po reconcile`)**
+   - Ingests the reconstructed PRD/FDS, queries active tracker tickets, identifies duplicates, orphans, and drift, and groups critical remediation and technical debt into early roadmap waves (`docs/requirements/roadmap.md`).
+
+5. **Plan-Driven Feature Delivery & Refactoring (`/swe` or `/refactor`)**
+   - Safely remediate architectural drift or build new features with full context, verified Seams, and TDD protection.
+
+---
+
+### 3. Scope changes & mid-flight feature additions
+
+When product scope shifts during active development:
+
+1. **Amend Requirements (`/ba`)**
+   - Re-invoke `/ba` to update the PRD and FDS. Existing stable IDs are preserved, new IDs (`EPIC-###`, `STORY-###`) are assigned, and the document revision history is incremented.
+
+2. **Micro Architectural & UI Design (`/architect design <ID>` / `/designer design <ID>`)**
+   - Run `/architect design EPIC-###` to adapt the data model, Module boundaries, or author new ADRs for the changed scope.
+   - Run `/designer design EPIC-###` if the change affects screens, producing validated prototype updates.
+
+3. **Reconcile Backlog & Waves (`/po amend` & `/po plan execution order`)**
+   - PO compares tracker items against the updated PRD/FDS:
+     - **Missing:** Creates new tracker tickets.
+     - **Drift:** Amends existing tickets in-place via their stable markers.
+     - **Deprecated:** Closes dropped tickets without deleting history.
+   - Updates `docs/requirements/roadmap.md` with new DAG dependencies and recalculates wave allocations.
+
+4. **Resume SWE Pickup (`/swe pick up next item from plan`)**
+   - Developers continue picking up ready work items in wave order without missing a beat.
+
+---
+
+### 4. Defect & hotfix workflows
+
+- **Routine Bug Lifecycle:**
+  - Run `create-bug-report` or `/po file a bug for <issue>`.
+  - Captures evidence automatically (environment, git commit, stack traces) and interviews only for human reproduction steps.
+  - Links bug to parent Epic and adds it into the next roadmap wave for SWE pickup.
+- **Production Emergency Hotfix:**
+  - Run `/devops hotfix <workitem>`.
+  - Spawns an isolated worktree directly off `main`, applies fix, runs canonical tests, tags a patch release, merges back into both `main` and `develop`, and emits release notes.
+
+---
+
 ## Skill catalog
 
 Grouping is by convention only (the files stay flat for discovery).

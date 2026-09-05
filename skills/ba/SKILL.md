@@ -1,10 +1,10 @@
 ---
 name: ba
-description: 'BA (Business Analyst) persona orchestrator — interactive requirements discovery with shared understanding. Drives a single long-context session using interview-me (one question at a time) and gather-requirements (two-stream PRD/FDS) to reach aligned requirements, then persists as documented artefacts ready for the po persona to seed the backlog. No subagent spawning — BA stays engaged throughout.'
+description: 'BA (Business Analyst) persona orchestrator — interactive requirements discovery with shared understanding. Drives a single long-context session using interview-me (one question at a time) and gather-requirements (two-stream PRD/FDS) to reach aligned requirements, then persists as documented artefacts ready for downstream architecture, design, and backlog orchestration. No subagent spawning — BA stays engaged throughout.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.2.1
+  version: 1.2.2
 user-invocable: true
 dependencies:
   - interview-me
@@ -31,7 +31,7 @@ flowchart TD
     GATHER --> CHECK{Shared understanding<br>confirmed?}
     CHECK -->|No| DISCOVER
     CHECK -->|Yes| PERSIST["Persist artefacts:<br>PRD + FDS"]
-    PERSIST --> DONE(["Done — ready for downstream<br>(po)"])
+    PERSIST --> DONE(["Done — ready for downstream<br>(architect / designer / po)"])
 ```
 
 ### PHASE 1 — Onboarding
@@ -81,7 +81,7 @@ Before finalizing any artefact, explicitly confirm alignment:
 1. Write PRD to `docs/requirements/product-requirements.md`.
 2. Write FDS to `docs/requirements/functional-requirements.md`.
 3. If architectural decisions were made during discovery, invoke `architectural-decision-register` (PHASE 1 Generate) to record each decision.
-4. Output ready for `po` (backlog orchestration) or other downstream skills.
+4. Output ready for `architect` (system blueprint / data modeling), `designer` (UI prototyping), or `po` (backlog orchestration).
 5. All findings carry `[Confidence: Level]` and provenance tracing.
 
 ### Resumability
