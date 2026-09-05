@@ -1,10 +1,10 @@
 ---
 name: seed-backlog
-description: DEPRECATED — superseded by the `po` persona (ADR-0003). Retained for installed users; NOT for new orchestration. Use `po` for requirements-to-backlog orchestration. Historic role: write-side orchestrator that seeded the workflow tracking system from the PRD/FDS produced by gather-requirements — resolved the platform once, sequenced the create-epic and create-user-story leaves across the Epic Register and User Story Backlog, wired every story to its parent epic, and reconciled the tracker against amended requirements via stable-ID markers.
+description: DEPRECATED — superseded by the `po` persona. Retained for installed users; NOT for new orchestration. Use `po` for requirements-to-backlog orchestration. Historic role: write-side orchestrator that seeded the workflow tracking system from the PRD/FDS produced by gather-requirements — resolved the platform once, sequenced the create-epic and create-user-story leaves across the Epic Register and User Story Backlog, wired every story to its parent epic, and reconciled the tracker against amended requirements via stable-ID markers.
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.0
+  version: 1.1.1
 dependencies:
   - resolve-repository-platform
   - create-epic
@@ -15,7 +15,7 @@ dependencies:
 argument-hint: "[epics | stories | full]  # tiers to seed; full (default) does epics then stories"
 user-invocable: true
 ---
-DEPRECATED — superseded by `po` (ADR-0003). Do not route new set-level orchestration here; use the `po` persona. Historic role: publish-side mirror of `gather-requirements`. Owned set-level concerns: resolve platform once, decide create/amend/close per item, order parents before children, report result. Composed leaves; did NOT re-render epics/stories.
+DEPRECATED — superseded by `po`. Do not route new set-level orchestration here; use the `po` persona. Historic role: publish-side mirror of `gather-requirements`. Owned set-level concerns: resolve platform once, decide create/amend/close per item, order parents before children, report result. Composed leaves; did NOT re-render epics/stories.
 
 1. PHASE 1 (Central Gate): Resolve everything ONCE.
    - Run `resolve-repository-platform`; carry resolved platform + Work-Item Authoring row + Parent Link mechanism into every leaf.

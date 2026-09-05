@@ -4,7 +4,7 @@ description: 'SWE (Software Engineer) persona orchestrator. Guides feature compl
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.4.0
+  version: 2.4.1
 user-invocable: true
 dependencies:
   - clean-architecture
@@ -51,7 +51,7 @@ flowchart TD
 
 ### PHASE 0 — Plan Pickup
 
-Triggered only when the invocation matches `/pick up .* from plan/`. Skip entirely for `implement <feature>` and free-form invocations. The in-repo roadmap at `docs/requirements/roadmap.md` is the sequencing source of truth (wave membership + DAG edges); the tracker (assignee + status + milestone) is the runtime state machine. See PO PHASE 2.7 for the roadmap schema and ADR-0005 for the decision.
+Triggered only when the invocation matches `/pick up .* from plan/`. Skip entirely for `implement <feature>` and free-form invocations. The in-repo roadmap at `docs/requirements/roadmap.md` is the sequencing source of truth (wave membership + DAG edges); the tracker (assignee + status + milestone) is the runtime state machine. See PO PHASE 2.7 for the roadmap schema.
 
 1. **Locate the roadmap.** Read `docs/requirements/roadmap.md`. Absent → HALT with `interview-me` recommendation to run `po plan-execution-order` first.
 2. **Parse waves + edges.** `## Waves` contains `### W N` sections in execution order. Each line: `<ID> <#tracker-ref> <optional edge tokens>`. Edge tokens: `->EPIC-X` (this item blocks X), `<-EPIC-X` (blocked by X), `~>EPIC-X` (relates-to, soft). Build the readiness graph: an item is ready when it is unassigned + open in the tracker AND every `<-` blocker is closed in the tracker.
@@ -138,7 +138,7 @@ Present the subagent's findings to the developer. Every finding must carry `[Ris
 
 ### Directives
 
-- Roadmap canonical owner: PO PHASE 2.7. Any schema change originates in PO; SWE reads `docs/requirements/roadmap.md` as-is. SWE does NOT load PO at runtime — it operates from the inline spec above. ADR-0005 governs the in-repo relocation.
+- Roadmap canonical owner: PO PHASE 2.7. Any schema change originates in PO; SWE reads `docs/requirements/roadmap.md` as-is. SWE does NOT load PO at runtime — it operates from the inline spec above.
 - Concurrency: tracker assignment is the distributed lock. Two concurrent SWE runs on different hosts resolve via the tracker assignee field — the second sees the item already assigned and skips it. No local file mutation; no write-back to the roadmap.
 - Skill drift: use only the skills listed in `dependencies` for persona reasoning. If a task requires outside skill, flag to developer — do not load ad-hoc.
 - Strategic Anchors: when output resolves a non-trivial design trade-off (architecture, system Seams, schema, process, operational patterns), append a `strategic-reading` Strategic Anchor. Never on routine tasks (CRUD, syntax fixes, linter errors, utilities, routine bugs).

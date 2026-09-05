@@ -29,8 +29,8 @@ A library of Agent Skills: one `SKILL.md` per skill under `skills/<name>/`. Skil
 ## Domain glossary maintenance
 - When adding features, modifying schemas, or introducing new domain concepts, keep `docs/domain-glossary.json` in sync. Update the glossary as you work to prevent drift between explicit `domain-glossary` invocations and the actual codebase.
 
-## Architectural decision logging
-- When making an architectural decision during a project session, create an ADR in `docs/adr/` using the `architectural-decision-register` skill. Never skip logging an architectural decision.
+## Self-contained skills (no in-repo ADRs)
+- Skills in this library must be completely self-contained. Do NOT create ADRs in `docs/adr/` for skills authored or modified in this repository. End users who install skills only receive the skill directories (`skills/<name>/`) and do not have access to internal ADRs. Any design decisions, operational contracts, or architectural rules governing a skill must be documented directly and explicitly inside the skill's `SKILL.md`.
 
 ## Git & PR workflow
 - Branch `feature/<slug>` off `develop`; open PRs **into `develop`** (not `main`).

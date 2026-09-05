@@ -4,7 +4,7 @@ description: 'Designer persona orchestrator — UI/UX flow prototyping, versione
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.0
+  version: 1.1.1
 user-invocable: true
 dependencies:
   - interview-me
@@ -17,7 +17,7 @@ dependencies:
 argument-hint: "<context>  # e.g. 'design <EPIC-### | STORY-###>' | 'prototype <flow-name>' | 'system init' | 'audit <screen-path>' | 'review <flow-name>'"
 ---
 
-Load all bundled skills on invoke. Use them consistently throughout — never load skills ad-hoc mid-session. Adopts ADR-0007.
+Load all bundled skills on invoke. Use them consistently throughout — never load skills ad-hoc mid-session.
 
 ```mermaid
 flowchart TD

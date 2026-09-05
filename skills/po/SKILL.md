@@ -4,7 +4,7 @@ description: 'PO (Product Owner) persona orchestrator. Requirements-to-backlog o
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.3.0
+  version: 2.3.1
 user-invocable: true
 dependencies:
   - agent-markup
@@ -21,7 +21,7 @@ dependencies:
 argument-hint: "<context>  # e.g. 'seed backlog from PRD' | 'plan release milestones' | 'plan execution order' | 'review backlog coherence' | 'file a bug for X' | 'amend requirements'"
 ---
 
-Load all bundled skills on invoke. Use them consistently throughout — never load skills ad-hoc mid-session. Supersedes `seed-backlog` (ADR-0003).
+Load all bundled skills on invoke. Use them consistently throughout — never load skills ad-hoc mid-session. Supersedes `seed-backlog`.
 
 ```mermaid
 flowchart TD
@@ -136,7 +136,7 @@ Triggered by task types `seed/reconcile` and `plan-execution-order`. Skip if the
    ### W2
    EPIC-003 #125 <-EPIC-001
    ```
-   Edge tokens live on wave items: `->EPIC-X` (this item blocks X), `<-EPIC-X` (blocked by X), `~>EPIC-X` (relates-to, emitted only when it affects wave placement). No edge token = standalone. No sidecar JSON, no `next_pickup`, no `schema_version`, no per-item status — the tracker (assignee + status + milestone) is the runtime state machine; `next_pickup` is derivable as the first unassigned open item in the lowest-numbered wave whose `<-` blockers are all closed. ADR-0005 supersedes the prior out-of-tree scheme.
+   Edge tokens live on wave items: `->EPIC-X` (this item blocks X), `<-EPIC-X` (blocked by X), `~>EPIC-X` (relates-to, emitted only when it affects wave placement). No edge token = standalone. No sidecar JSON, no `next_pickup`, no `schema_version`, no per-item status — the tracker (assignee + status + milestone) is the runtime state machine; `next_pickup` is derivable as the first unassigned open item in the lowest-numbered wave whose `<-` blockers are all closed.
 6. The roadmap is the **authoritative sequencing record**. DO NOT mirror waves/orderings onto tracker labels — large releases explode the label list and the DAG semantics are lost. Tracker holds work items + milestone assignment; roadmap holds the sequencing. Platform-native roadmap views are not configured — too fragmented across platforms (see `resolve-repository-platform`); the in-repo file is the portable contract.
 
 ### PHASE 3 — Plan & Approval Gate

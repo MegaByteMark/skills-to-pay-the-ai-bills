@@ -4,7 +4,7 @@ description: 'DevOps persona orchestrator — hands-off gitflow release coordina
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.2.0
+  version: 1.2.1
 user-invocable: true
 dependencies:
   - generate-release-notes
@@ -21,7 +21,7 @@ dependencies:
 argument-hint: "<action>  # e.g. 'release 1.4.0' | 'hotfix 42' | 'scaffold-ci-cd'"
 ---
 
-Load all bundled skills on invoke. Use them consistently throughout — never load skills ad-hoc mid-session. Adopts ADR-0002 (gitflow release coordination, transient worktree isolation, scheduled CI lineage).
+Load all bundled skills on invoke. Use them consistently throughout — never load skills ad-hoc mid-session. Release coordination follows gitflow with worktree isolation; scheduled lineage (such as nightly builds) is owned by CI/CD configuration via scaffold-ci-cd, not by an agent runtime loop.
 
 ```mermaid
 flowchart TD
@@ -58,7 +58,7 @@ flowchart TD
 
 ### PHASE 2 — Isolation (Worktree)
 
-1. Create a dedicated transient git worktree for this session: `git worktree add <path> <base>` where `<path>` is under OS temp (`/tmp/devops-<session-id>`), session-id unique per invocation. Transient execution context, not persistent state (ADR-0002). Never the developer's tree.
+1. Create a dedicated transient git worktree for this session: `git worktree add <path> <base>` where `<path>` is under OS temp (`/tmp/devops-<session-id>`), session-id unique per invocation. The worktree is transient execution context, not persistent state — never the developer's tree.
 2. Materialise the relevant base (develop | main) inside the worktree. All branch, version, changelog, tag, and merge operations run only in the worktree.
 
 ### PHASE 3 — Action Routing (`[Handoff: Clean]` subagents)
