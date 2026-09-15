@@ -1,10 +1,10 @@
 ---
 name: architect
-description: 'Architect persona orchestrator — system blueprinting, architectural decision governance, data model normalisation, and technical design decomposition. Ingests PRD/FDS or existing codebase to produce/maintain docs/architecture/system-blueprint.md, docs/architecture/data-model.md, and docs/adr/ADR-XXXX.md. Enriches FDS technical contracts with Module structures, Interface contracts across Seams, and Adapter placements. All proposed artefacts are held in memory until explicit developer approval before in-repo persistence.'
+description: 'Architect persona orchestrator — system blueprinting, architectural decision governance, data model normalisation, and technical design decomposition. Ingests PRD/FDS or existing codebase to produce/maintain docs/architecture/system-blueprint.md, docs/architecture/data-model.md, and docs/adr/ADR-XXXX.md. Enriches FDS technical contracts with Module structures, Interface contracts across Seams, and Adapter placements. Bundles coding-standards to generate/maintain the project style contract in-session and signposts it from the blueprint. All proposed artefacts are held in memory until explicit developer approval before in-repo persistence.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.1
+  version: 1.1.0
 user-invocable: true
 dependencies:
   - interview-me
@@ -19,6 +19,7 @@ dependencies:
   - resolve-repository-platform
   - analyze-a-codebase
   - audit-blueprint-implementation
+  - coding-standards
 argument-hint: "<context>  # e.g. 'blueprint' | 'analyze' | 'design EPIC-###' | 'design STORY-###' | 'audit'"
 ---
 
@@ -115,7 +116,8 @@ Upon developer confirmation, persist artefacts to their canonical repository loc
 2. **Data Model:** Write `docs/architecture/data-model.md`.
 3. **Architectural Decisions:** Write each new record to `docs/adr/ADR-XXXX.md` (zero-padded 4-digit sequence).
 4. **FDS Enrichment:** Enrich `docs/requirements/functional-requirements.md` technical contracts with resolved Module paths, Interface signatures, Seam Adapters, and references to active ADR numbers.
-5. Hand off cleanly: artefacts ready for `po` (execution planning / DAG) and `swe` (feature pickup / implementation).
+5. **Coding Standards:** When the developer requests project standards, execute bundled `coding-standards` in-session (interview-driven; never spawn as a subagent). When `docs/architecture/coding-standards.md` exists, add or refresh a one-line signpost to it in `system-blueprint.md` — rules and waiver rows live in the artefact, never in the blueprint.
+6. Hand off cleanly: artefacts ready for `po` (execution planning / DAG) and `swe` (feature pickup / implementation).
 
 ### Directives
 

@@ -4,7 +4,7 @@ description: 'Adversarial code review of working-tree changes since last push. A
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.0.1
+  version: 2.1.0
 user-invocable: true
 dependencies:
   - interview-me
@@ -27,6 +27,7 @@ Accepted: PR diff, persona directive, tracked issue/requirement reference links.
    - Attempt `resolve-repository-platform` to enrich with linked Issues/PRs.
    - Attempt `docs/requirements/functional-requirements.md` and `docs/architecture/system-blueprint.md` for contract cross-reference. Absent → note "no contract baseline" per category; never skip category.
    - Attempt style guide config files (`.editorconfig`, `.prettierrc*`, `eslint*`, `tsconfig*`, `rustfmt.toml`, `go.*` lint configs, `.clang-format`).
+   - Attempt `docs/architecture/coding-standards.md` (rules + waiver register). Present → primary style baseline: verify Tier 1 rules by executing the referenced formatter/linter config, review Tier 2 rules adversarially against the rubric's do/don't exemplars, silence violations matching a waiver's scope. Absent → note "no coding-standards baseline" and fall back to discovered style configs only.
 
 3. PHASE 3 (Adversarial Sweep): Review every changed file across all domains starting from guilty assumption. Per domain, identify findings and gather evidence (File:Line, Finding, Domain, `[Confidence: Level]`). Do NOT assign Priority or Remediation at this stage — triage happens in PHASE 3.5 with the full finding set visible.
 
@@ -36,7 +37,7 @@ Accepted: PR diff, persona directive, tracked issue/requirement reference links.
    d. **Security**: Injection surfaces (XSS, SQLi, command injection), auth/authz bypass, hardcoded secrets, unsafe deserialisation, path traversal, missing input validation, TLS/crypto misuse. Anchor to OWASP Top 10 + CWE inline in the Finding text — e.g. `SQL injection via string concatenation [CWE-89]`.
    e. **Governance & GDPR**: PII introduced or leaked, missing consent/erasure/retention controls, data flows crossing Seams to third parties without lawful basis, audit-logging gaps. Fold `[Data: Classification]` into the Finding text — e.g. `PII (email) logged without consent [Data: Special-Category]`.
    f. **Requirements Alignment**: Where original Issues/PRD/FDS references exist, flag implementation drift. Derive from linked Issues in commit messages or `resolve-repository-platform`.
-   g. **Style Guide Alignment**: Flag violations against discovered style configs. Frontend: lint rules, import ordering, naming conventions. Backend: project-specific conventions. Absent config → note "no style baseline".
+   g. **Style Guide Alignment**: Flag violations against `docs/architecture/coding-standards.md` when present — Tier 1 failures from executing its config, Tier 2 violations of its rubric, each finding citing the breached `RULE-###`. Otherwise flag violations against discovered style configs. Frontend: lint rules, import ordering, naming conventions. Backend: project-specific conventions. Absent both → note "no style baseline". Violations matching a `WAIVER-###` scope are silenced, never reported.
    h. **Dependency Health**: New or bumped dependencies — check EOL status, deprecated APIs, known CVEs, license compatibility, copyleft exposure.
 
 4. PHASE 3.5 (Triage): With the full finding set visible, assign per finding:
@@ -70,6 +71,7 @@ Directives:
 - No suppression: capture and surface all findings, including nitpicks. The standards you walk past are the standards you accept.
 - Strict `design-vocab` for architectural findings. Prohibited: component, service, unit, API, boundary.
 - Strict `agent-markup` tokens: `[Review: Priority]`, `[Scope: Origin]`, `[Confidence: Level]`, `[Remediation: Action]`, `[Data: Classification]` (inline in Finding text for Governance).
+- Coding-standards gate: when `docs/architecture/coding-standards.md` is present it is the authoritative style baseline — Tier 1 verified by executing its config, Tier 2 reviewed against its rubric, findings cite `RULE-###`. Waived violations (`WAIVER-###` scope match) are silenced. Priority follows each rule's recorded `[Review: Priority]` severity.
 
 Output Schema:
 
