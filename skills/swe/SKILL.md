@@ -1,10 +1,10 @@
 ---
 name: swe
-description: 'SWE (Software Engineer) persona orchestrator. Guides feature completion using bundled code-quality and architecture skills (clean-architecture, solid-principles, dry-kiss, red-green-refactor-tdd), then auto-spawns adversarial-review subagent with clean context for an adversarial gate, presenting findings for developer decision (fix & re-review or accept & proceed). Plan-driven pickup: `pick up next item from plan [milestone MS-###] [wave N]` reads docs/requirements/roadmap.md for wave membership + DAG edges, reads the tracker for live status/assignment, resolves the next ready work item, runs the standard SWE flow, and closes the tracker item on completion.'
+description: 'SWE (Software Engineer) persona orchestrator. Guides feature completion using bundled code-quality and architecture skills (clean-architecture, solid-principles, dry-kiss, red-green-refactor-tdd), then auto-spawns adversarial-review subagent with clean context for an adversarial gate, presenting findings for developer decision (fix & re-review or accept & proceed). Plan-driven pickup: `pick up next item from plan [milestone MS-###] [wave N]` reads docs/requirements/roadmap.md for wave membership + DAG edges, reads the tracker for live status/assignment, resolves the next ready work item, runs the standard SWE flow, and closes the tracker item on completion. Reads docs/architecture/coding-standards.md when present and generates to both enforcement tiers.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.4.1
+  version: 2.5.0
 user-invocable: true
 dependencies:
   - clean-architecture
@@ -75,7 +75,7 @@ Triggered only when the invocation matches `/pick up .* from plan/`. Skip entire
 
 ### PHASE 2 — Feature Development
 
-Develop the feature using the bundled skills for guidance and enforcement. Ingest active ADRs (`docs/adr/`), `docs/architecture/system-blueprint.md`, `docs/architecture/data-model.md`, approved UI prototypes (`docs/design/approved/`), and pinned design systems (`docs/design/system/vX/`) when present, adhering strictly to established Module structures, Interface contracts across Seams, Adapter placements, and validated UI designs:
+Develop the feature using the bundled skills for guidance and enforcement. Ingest active ADRs (`docs/adr/`), `docs/architecture/system-blueprint.md`, `docs/architecture/data-model.md`, approved UI prototypes (`docs/design/approved/`), and pinned design systems (`docs/design/system/vX/`) when present, adhering strictly to established Module structures, Interface contracts across Seams, Adapter placements, and validated UI designs. When `docs/architecture/coding-standards.md` is present, generated code MUST satisfy both tiers — the machine-enforced rules and the agent-gated rubric; absent → note absence and proceed, never fabricate standards:
 
 | Skill | Role in SWE persona |
 |---|---|

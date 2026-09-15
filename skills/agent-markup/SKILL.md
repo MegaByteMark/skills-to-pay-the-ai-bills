@@ -4,7 +4,7 @@ description: Defines the strict token syntax, bracket-enclosed schema fields, an
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.5.0
+  version: 1.6.0
 ---
 All machine-readable tokens MUST be in square brackets `[...]`.
 
@@ -13,6 +13,8 @@ All machine-readable tokens MUST be in square brackets `[...]`.
 [Risk: Level]: [Low, Medium, High, Critical]
 
 [Policy]: [Enforced, Advisory, Audit-Only]. Written `[Policy: Enforced]` etc. when tagging a concrete rule.
+
+[Enforcement: Mode]: [Machine, Agent]. Written `[Enforcement: Machine]` etc. on coding-standards rule rows. Machine = rule emitted into a formatter/linter config and verified by executing the config; Agent = rule emitted into the review rubric and gated by adversarial-review. Owned by coding-standards.
 
 [Data: Classification]: [Public, Internal, Confidential, PII, Special-Category]. Special-Category = GDPR Art. 9 (health, biometrics, race, religion, sexual orientation, etc.) — strictest handling obligations.
 
