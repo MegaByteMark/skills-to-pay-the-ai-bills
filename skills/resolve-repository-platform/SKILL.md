@@ -4,7 +4,7 @@ description: Shared protocol for determining which hosting platform a repository
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 dependencies:
   - interview-me
   - agent-markup
@@ -16,6 +16,7 @@ Neutral Vocabulary (use in prose; map to platform terms only at tooling layer):
 - Repository Visibility: public, internal, or private.
 - Work Item: umbrella for issue/epic/story. Never hard-code "issue".
 - Parent Link: hierarchy relation (epic→story / parent→sub-issue).
+- Dependency Edge: blocked-by relation between two open work items (hard `blocks` edges only; soft `relates-to` edges and satisfied-at-derivation edges are never mirrored).
 
 Resolution Protocol:
 1. PHASE 1 (Host Inference): `git remote -v` → parse origin/first remote host:
@@ -40,13 +41,13 @@ Platform Adapter Map:
 *(Commands illustrative — verify at runtime.)*
 
 Work-Item Authoring Adapter Map (write-side):
-| Platform | Work Item | Epic Representation | Illustrative Create/Amend/Close | Illustrative Parent Link |
-| :--- | :--- | :--- | :--- | :--- |
-| GitHub | Issue | Issue (`epic`-labelled; no first-class Epic) | `gh issue create/edit/close` | GraphQL `addSubIssue` (else task-list/tracking issue) |
-| GitLab | Issue | Native Epic (group-level; tier-gated) | `glab issue create/update/close` (Epics via API) | epic↔issue association or `/epic` quick action |
-| Bitbucket | Issue | none native | REST API (token required) | REST API only; no native epic hierarchy |
-| Self-hosted/Other | per user | per user | per user | per user |
-| No remote | n/a | n/a | unavailable → portable Markdown | n/a |
+| Platform | Work Item | Epic Representation | Illustrative Create/Amend/Close | Illustrative Parent Link | Dependency Edge (blocked-by) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| GitHub | Issue | Issue (`epic`-labelled; no first-class Epic) | `gh issue create/edit/close` | GraphQL `addSubIssue` (else task-list/tracking issue) | native blocked-by issue dependency (GraphQL sub-issue dependency; else roadmap-only) |
+| GitLab | Issue | Native Epic (group-level; tier-gated) | `glab issue create/update/close` (Epics via API) | epic↔issue association or `/epic` quick action | issue links (`blocks` / `blocked_by`) |
+| Bitbucket | Issue | none native | REST API (token required) | REST API only; no native epic hierarchy | none native → roadmap-only |
+| Self-hosted/Other | per user | per user | per user | per user | per user |
+| No remote | n/a | n/a | unavailable → portable Markdown | n/a | unavailable |
 
 Directives:
 - Resolve-Before-Invoke: consuming skill MUST run this protocol before any platform-specific command. Never assume GitHub.

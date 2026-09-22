@@ -4,7 +4,7 @@ description: Renders ONE epic work item from a single PRD Epic Register entry (E
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.2
+  version: 1.0.3
 dependencies:
   - resolve-repository-platform
   - agent-markup
@@ -27,6 +27,7 @@ Accepted: `EPIC-###` + PRD Epic Register row + traced FDS contract + platform re
 
 Directives:
 - PRD-Primary, FDS-Enriched: PRD decides existence, title, scope, priority. FDS supplies Technical Contract + E2E Definition of Done. Never let FDS invent scope PRD doesn't justify.
+- No milestone assignment: an epic NEVER carries a tracker milestone. Milestones hold stories + release-blocking bugs only; the epic's release commitment lives in the roadmap `Ships in` entry, and the epic closes un-milestoned when its last story lands.
 - Ambiguity Escalation: underspecified/contradictory section → (1) `interview-me` for specific gap; (2) if answered, render + note captured interactively; (3) if gap cannot close → recommend `gather-requirements` `amend` mode, HALT. When invoked by `po`, report gap to orchestrator instead of interviewing mid-batch.
 - Stable-ID: embed `EPIC-###` footer marker. Match by marker, NEVER title.
 - Amend, Don't Clobber: existing work item is baseline — update changed sections, preserve marker, do not reset unrelated fields.
