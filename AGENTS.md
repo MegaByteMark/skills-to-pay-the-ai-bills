@@ -2,6 +2,8 @@
 
 Operational rules for any agent **authoring or maintaining skills in this repository**. (This governs work *on* the skills library itself — it is not a template for end-user projects.)
 
+Rules that govern agents working in a **project where these skills are installed** (target repos) live in [`AGENTS.example.md`](AGENTS.example.md) — a template end users copy into their own repositories.
+
 ## What this repo is
 A library of Agent Skills: one `SKILL.md` per skill under `skills/<name>/`. Skills are loaded on demand by opencode / Claude / `.agents`-compatible runtimes.
 
@@ -12,22 +14,16 @@ A library of Agent Skills: one `SKILL.md` per skill under `skills/<name>/`. Skil
 - Required frontmatter: `name`, `description` (≤1024 chars, specific enough for correct selection), `license`, and `metadata` (with `author` and `version`). `compatibility` is also recognized; all other fields are ignored by the runtime.
 - This repo additionally uses `dependencies`, `argument-hint`, and `user-invocable` as **documentation-only** fields. Reference other skills by bare `name` in `dependencies`.
 - Bump `metadata.version` on every modification. Use semantic versioning: bump major for breaking changes, minor for new features, patch for fixes and prose edits.
+- Skills embed the runtime state contract defined in `AGENTS.example.md` (§ State & persistence): never persist runtime state in the user's working tree; resolve to a persistent out-of-tree agent state store. See `competency-profile` for the canonical pattern.
 
 ## Vocabulary & markup compliance
 - Use the `design-vocab` taxonomy for architecture: Module, Interface, Implementation, Depth, Seam, Adapter. Avoid unit/component/service/API/boundary except when naming a literal path.
 - Restrict bracket tokens to the `agent-markup` enumerations (`[Risk: Level]`, `[Confidence: Level]`, `[Remediation: Effort]`, `[Competency: Level]`, …). Need a new token? Extend `agent-markup` rather than inventing a skill-local one.
 
-## State & persistence
-- NEVER persist runtime state inside a user's working tree, and never commit it. Resolve to a single **persistent** out-of-tree path — the agent state store. Platform base: Linux `${XDG_STATE_HOME:-$HOME/.local/state}/`, macOS `~/Library/Application Support/`, Windows `%LOCALAPPDATA%/`. Do NOT fall back to volatile OS temp (`${TMPDIR}`/`/tmp`): state that governs escalation, competency, or progress must survive OS cleanup and reboots. In chat-only runtimes with no writable out-of-tree location, hold state in memory and emit paste-back snapshots — never a workspace file, never temp. Skills that previously wrote a `${TMPDIR}` fallback must migrate any legacy file up to the persistent path on first read. See `competency-profile` for the canonical pattern.
-- State that belongs to the *person* (skill competency) is shared via `competency-profile`; project- or course-specific state stays with its owning skill.
-
 ## Architecture idioms
 - Prefer **leaf + orchestrator** decomposition: a focused leaf does one job; an orchestrator sequences leaves (see `teach-me` → `teach-a-skill`, `audit-application-health` → its leaf audits).
 - Factor cross-skill rules into a **shared-contract skill** (`design-vocab`, `agent-markup`, `commentary`, `competency-profile`, `resolve-repository-platform`) rather than duplicating them.
 - Keep skills concise and high-signal; cut prose that doesn't change agent behavior.
-
-## Domain glossary maintenance
-- When adding features, modifying schemas, or introducing new domain concepts, keep `docs/domain-glossary.json` in sync. Update the glossary as you work to prevent drift between explicit `domain-glossary` invocations and the actual codebase.
 
 ## Self-contained skills (no in-repo ADRs)
 - Skills in this library must be completely self-contained. Do NOT create ADRs in `docs/adr/` for skills authored or modified in this repository. End users who install skills only receive the skill directories (`skills/<name>/`) and do not have access to internal ADRs. Any design decisions, operational contracts, or architectural rules governing a skill must be documented directly and explicitly inside the skill's `SKILL.md`.
