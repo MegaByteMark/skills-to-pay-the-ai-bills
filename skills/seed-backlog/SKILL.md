@@ -1,10 +1,10 @@
 ---
 name: seed-backlog
-description: DEPRECATED — superseded by the `po` persona. Retained for installed users; NOT for new orchestration. Use `po` for requirements-to-backlog orchestration. Historic role: write-side orchestrator that seeded the workflow tracking system from the PRD/FDS produced by gather-requirements — resolved the platform once, sequenced the create-epic and create-user-story leaves across the Epic Register and User Story Backlog, wired every story to its parent epic, and reconciled the tracker against amended requirements via stable-ID markers.
+description: 'DEPRECATED — superseded by the `po` persona. Retained for installed users; NOT for new orchestration. Use `po` for requirements-to-backlog orchestration. Historic role: write-side orchestrator that seeded the workflow tracking system from the PRD/FDS produced by gather-requirements — resolved the platform once, sequenced the create-epic and create-user-story leaves across the Epic Register and User Story Backlog, wired every story to its parent epic, and reconciled the tracker against amended requirements via stable-ID markers.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.1
+  version: 1.1.2
 dependencies:
   - resolve-repository-platform
   - create-epic
