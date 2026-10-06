@@ -4,12 +4,13 @@ description: 'Generates self-contained, interactive flat HTML/CSS/JS prototypes 
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.0
+  version: 1.2.0
 user-invocable: true
 dependencies:
   - design-vocab
   - agent-markup
   - agent-handoff
+  - browser-verification
 argument-hint: "<prompt | spec | screen-name>"
 ---
 
@@ -65,3 +66,6 @@ flowchart TD
 5. **Output Location:**
    - When spawned by `designer`: Write to target path passed in handoff (e.g. `docs/design/drafts/<flow-name>/<screen-name>.html`).
    - When invoked directly: Write to `docs/design/drafts/adhoc/<screen-name>.html` (or display directly to user if repo has no design directory).
+
+6. **Browser Verification:**
+   - Verify rendered output via the `browser-verification` protocol (drive Chrome; screenshot evidence into a project temp dir; delete before commit). Static markup inspection alone cannot prove rendered behaviour.

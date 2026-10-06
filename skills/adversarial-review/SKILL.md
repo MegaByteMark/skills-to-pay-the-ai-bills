@@ -4,7 +4,7 @@ description: 'Adversarial code review of working-tree changes since last push. A
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.2.0
+  version: 2.3.0
 user-invocable: true
 dependencies:
   - interview-me
@@ -12,6 +12,7 @@ dependencies:
   - design-vocab
   - resolve-repository-platform
   - agent-handoff
+  - browser-verification
 ---
 
 **Accepts:** `[Handoff: Clean]` from `swe` PHASE 3 — `[Review: Round 1]` initial or `[Review: Round N]` re-review.
@@ -88,6 +89,7 @@ Directives:
 - Strict `design-vocab` for architectural findings. Prohibited: component, service, unit, API, boundary.
 - Strict `agent-markup` tokens: `[Review: Round]`, `[Review: Priority]`, `[Review: Verification]`, `[Scope: Origin]`, `[Confidence: Level]`, `[Remediation: Action]`, `[Data: Classification]` (inline in Finding text for Governance).
 - Coding-standards gate: when `docs/architecture/coding-standards.md` is present it is the authoritative style baseline — Tier 1 verified by executing its config, Tier 2 reviewed against its rubric, findings cite `RULE-###`. Waived violations (`WAIVER-###` scope match) are silenced. Priority follows each rule's recorded `[Review: Priority]` severity.
+- UI path: when the diff touches rendered UI (HTML/CSS/JS), verify rendered output via `browser-verification` — screenshot evidence into a project temp dir, deleted before commit; static markup inspection alone cannot prove rendered behaviour.
 
 Output Schema:
 

@@ -4,7 +4,7 @@ description: 'Designer persona orchestrator — UI/UX flow prototyping, versione
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.2.0
+  version: 1.3.0
 user-invocable: true
 dependencies:
   - interview-me
@@ -12,6 +12,7 @@ dependencies:
   - agent-markup
   - agent-handoff
   - prototype-ui
+  - browser-verification
   - resolve-repository-platform
   - strategic-reading
   - brevity
@@ -147,6 +148,7 @@ flowchart TD
 ### Directives
 
 - Zero unapproved writes: Never create files in `docs/design/approved/` before explicit developer confirmation and passing the zero `MUST FIX` accessibility gate.
+- Browser verification: when verifying rendered screens (walkthroughs, accessibility sweeps), follow the `browser-verification` protocol — drive Chrome, capture screenshot evidence into a project temp dir, delete before commit.
 - Zero CDN dependencies: All design systems and prototypes must use relative local stylesheets and offline SVG assets.
 - Design System Pinned Immutability: Once approved, prototypes remain pinned to their specific `system/vX/` version.
 - Skill drift: Use only skills listed in `dependencies`.

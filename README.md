@@ -202,6 +202,7 @@ Grouping is by convention only (the files stay flat for discovery).
 - **competency-profile** — the shared, out-of-tree, per-user record of a human's demonstrated skill, so calibration is continuous across skills.
 - **resolve-repository-platform** — figures out the hosting platform (GitHub/GitLab/…) before any platform-specific tooling runs, and maps write-side mechanics per platform including dependency edges (blocked-by relations).
 - **detect-test-harness** — resolves the project's test runner/framework, layout, and native test-double idiom from signal files before any test is read or written; asks one question only when inconclusive and never introduces a new framework silently.
+- **browser-verification** — shared protocol for browser-driven verification of rendered UI: drive Google Chrome to open local prototypes and capture screenshots, macOS prerequisites (Chrome installed, Automation permission, Zed restart caveat), and the screenshot evidence convention (project-scoped temp dir, read, delete before commit). Consumed by design-facing skills and the adversarial-review UI path.
 - **agent-handoff** — shared contract for agent-to-agent context handoffs at spawn sites. Defines two modes: `[Handoff: Clean]` (isolation — parent context would taint the leaf, e.g. reviews/audits) and `[Handoff: Enriched]` (bag — parent context enriches the leaf beyond repo artefacts, e.g. PR creation, teaching). Includes declaration syntax, validation rules (undeclared fields = HALT), mode selection rule, and the re-review profile (Clean variant) for versioned review rounds — fixed declaration plus a stable prior-findings ledger (`RV-###` IDs, Action, Evidence) whose claimed fixes the leaf verifies independently. Enforced by skill-authoring Rule 14.
 - **strategic-reading** — shared contract for Strategic Literature Nudges: lead/orchestrator skills append a 2-line Strategic Anchor (a canonical book/chapter reference plus the mental model it lends to the current design trade-off) to output only when the work resolves a non-trivial architectural, schema, or process/operational design choice — never on routine tasks. Supplies the trusted-literature whitelist by domain.
 - **brevity** — shared contract enforcing concise direct chat replies: sentence budgets, banned filler transitions and dummy pronouns, active voice, direct address, and few-shot calibration. Scope is chat replies only — code, comments, docs, and generated artefacts are exempt. Bundled by every persona orchestrator.
@@ -401,6 +402,8 @@ architect ──> analyze-a-codebase ────────┐
 swe · adversarial-review ──> docs/architecture/coding-standards.md  (canonical read: generation + gate)
 
 designer ──> prototype-ui  (enriched-context subagent)
+
+designer · prototype-ui · adversarial-review ──> browser-verification  (rendered-UI verification: Chrome + screenshot evidence)
 
 teach-me          ──> teach-a-skill ──┐
 vibe-code-antidote ──> teach-a-skill   │  (escalation leaf)
