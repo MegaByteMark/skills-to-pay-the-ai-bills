@@ -4,7 +4,7 @@ description: 'Leaf skill that creates and coordinates ONE gitflow hotfix: create
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.1
+  version: 1.0.3
 user-invocable: true
 dependencies:
   - generate-release-notes
@@ -35,10 +35,11 @@ flowchart TD
 ### PHASE 1 — Input & Isolation
 
 **Accepts:** `[Handoff: Clean]` from `devops` PHASE 3
-Accepted: Work Item reference (or patch source), main reference/SHA, platform resolution.
+Accepted: Work Item reference (or patch source), main reference/SHA, platform resolution, literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands).
 
 1. Consume handoff: Work Item reference (or patch source), main reference/SHA, platform resolution.
-2. Operate inside the provided isolated worktree — never the developer's working tree. No worktree supplied → create a transient worktree (`git worktree add <path> <main-reference>`, path under OS temp), removed on exit. Branch, fix, tag, and merge operations run only in the worktree.
+2. Operate inside the provided isolated worktree — never the developer's working tree. No worktree supplied → create a transient worktree via the terminal tool (`git worktree add <literal-path> <main-reference>`, literal absolute path under OS temp, no shell variables or substitutions), removed on exit. Branch, fix, tag, and merge operations run only in the worktree.
+   - File tools are project-scoped and cannot reach paths outside the project root: all worktree reads and writes MUST use terminal commands (e.g. `git -C <path>`, `cat`, `grep`, `sed`).
 
 ### PHASE 2 — Hotfix Branch
 

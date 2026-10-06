@@ -4,7 +4,7 @@ description: 'Leaf skill that creates or improves CI/CD pipelines on the resolve
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.1
+  version: 1.0.2
 user-invocable: true
 dependencies:
   - resolve-repository-platform
@@ -35,7 +35,7 @@ flowchart TD
 ```
 
 **Accepts:** `[Handoff: Clean]` from `devops` PHASE 3
-Accepted: platform resolution, repo root, canonical build/test/lint command set, requested stage list.
+Accepted: platform resolution, repo root, canonical build/test/lint command set, requested stage list, literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands).
 
 ### PHASE 1 — Contract Gate
 
@@ -61,7 +61,7 @@ Nightly scheduled full-build validation on develop: only on explicit request (`/
 
 ### PHASE 4 — Write
 
-1. Write or amend the pipeline config at the resolved location; keep every job command within the discovered canonical set — no invented steps.
+1. Write or amend the pipeline config at the resolved location — inside the provided worktree when supplied; keep every job command within the discovered canonical set — no invented steps.
 2. Secrets as placeholder variables bound to the platform secret store; never literal secrets in config or docs.
 3. Deploy targets: only the testing/production stages the developer names.
 
@@ -75,6 +75,7 @@ Nightly scheduled full-build validation on develop: only on explicit request (`/
 
 Directives:
 - Resolve-Before-Invoke: `resolve-repository-platform` first, always.
+- Worktree access: file tools are project-scoped — all worktree reads/writes via terminal commands.
 - Evidence-only commands: every job step maps to a discovered command; missing = `[Confidence: Possible]` + requires verification.
 - Never literal secrets; secret-store placeholders only.
 - No invented deploy targets or nightly builds without explicit request.

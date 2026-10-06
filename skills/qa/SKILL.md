@@ -4,7 +4,7 @@ description: 'QA (Quality Assurance) persona orchestrator. Runs audit-test-cover
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.4.0
+  version: 1.4.2
 user-invocable: true
 dependencies:
   - audit-test-coverage
@@ -63,14 +63,15 @@ flowchart TD
 
 ### PHASE 2 — Isolation (Worktree)
 
-1. Create a dedicated git worktree for this session: `git worktree add <path> <base>` where `<path>` is under OS temp (e.g. `/tmp/qa-<session-id>`). Session-id is unique per invocation.
+1. Create a dedicated git worktree for this session via the terminal tool: `git worktree add <literal-path> <base>` where `<literal-path>` is under OS temp (e.g. `/tmp/qa-<session-id>`). Session-id is unique per invocation; resolve it to a literal value — no shell variables or substitutions.
+   - File tools are project-scoped and cannot reach paths outside the project root: all worktree reads and writes MUST use terminal commands (e.g. `git -C <path>`, `cat`, `grep`, `sed`).
    - Worktree is **transient execution context, not persistent state**: the volatile-temp prohibition governs the persistent state store (escalation/competency/progress) — never the short-lived execution sandbox. The worktree is removed in PHASE 7.
 2. Materialise the code under test inside the worktree (checkout `<base>`; apply the change by commit or patch). Never touch the developer's working tree — audits, tests, simulations, and remediation run only inside the worktree.
 3. Run `detect-test-harness` inside the worktree before any test is read or run. Carry the Resolution Record into every subsequent phase.
 
 ### PHASE 3 — Parallel Audits
 
-Run `audit-test-coverage` and `audit-security-and-governance` in parallel (sequential if resource-constrained). Consume each leaf's output as-is; do not re-run or summarise away leaf analysis.
+Run `audit-test-coverage` and `audit-security-and-governance` in parallel (sequential if resource-constrained) against the worktree: pass the literal worktree path and the terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands) to each leaf. Consume each leaf's output as-is; do not re-run or summarise away leaf analysis.
 
 - Missing contracts: do NOT pull in `analyze-a-codebase` / blueprints. `audit-test-coverage`'s equivalent gate resolves to **EPHEMERAL** (in-context minimalist FDS, `[Inferred: Unverified]`, down-weighted `[Confidence: Level]`). `audit-security-and-governance` runs standalone with a "no contract baseline" notice.
 - When `docs/architecture/system-blueprint.md` is present: consume its Seam test topologies (§2.3.2) and data isolation models (§5.2) to inform high-leverage verification surfaces without regenerating the blueprint.
@@ -96,7 +97,7 @@ Present findings. Developer chooses:
 
 | Choice | Behavior |
 |---|---|
-| **Remediate coverage** | Spawn `remediate-test-coverage` `[Handoff: Clean]`: coverage gap set + harness Resolution Record + directive "close the coverage gaps per your phased approval workflow, inside the worktree". Output consumed as-is. Re-evaluate at the issues gate. |
+| **Remediate coverage** | Spawn `remediate-test-coverage` `[Handoff: Clean]`: coverage gap set + harness Resolution Record + literal worktree path + terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands) + directive "close the coverage gaps per your phased approval workflow, inside the worktree". Output consumed as-is. Re-evaluate at the issues gate. |
 | **File bug report** | Spawn `create-bug-report` `[Handoff: Clean]`: security/governance / logic findings + reproduction steps from PHASE 4 + directive "render a bug report per your schema and file it via the resolved platform". Output consumed as-is. Re-evaluate at the issues gate. |
 | **Deepen investigation** | Re-run PHASE 3–4 with expanded scope and re-enter the loop. |
 | **Accept & proceed** | Exit the loop; proceed to PHASE 7. |

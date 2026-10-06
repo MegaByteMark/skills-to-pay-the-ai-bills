@@ -4,7 +4,7 @@ description: 'DevOps persona orchestrator — hands-off gitflow release coordina
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.3.0
+  version: 1.3.3
 user-invocable: true
 dependencies:
   - generate-release-notes
@@ -36,7 +36,10 @@ flowchart TD
     ROUTE -->|scaffold-ci-cd| SPAWN_CI["Spawn scaffold-ci-cd<br>clean context"]
     ROUTE -->|release| SPAWN_REL["Spawn create-release<br>clean context"]
     ROUTE -->|hotfix| SPAWN_HOT["Spawn create-hotfix<br>clean context"]
-    SPAWN_CI --> VERIFY_CI{Pipelines healthy?}
+    SPAWN_CI --> PUSH_CI["Commit + push scaffold<br>branch; open Proposal → develop"]
+    PUSH_CI --> PUSHED{Push + Proposal<br>landed?}
+    PUSHED -->|No| HOLD_PUSH["HOLD: retain worktree,<br>report, re-invoke"]
+    PUSHED -->|Yes| VERIFY_CI{Pipelines healthy?}
     VERIFY_CI -->|No| HOLD_CI["HOLD: report defects,<br>re-invoke"]
     VERIFY_CI -->|Yes| CLEANUP
     SPAWN_REL --> GATE{QA regression<br>approved?}
@@ -48,7 +51,7 @@ flowchart TD
     VALIDATE -->|No| HOLD_HOT["HOLD: fix in worktree,<br>re-invoke /devops hotfix"]
     VALIDATE -->|Yes| MERGE_HOT["Merge hotfix:<br>→ main, → develop"]
     MERGE_HOT --> CLEANUP
-    CLEANUP["Remove worktree<br>(always, even on error)"] --> DONE(["Done — release coordinated,<br>CI/CD healthy, working tree<br>untouched"])
+    CLEANUP["Remove worktree<br>(after changes persisted)"] --> DONE(["Done — release coordinated,<br>CI/CD healthy, working tree<br>untouched"])
 ```
 
 ### PHASE 1 — Onboarding
@@ -59,7 +62,8 @@ flowchart TD
 
 ### PHASE 2 — Isolation (Worktree)
 
-1. Create a dedicated transient git worktree for this session: `git worktree add <path> <base>` where `<path>` is under OS temp (`/tmp/devops-<session-id>`), session-id unique per invocation. The worktree is transient execution context, not persistent state — never the developer's tree.
+1. Create a dedicated transient git worktree for this session via the terminal tool: `git worktree add <literal-path> <base>` where `<literal-path>` is under OS temp (`/tmp/devops-<session-id>`), session-id unique per invocation and resolved to a literal value — no shell variables or substitutions. The worktree is transient execution context, not persistent state — never the developer's tree.
+   - File tools are project-scoped and cannot reach paths outside the project root: all worktree reads and writes MUST use terminal commands (e.g. `git -C <path>`, `cat`, `grep`, `sed`).
 2. Materialise the relevant base (develop | main) inside the worktree. All branch, version, changelog, tag, and merge operations run only in the worktree.
 
 ### PHASE 3 — Action Routing (`[Handoff: Clean]` subagents)
@@ -68,9 +72,9 @@ Spawn subagents with `[Handoff: Clean]` — never parent reasoning, conversation
 
 | Action | Spawn | `[Handoff: Clean]` passed |
 |---|---|---|
-| `scaffold-ci-cd` | `scaffold-ci-cd` | platform resolution, repo root, canonical build/test/lint command set, requested stage list |
-| `release <version>` | `create-release` | target version, develop reference, platform, changelog baseline (last release tag) |
-| `hotfix <workitem>` | `create-hotfix` | Work Item reference (or patch source), main reference, platform |
+| `scaffold-ci-cd` | `scaffold-ci-cd` | platform resolution, repo root, canonical build/test/lint command set, requested stage list, literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands) |
+| `release <version>` | `create-release` | target version, develop reference, platform, changelog baseline (last release tag), literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands) |
+| `hotfix <workitem>` | `create-hotfix` | Work Item reference (or patch source), main reference, platform, literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands) |
 
 A missing leaf skill is a HALT — report and never fabricate the operation.
 
@@ -83,12 +87,12 @@ A missing leaf skill is a HALT — report and never fabricate the operation.
 2. **Production deploy:** on release merge to main, ensure the pipeline expresses full build + production deploy; verify pipeline run status when platform tooling exposes it.
 3. **Testing deploy:** on merge to develop, ensure the pipeline expresses full build + integration + deploy to testing stages.
 4. **Hotfix:** after `create-hotfix`, verify release notes attached and merges landed on main + develop.
-5. **CI/CD:** after `scaffold-ci-cd`, verify pipeline triggers express the gitflow stages and report health.
+5. **CI/CD:** after `scaffold-ci-cd`, commit + push the scaffolded config from the worktree on a dedicated branch (default `chore/scaffold-ci-cd`) and open a Change Proposal into develop; then verify pipeline triggers express the gitflow stages and report health. Push or Proposal failure → HOLD: retain the worktree, report, re-invoke on fix.
 
 ### PHASE 5 — Report & Clean Shutdown
 
 1. Emit a deployment/release report tagged `[Scope: Artefact: Deployment]` with: version, branch/hash lineage, Change Proposals, deploy targets, pipeline status with `[Confidence: Level]`.
-2. Always remove the worktree — on completion, on error, on early termination: `git worktree remove <path> --force`. Failure → record it and delete the directory as a fallback.
+2. Remove the worktree on completion, on error, or on early termination — but only once the action's changes are persisted: `git worktree remove <path> --force`. Unpersisted changes → HOLD and retain the worktree; never destroy unpushed work. Removal failure → record it and delete the directory as a fallback.
 3. Developer working tree untouched; zero artefacts left in the tree.
 4. If architectural decisions surfaced during the run, record via `architectural-decision-register`.
 

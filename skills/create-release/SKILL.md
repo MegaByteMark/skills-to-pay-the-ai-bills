@@ -4,7 +4,7 @@ description: 'Leaf skill that orchestrates ONE gitflow release: creates a releas
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.1
+  version: 1.0.3
 user-invocable: true
 dependencies:
   - generate-release-notes
@@ -37,10 +37,11 @@ flowchart TD
 ### PHASE 1 — Input & Isolation
 
 **Accepts:** `[Handoff: Clean]` from `devops` PHASE 3
-Accepted: target version, develop reference/SHA, platform resolution, changelog baseline.
+Accepted: target version, develop reference/SHA, platform resolution, changelog baseline, literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands).
 
 1. Consume handoff: target `version`, develop reference/SHA, platform resolution.
-2. Operate inside the provided isolated worktree — never the developer's working tree. No worktree supplied → create a transient worktree (`git worktree add <path> <develop-reference>`, path under OS temp), removed on exit. Version bumps, branch, changelog, tag, and merge operations run only in the worktree.
+2. Operate inside the provided isolated worktree — never the developer's working tree. No worktree supplied → create a transient worktree via the terminal tool (`git worktree add <literal-path> <develop-reference>`, literal absolute path under OS temp, no shell variables or substitutions), removed on exit. Version bumps, branch, changelog, tag, and merge operations run only in the worktree.
+   - File tools are project-scoped and cannot reach paths outside the project root: all worktree reads and writes MUST use terminal commands (e.g. `git -C <path>`, `cat`, `grep`, `sed`).
 
 ### PHASE 2 — Version Gate
 
