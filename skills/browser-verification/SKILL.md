@@ -1,29 +1,37 @@
 ---
 name: browser-verification
-description: 'Shared protocol for browser-driven verification of rendered UI. Defines the capability (drive Google Chrome via osascript to open local prototypes and capture screenshots), the macOS prerequisites (Chrome installed, Automation permission, Zed restart caveat, JS-from-Apple-Events for scripted interaction), and the screenshot evidence convention (capture into a project-scoped temp dir, read with the image reader, delete before commit). Consumed by design-facing skills (designer, prototype-ui) and the adversarial-review UI path.'
+description: 'Shared protocol for browser-driven verification of rendered UI, cross-platform (macOS, Windows, Linux). Defines the capability (drive an installed Chrome/Chromium to open local prototypes, interact, and capture screenshots), mechanism selection (Chrome DevTools Protocol for scripted interaction; OS-native tooling for open-and-capture), per-platform permission caveats, and the screenshot evidence convention (capture into a project-scoped temp dir, read with the image reader, delete before commit). Consumed by design-facing skills (designer, prototype-ui) and the adversarial-review UI path.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.1.0
 dependencies:
   - agent-markup
 user-invocable: false
 ---
 
-Static markup inspection cannot prove rendered behaviour. When a task requires verifying rendered UI — layout, interaction states, in-browser accessibility — drive a real browser and verify from screenshot evidence.
+Static markup inspection cannot prove rendered behaviour. When a task requires verifying rendered UI — layout, interaction states, in-browser accessibility — drive a real browser and verify from screenshot evidence. Resolve the mechanism for the current OS before first use.
 
 Capability:
-- Drive Google Chrome via `osascript` (macOS AppleScript): open `file://` prototypes or localhost URLs, navigate, capture screenshots via `screencapture`.
+- Drive an installed Chrome/Chromium: open `file://` prototypes or localhost URLs, navigate, interact, capture screenshots.
 - Read the screenshot with the image reader to verify rendered output.
-- Illustrative commands (verify at runtime):
-  - Open: `osascript -e 'tell application "Google Chrome" to open location "<url>"'`
-  - Capture: `screencapture -x <project-temp-dir>/shot.png`
+
+Mechanism selection:
+1. Scripted interaction (click, type, JS evaluation) → Chrome DevTools Protocol (CDP) on any platform; macOS may alternatively use AppleScript (`osascript`).
+2. Open-and-capture only → OS-native tooling per the map.
+
+Platform Adapter Map (illustrative — verify at runtime):
+| Platform | Browser launch | Screenshot capture | Permission caveats |
+| :--- | :--- | :--- | :--- |
+| macOS | `open -a "Google Chrome" <url>` | `screencapture` | AppleScript control needs Automation permission (System Settings → Privacy & Security → Automation); denied → error `-1743`; JS execution needs Chrome View → Developer → Allow JavaScript from Apple Events |
+| Windows | `Start-Process chrome <url>` | PowerShell .NET screen capture, or CDP | Screen capture may require an unlocked session |
+| Linux | `google-chrome <url>` / `chromium <url>` | `gnome-screenshot`, `scrot`, `import`, or CDP | Wayland compositors may restrict screen capture |
+| Any OS (CDP) | `<chrome-binary> --remote-debugging-port=<port> --user-data-dir=<temp-profile> <url>` | CDP `Page.captureScreenshot` | None beyond browser install; dedicated `--user-data-dir` required when Chrome is already running |
 
 Prerequisites (each missing item costs a round-trip — check before first use):
-1. Chrome installed (`/Applications/Google Chrome.app`). Absent → static inspection only; request install approval — never install silently.
-2. macOS Automation permission: the first `osascript` targeting Chrome triggers the system prompt. Denied or previously denied → error `-1743`; fix in System Settings → Privacy & Security → Automation → enable the controlling app (Zed/Terminal) for Google Chrome.
-3. Zed restart caveat: a running Zed and its terminals do not inherit a newly granted Automation permission — restart Zed, then retry.
-4. Scripted interaction (`execute javascript`) additionally requires Chrome View → Developer → Allow JavaScript from Apple Events.
+1. Chrome/Chromium installed. Absent → static inspection only; request install approval — never install silently.
+2. Permission caveats for the selected mechanism (see map). Denied → re-grant in OS settings, then retry.
+3. Host-app restart caveat: a running editor/terminal may not inherit a newly granted OS permission — restart the host app, then retry.
 
 Screenshot evidence convention:
 1. Capture or copy screenshots into a project-scoped temp dir (e.g. `.tmp/browser-verification/`) — the image reader is project-scoped and cannot read outside the project root.
@@ -32,5 +40,5 @@ Screenshot evidence convention:
 
 Directives:
 - Evidence over assertion: a rendered-UI claim is `[Confidence: Confirmed]` only with a screenshot read; otherwise `Possible — requires verification`.
-- Graceful degradation: no Chrome or no permission → fall back to static inspection and state the limitation; never fabricate rendered evidence.
+- Graceful degradation: no browser or no permission → fall back to static inspection and state the limitation; never fabricate rendered evidence.
 - Cleanup: screenshots are transient evidence, never repo artefacts.
