@@ -4,7 +4,7 @@ description: 'Shared contract defining the two modes of agent-to-agent context h
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.3.0
+  version: 1.3.1
 dependencies:
   - agent-markup
   - design-vocab
@@ -108,13 +108,13 @@ The orchestrator is the source of truth — it constructs the bag, so it owns th
 
 ## Migration
 
-The following spawn sites were retrofitted from informal prose to formal `[Handoff: Mode]` declarations in the introducing PR:
+The following spawn sites carry formal `[Handoff: Mode]` declarations:
 
 **Clean mode:**
 - `swe` → `adversarial-review` (PHASE 3; initial Clean + re-review profile)
 - `po` → `create-epic`, `create-user-story`, `create-bug-report`, `create-milestone` (PHASE 4)
 - `architect` → `analyze-a-codebase`, `audit-blueprint-implementation` (PHASE 2)
-- `qa` → `remediate-test-coverage`, `create-bug-report` (PHASE 6)
+- `qa` → `audit-test-coverage`, `audit-security-and-governance` (PHASE 3), `remediate-test-coverage`, `create-bug-report` (PHASE 6)
 - `devops` → `create-release`, `create-hotfix`, `scaffold-ci-cd` (PHASE 3)
 
 **Enriched mode:**

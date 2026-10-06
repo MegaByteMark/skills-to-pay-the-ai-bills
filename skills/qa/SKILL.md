@@ -4,7 +4,7 @@ description: 'QA (Quality Assurance) persona orchestrator. Runs audit-test-cover
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.4.2
+  version: 1.4.3
 user-invocable: true
 dependencies:
   - audit-test-coverage
@@ -71,7 +71,13 @@ flowchart TD
 
 ### PHASE 3 — Parallel Audits
 
-Run `audit-test-coverage` and `audit-security-and-governance` in parallel (sequential if resource-constrained) against the worktree: pass the literal worktree path and the terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands) to each leaf. Consume each leaf's output as-is; do not re-run or summarise away leaf analysis.
+Run `audit-test-coverage` and `audit-security-and-governance` in parallel (sequential if resource-constrained). Consume each leaf's output as-is; do not re-run or summarise away leaf analysis.
+
+**Handoff:** `[Handoff: Clean]` → `audit-test-coverage`
+Passed: literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands).
+
+**Handoff:** `[Handoff: Clean]` → `audit-security-and-governance`
+Passed: literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands).
 
 - Missing contracts: do NOT pull in `analyze-a-codebase` / blueprints. `audit-test-coverage`'s equivalent gate resolves to **EPHEMERAL** (in-context minimalist FDS, `[Inferred: Unverified]`, down-weighted `[Confidence: Level]`). `audit-security-and-governance` runs standalone with a "no contract baseline" notice.
 - When `docs/architecture/system-blueprint.md` is present: consume its Seam test topologies (§2.3.2) and data isolation models (§5.2) to inform high-leverage verification surfaces without regenerating the blueprint.
