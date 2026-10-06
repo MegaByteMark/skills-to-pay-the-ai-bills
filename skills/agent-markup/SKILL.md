@@ -4,7 +4,7 @@ description: Defines the strict token syntax, bracket-enclosed schema fields, an
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.6.0
+  version: 1.7.0
 ---
 All machine-readable tokens MUST be in square brackets `[...]`.
 
@@ -31,6 +31,12 @@ All machine-readable tokens MUST be in square brackets `[...]`.
 [Priority: MoSCoW]: [Must, Should, Could, Wont]. Written `[Priority: Must]` etc. Must = release fails without it; Should = viable workaround; Could = desirable if capacity; Wont = explicitly out-of-scope (records decision). Owned by gather-requirements PRD stream.
 
 [Review: Priority]: [Must, Should, Could, Nitpick]. Written `[Review: Must]` etc. Must = merge-blocking (breaks functionality, introduces vulnerability/violation, or regresses behaviour); Should = non-conformance with repo-resident standards; Could = opportunistic improvement within blast radius; Nitpick = trivial non-conformance (typos, inconsistency). Review-context only — never used in PRD or planning. Owned by adversarial-review.
+
+[Review: Round]: integer ≥ 1. Written `[Review: Round 2]`. Round 1 = initial review; Round N > 1 = re-review round consuming a prior-findings ledger. Owned by adversarial-review.
+
+[Review: Verification]: [Verified, Unresolved, Recorded]. Verified = claimed fix independently confirmed resolved; Unresolved = claimed fix still present or incomplete — re-enters the fix loop under its original Finding ID; Recorded = non-Fix action acknowledged (Accept/Defer/Log/None), never re-flagged. Owned by adversarial-review.
+
+[Baseline: Range]: git revision range. Written `[Baseline: HEAD~3..HEAD]`. Review baseline echoed in report headers; orchestrators extract it to scope re-review rounds. Owned by adversarial-review.
 
 [Doc: Archetype]: [QuickStart, Technical, Troubleshooting, Installation, Commentary]. Path bindings owned by document-a-codebase.
 

@@ -1,10 +1,10 @@
 ---
 name: agent-handoff
-description: 'Shared contract defining the two modes of agent-to-agent context handoff at spawn sites: Clean (isolation — parent context would taint the leaf) and Enriched (bag — parent context enriches the leaf beyond what repo artefacts provide). Defines the [Handoff: Mode] token, declaration syntax for both modes, validation rules (absent declared fields = graceful fallback; undeclared fields = HALT), and the mode selection rule. Consumed by every orchestrator and leaf that spawns or receives a subagent. Enforced by skill-authoring Rule 14.'
+description: 'Shared contract defining the two modes of agent-to-agent context handoff at spawn sites: Clean (isolation — parent context would taint the leaf) and Enriched (bag — parent context enriches the leaf beyond what repo artefacts provide). Defines the [Handoff: Mode] token, declaration syntax for both modes, validation rules (absent declared fields = graceful fallback; undeclared fields = HALT), the mode selection rule, and the re-review profile (Clean variant) for versioned review rounds — fixed declaration syntax plus a stable prior-findings ledger (Finding ID, File:Line, Finding, Domain, Priority, Action, Evidence) whose claimed fixes the leaf verifies independently. Consumed by every orchestrator and leaf that spawns or receives a subagent. Enforced by skill-authoring Rule 14.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.2.0
+  version: 1.3.0
 dependencies:
   - agent-markup
   - design-vocab
@@ -63,6 +63,33 @@ Enrichment — the orchestrator passes a typed field bag holding in-context know
 
 Required? is always `no` — absent fields are expected (headless mode, partial context). If a field is truly required, the leaf HALTs with a clear message rather than degrading silently.
 
+## Re-review Profile (Clean variant)
+
+Recurring spawn pattern: an orchestrator re-spawns a review leaf after applying fixes. Still Clean — parent reasoning about the fixes is never passed; the leaf verifies independently. Adds two fixed items to the base Clean list: the prior review ledger and the review scope (baseline from the prior round). The ledger is a fixed-format artefact, not a context bag — this profile does not make the handoff Enriched.
+
+**Orchestrator declaration (spawn site):**
+```markdown
+**Handoff:** `[Handoff: Clean]` → `<leaf-name>` — `[Review: Round N]`
+Passed: prior review ledger, review scope (baseline from round N-1), persona directive, reference links.
+```
+
+**Leaf declaration (consume site):**
+```markdown
+**Accepts:** `[Handoff: Clean]` re-review from `<orchestrator>` PHASE <N> — `[Review: Round N]`
+Accepted: prior review ledger, review scope (baseline from round N-1), persona directive, reference links.
+```
+
+**Ledger schema** — one row per finding from every prior round; never omit a finding, never renumber an ID:
+
+| Finding ID | File:Line | Finding | Domain | Priority | Action | Evidence |
+|---|---|---|---|---|---|---|
+| `RV-###` | `<path>:<line>` | verbatim finding text | 8-domain category | `[Review: Priority]` | `[Remediation: Action]` | fix pointer / waiver justification / tracker ref / `-` |
+
+- Finding IDs are stable across rounds; new findings continue the sequence.
+- Rows with Action `[Remediation: Fix]` are claims — the leaf verifies each independently against the current tree.
+- Non-Fix rows are recorded and never re-flagged.
+- The ledger is session-scoped orchestrator context — never persisted to the working tree or a state store. Ledger absent → the leaf runs an initial review (round 1).
+
 ## Validation Rules
 
 | Condition | Action |
@@ -84,7 +111,7 @@ The orchestrator is the source of truth — it constructs the bag, so it owns th
 The following spawn sites were retrofitted from informal prose to formal `[Handoff: Mode]` declarations in the introducing PR:
 
 **Clean mode:**
-- `swe` → `adversarial-review` (PHASE 3)
+- `swe` → `adversarial-review` (PHASE 3; initial Clean + re-review profile)
 - `po` → `create-epic`, `create-user-story`, `create-bug-report`, `create-milestone` (PHASE 4)
 - `architect` → `analyze-a-codebase`, `audit-blueprint-implementation` (PHASE 2)
 - `qa` → `remediate-test-coverage`, `create-bug-report` (PHASE 6)
