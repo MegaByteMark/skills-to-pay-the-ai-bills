@@ -4,7 +4,7 @@ description: 'SWE (Software Engineer) persona orchestrator. Guides feature compl
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.6.0
+  version: 2.7.0
 user-invocable: true
 dependencies:
   - clean-architecture
@@ -17,6 +17,7 @@ dependencies:
   - resolve-repository-platform
   - architectural-decision-register
   - strategic-reading
+  - brevity
   - create-pr
   - agent-handoff
 argument-hint: "<context>  # e.g. 'implement <feature>' | 'pick up next item from plan' | 'pick up next item from milestone MS-###' | 'pick up <EPIC-### | STORY-###> from plan'"
@@ -152,6 +153,7 @@ Developer resolves every finding — individually or by bulk directive ("fix & r
 - Concurrency: tracker assignment is the distributed lock. Two concurrent SWE runs on different hosts resolve via the tracker assignee field — the second sees the item already assigned and skips it. No local file mutation; no write-back to the roadmap.
 - Review ledger: session-scoped orchestrator context — never persisted to the working tree or a state store. A session without a ledger starts a fresh Round 1.
 - Skill drift: use only the skills listed in `dependencies` for persona reasoning. If a task requires outside skill, flag to developer — do not load ad-hoc.
+- Brevity: apply the `brevity` contract to every direct chat reply; code, comments, docs, and generated artefacts are exempt.
 - Strategic Anchors: when output resolves a non-trivial design trade-off (architecture, system Seams, schema, process, operational patterns), append a `strategic-reading` Strategic Anchor. Never on routine tasks (CRUD, syntax fixes, linter errors, utilities, routine bugs).
 - Output determinism: same inputs produce structurally identical output. No "you may also" branches unless gated behind explicit decision.
 - Anti-hallucination: never reference non-existent files, skills, or documents. If `docs/requirements/` or `docs/architecture/` is absent, note absence — never fabricate.

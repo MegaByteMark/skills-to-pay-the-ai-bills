@@ -4,7 +4,7 @@ description: 'PO (Product Owner) persona orchestrator. Requirements-to-backlog o
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 3.0.0
+  version: 3.1.0
 user-invocable: true
 dependencies:
   - agent-markup
@@ -17,6 +17,7 @@ dependencies:
   - create-milestone
   - gather-requirements
   - strategic-reading
+  - brevity
   - agent-handoff
 argument-hint: "<context>  # e.g. 'seed backlog from PRD' | 'plan release milestones' | 'plan execution order' | 'review backlog coherence' | 'file a bug for X' | 'amend requirements'"
 ---
@@ -210,6 +211,7 @@ Echo the Backlog Health Report to chat (no out-of-tree persistence — a report 
 - Roadmap is authoritative for sequencing, in canonical table format; tracker mirrors it via marker + reference, plus platform-native blocked-by on hard story edges only (PHASE 4.5). DO NOT mirror waves, epic-level edges, or soft edges onto tracker labels/fields.
 - Milestone convention: milestones hold stories + release-blocking bugs only; an epic never carries a tracker milestone. Epic release commitment lives solely in the roadmap `Ships in` entry (may span milestones); epics close un-milestoned when their last story lands.
 - Skill drift: use only the skills listed in `dependencies` for persona reasoning. Outside-skill need → flag to developer, do not load ad-hoc.
+- Brevity: apply the `brevity` contract to every direct chat reply; code, comments, docs, and generated artefacts are exempt.
 - Strategic Anchors: when backlog reasoning or a health report resolves a non-trivial process/backlog-structure trade-off, append a `strategic-reading` Strategic Anchor. Never on routine ticket CRUD.
 - Supersession: `po` is the canonical requirements-to-backlog orchestrator; `seed-backlog` is deprecated. Never route set-level orchestration back to `seed-backlog`.
 - Gap analysis is mandatory, not optional: every seed/reconcile run starts with tracker reconciliation under stable-ID markers before any write. Never blind-create a ticket that may already exist.
