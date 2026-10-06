@@ -4,7 +4,7 @@ description: 'Designer persona orchestrator — UI/UX flow prototyping, versione
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.1
+  version: 1.2.0
 user-invocable: true
 dependencies:
   - interview-me
@@ -14,6 +14,7 @@ dependencies:
   - prototype-ui
   - resolve-repository-platform
   - strategic-reading
+  - brevity
 argument-hint: "<context>  # e.g. 'design <EPIC-### | STORY-###>' | 'prototype <flow-name>' | 'system init' | 'audit <screen-path>' | 'review <flow-name>'"
 ---
 
@@ -149,5 +150,6 @@ flowchart TD
 - Zero CDN dependencies: All design systems and prototypes must use relative local stylesheets and offline SVG assets.
 - Design System Pinned Immutability: Once approved, prototypes remain pinned to their specific `system/vX/` version.
 - Skill drift: Use only skills listed in `dependencies`.
+- Brevity: apply the `brevity` contract to every direct chat reply; code, comments, docs, and generated artefacts are exempt.
 - All bracket tokens: Must use `agent-markup` enumerations (`[Risk: Level]`, `[Confidence: Level]`, `[Review: Priority]`, `[Remediation: Action]`, `[Scope: Origin]`).
 - All architectural terminology: Must use `design-vocab` taxonomy (Module, Interface, Implementation, Depth, Seam, Adapter).

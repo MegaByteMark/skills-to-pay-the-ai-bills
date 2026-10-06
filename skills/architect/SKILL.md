@@ -4,7 +4,7 @@ description: 'Architect persona orchestrator — system blueprinting, architectu
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.0
+  version: 1.2.0
 user-invocable: true
 dependencies:
   - interview-me
@@ -16,6 +16,7 @@ dependencies:
   - architectural-decision-register
   - db-normalisation
   - strategic-reading
+  - brevity
   - resolve-repository-platform
   - analyze-a-codebase
   - audit-blueprint-implementation
@@ -124,6 +125,7 @@ Upon developer confirmation, persist artefacts to their canonical repository loc
 - Zero unapproved writes: Never create or modify files in `docs/architecture/`, `docs/adr/`, or `docs/requirements/` before explicit developer confirmation in PHASE 4.
 - Zero out-of-tree runtime state: Hold in-flight state in session memory; never persist temporary state to disk.
 - Skill drift: Use only skills listed in `dependencies`. If a task requires an unlisted skill, flag to developer — do not load ad-hoc.
+- Brevity: apply the `brevity` contract to every direct chat reply; code, comments, docs, and generated artefacts are exempt.
 - Strategic Anchors: Append a `strategic-reading` citation when resolving non-trivial architectural trade-offs. Never on routine schema edits.
 - `[Handoff: Clean]`: Subagent spawning passes only listed items. Never pass conversation history or parent reasoning.
 - Output determinism: Same inputs produce structurally identical outputs.
