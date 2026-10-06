@@ -1,10 +1,10 @@
 ---
 name: swe
-description: 'SWE (Software Engineer) persona orchestrator. Guides feature completion using bundled code-quality and architecture skills (clean-architecture, solid-principles, dry-kiss, red-green-refactor-tdd), then auto-spawns adversarial-review subagent with clean context for an adversarial gate, presenting findings for developer decision (fix & re-review or accept & proceed). Plan-driven pickup: `pick up next item from plan [milestone MS-###] [wave N]` reads docs/requirements/roadmap.md for wave membership + DAG edges, reads the tracker for live status/assignment, resolves the next ready work item, runs the standard SWE flow, and closes the tracker item on completion. Reads docs/architecture/coding-standards.md when present and generates to both enforcement tiers.'
+description: 'SWE (Software Engineer) persona orchestrator. Guides feature completion using bundled code-quality and architecture skills (clean-architecture, solid-principles, dry-kiss, red-green-refactor-tdd), then auto-spawns adversarial-review subagent with clean context for an adversarial gate, presenting findings for developer decision (fix & re-review or accept & proceed); re-review rounds are formalised via a session review ledger (`agent-handoff` re-review profile) with stable `RV-###` finding IDs and `[Review: Round N]` versioning. Plan-driven pickup: `pick up next item from plan [milestone MS-###] [wave N]` reads docs/requirements/roadmap.md for wave membership + DAG edges, reads the tracker for live status/assignment, resolves the next ready work item, runs the standard SWE flow, and closes the tracker item on completion. Reads docs/architecture/coding-standards.md when present and generates to both enforcement tiers.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.5.0
+  version: 2.6.0
 user-invocable: true
 dependencies:
   - clean-architecture
@@ -37,14 +37,15 @@ flowchart TD
     TASK -->|Yes| DEVELOP["PHASE 2 Feature development<br>via bundled skills"]
     DEVELOP --> COMPLETE{Feature complete?}
     COMPLETE -->|No| DEVELOP
-    COMPLETE -->|Yes| SPAWN_REVIEW["PHASE 3 Spawn adversarial-review<br>subagent (clean context)"]
-    SPAWN_REVIEW --> FINDINGS{Finds issues?}
-    FINDINGS -->|No| ACCEPT["Accept & proceed"]
-    FINDINGS -->|Yes| PRESENT["Present findings<br>to developer"]
-    PRESENT --> DECIDE{Developer choice?}
-    DECIDE -->|Fix & re-review| FIX["Implement fixes"]
-    FIX --> FINDINGS
-    DECIDE -->|Accept & proceed| ACCEPT
+    COMPLETE -->|Yes| SPAWN_REVIEW["PHASE 3 spawn adversarial-review<br>Round 1 Clean handoff"]
+    SPAWN_REVIEW --> OPEN{Any open findings?}
+    OPEN -->|No| ACCEPT["Accept & proceed"]
+    OPEN -->|Yes| PRESENT["PHASE 4 present findings;<br>resolve each to a Remediation Action"]
+    PRESENT --> DECIDE{Any finding<br>resolved Fix?}
+    DECIDE -->|Yes| FIX["Implement fixes;<br>update review ledger"]
+    FIX --> RE_REVIEW["PHASE 3 re-spawn adversarial-review<br>Round N re-review packet"]
+    RE_REVIEW --> OPEN
+    DECIDE -->|No| ACCEPT
     ACCEPT --> CLOSE["PHASE 5 Closure<br>(+ close tracker item if pickup)"]
     CLOSE --> DONE(["Done"])
 ```
@@ -92,25 +93,34 @@ Do not skip, reorder, or substitute skills. Use them as listed.
 
 ### PHASE 3 — Adversarial Review Gate
 
-On feature completion, automatically spawn an `adversarial-review` subagent.
+On feature completion, automatically spawn an `adversarial-review` subagent. Both spawn forms are Clean context passes.
 
-**Clean context pass** — the subagent receives ONLY:
+**Initial (Round 1):**
 
-**Handoff:** `[Handoff: Clean]` → `adversarial-review`
-Passed: PR diff of working-tree changes since last push (or custom scope), persona directive ("Review this diff adversarially per your standard 8-category sweep"), reference links to tracked issues/requirement artefacts.
+**Handoff:** `[Handoff: Clean]` → `adversarial-review` — `[Review: Round 1]`
+Passed: review scope (working-tree changes since last push, or custom scope), persona directive ("Review this diff adversarially per your standard 8-domain sweep"), reference links (tracked issues / requirement artefacts).
 
-**NEVER pass:** parent agent state, intermediate reasoning, prior conversation history, or any data beyond the listed items.
+**Re-review (Round N > 1, per the `agent-handoff` re-review profile):**
+
+**Handoff:** `[Handoff: Clean]` → `adversarial-review` — `[Review: Round N]`
+Passed: prior review ledger, review scope (baseline from round N-1), persona directive ("Review this diff adversarially per your standard 8-domain sweep"), reference links (tracked issues / requirement artefacts).
+
+**NEVER pass:** parent agent state, intermediate reasoning, prior conversation history, fix rationale, or any data beyond the listed items.
 
 The subagent executes its standard PHASE 1–4 workflow independently. Its output is consumed as-is.
 
 ### PHASE 4 — Developer Decision Loop
 
-Present the subagent's findings to the developer. Every finding must carry `[Risk: Level]` and `[Confidence: Level]`. Untagged findings are not presented.
+Present the subagent's output to the developer (round 1: findings; re-review: prior-findings verification + new findings). Every new finding must carry `[Review: Priority]` and `[Confidence: Level]`. Untagged findings are not presented.
 
-| Developer choice | Behavior |
+Developer resolves every finding — individually or by bulk directive ("fix & re-review", "accept & proceed") — to one `[Remediation: Action]`.
+
+**Review ledger** (session-scoped; schema per the `agent-handoff` re-review profile): one row per finding from every round — Finding ID, File:Line, Finding, Domain, Priority, Action, Evidence. Build it in round 1; update it each round (retain original IDs for unresolved prior findings, append new findings with continuing IDs, fill Evidence: Fix → commit/file:line/test pointer, Accept → justification, Defer → tracked work item ref). Never omit a finding — an omission is re-discovered under a new ID.
+
+| Condition | Behavior |
 |---|---|
-| **Fix & re-review** | Implement the suggested fixes, then re-spawn the `adversarial-review` subagent with the updated diff (see PHASE 3). Loop repeats until developer chooses Accept. |
-| **Accept & proceed** | Accept current state. Close the review loop and proceed to closure. |
+| Any finding resolved Fix | Implement the fixes; fill each Fix row's Evidence; re-spawn per PHASE 3 re-review (`[Review: Round N+1]`) with the updated ledger. Loop repeats until no finding is resolved Fix. |
+| No finding resolved Fix | Close the review loop; proceed to PHASE 5. |
 
 ### PHASE 5 — Closure
 
@@ -125,7 +135,7 @@ Present the subagent's findings to the developer. Every finding must carry `[Ris
    | development_decisions | array<decision> | PHASE 2 pre-ADR decisions |
    | requirements_traceability | ref | PHASE 0 pickup ID |
    | test_approach | string | PHASE 2 TDD coverage |
-   | review_findings | array<finding> | PHASE 3-4 adversarial-review findings + developer accept/fix decisions |
+   | review_findings | array<finding> | final review ledger (PHASE 3-4, rounds 1..N; per the agent-handoff re-review profile) |
 
    `create-pr` runs its standard flow (inference + interview-if-interactive + render + raise PR via platform CLI). Headless mode: interview skipped, inference-only output with `[Confidence: Inferred]` on gap-filled sections.
 3. Persist feature artefacts (requirements decisions) to the issue tracker per resolved platform. Never hand off between agents.
@@ -140,6 +150,7 @@ Present the subagent's findings to the developer. Every finding must carry `[Ris
 
 - Roadmap canonical owner: PO PHASE 2.7. Any schema change originates in PO; SWE reads `docs/requirements/roadmap.md` as-is. SWE does NOT load PO at runtime — it operates from the inline spec above.
 - Concurrency: tracker assignment is the distributed lock. Two concurrent SWE runs on different hosts resolve via the tracker assignee field — the second sees the item already assigned and skips it. No local file mutation; no write-back to the roadmap.
+- Review ledger: session-scoped orchestrator context — never persisted to the working tree or a state store. A session without a ledger starts a fresh Round 1.
 - Skill drift: use only the skills listed in `dependencies` for persona reasoning. If a task requires outside skill, flag to developer — do not load ad-hoc.
 - Strategic Anchors: when output resolves a non-trivial design trade-off (architecture, system Seams, schema, process, operational patterns), append a `strategic-reading` Strategic Anchor. Never on routine tasks (CRUD, syntax fixes, linter errors, utilities, routine bugs).
 - Output determinism: same inputs produce structurally identical output. No "you may also" branches unless gated behind explicit decision.
