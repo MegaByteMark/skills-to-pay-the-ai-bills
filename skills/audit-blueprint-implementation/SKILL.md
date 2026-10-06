@@ -4,12 +4,18 @@ description: Audits the physical codebase against the established system bluepri
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.0.1
 dependencies:
   - design-vocab
   - agent-markup
   - interview-me
 ---
+**Accepts:** `[Handoff: Clean]` from `audit-application-health` PHASE 2
+Accepted: platform resolution, contract paths (`docs/architecture/system-blueprint.md`, `docs/requirements/functional-requirements.md`).
+
+**Accepts:** `[Handoff: Clean]` from `architect` PHASE 2
+Accepted: FDS path, system blueprint path (`docs/architecture/system-blueprint.md`), active ADRs path (`docs/adr/`), directive "audit physical codebase against contracts".
+
 1. PHASE 1 (Contract Gate): Check `docs/requirements/functional-requirements.md` AND `docs/architecture/system-blueprint.md`.
    - Missing → trigger `interview-me` for ONE decision:
      - GENERATE: hand off to `gather-requirements`/`analyze-a-codebase`, then proceed.

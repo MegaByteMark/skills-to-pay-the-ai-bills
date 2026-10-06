@@ -4,7 +4,7 @@ description: 'Shared contract defining the two modes of agent-to-agent context h
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.3.1
+  version: 1.3.2
 dependencies:
   - agent-markup
   - design-vocab
@@ -116,6 +116,8 @@ The following spawn sites carry formal `[Handoff: Mode]` declarations:
 - `architect` → `analyze-a-codebase`, `audit-blueprint-implementation` (PHASE 2)
 - `qa` → `audit-test-coverage`, `audit-security-and-governance` (PHASE 3), `remediate-test-coverage`, `create-bug-report` (PHASE 6)
 - `devops` → `create-release`, `create-hotfix`, `scaffold-ci-cd` (PHASE 3)
+- `audit-application-health` → `audit-security-and-governance`, `audit-blueprint-implementation`, `audit-test-coverage` (PHASE 2)
+- `remediate-test-coverage` → `audit-test-coverage` (PHASE 1)
 
 **Enriched mode:**
 - `designer` → `prototype-ui` (PHASE 2)

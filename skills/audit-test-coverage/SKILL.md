@@ -4,7 +4,7 @@ description: Discovers physical test files, evaluates actual coverage patterns a
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.1
+  version: 1.0.2
 dependencies:
   - design-vocab
   - agent-markup
@@ -12,6 +12,12 @@ dependencies:
   - detect-test-harness
 ---
 **Accepts:** `[Handoff: Clean]` from `qa` PHASE 3
+Accepted: literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands).
+
+**Accepts:** `[Handoff: Clean]` from `audit-application-health` PHASE 2
+Accepted: platform resolution, contract paths (`docs/architecture/system-blueprint.md`, `docs/requirements/functional-requirements.md`).
+
+**Accepts:** `[Handoff: Clean]` from `remediate-test-coverage` PHASE 1
 Accepted: literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands).
 
 1. PHASE 1 (Blueprint & FDS Gate): Read `docs/architecture/system-blueprint.md` + `docs/requirements/functional-requirements.md`.

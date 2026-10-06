@@ -4,7 +4,7 @@ description: Scans the physical codebase for security vulnerabilities, data-prot
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.1
+  version: 1.0.2
 dependencies:
   - design-vocab
   - agent-markup
@@ -12,6 +12,9 @@ dependencies:
 ---
 **Accepts:** `[Handoff: Clean]` from `qa` PHASE 3
 Accepted: literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands).
+
+**Accepts:** `[Handoff: Clean]` from `audit-application-health` PHASE 2
+Accepted: platform resolution.
 
 1. PHASE 1 (Contract Enrichment): NEVER abort on missing contracts.
    - Attempt `docs/architecture/system-blueprint.md` + `docs/requirements/functional-requirements.md`.

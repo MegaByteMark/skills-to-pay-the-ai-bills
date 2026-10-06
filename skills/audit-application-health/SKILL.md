@@ -4,7 +4,7 @@ description: Overarching audit orchestrator that runs the security/governance, b
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.0.1
 dependencies:
   - audit-security-and-governance
   - audit-blueprint-implementation
@@ -20,10 +20,13 @@ dependencies:
    - Either missing → `interview-me` ONE decision: "Generate missing contract(s)?"
      - YES: hand off to `analyze-a-codebase`/`gather-requirements`, then proceed with all three leaves.
      - NO: contract-dependent leaves (blueprint-implementation, test-coverage) EXCLUDED. Security/governance ALWAYS runs.
-2. PHASE 2 (Leaf Execution): Run available leaves in order:
-     1. `audit-security-and-governance` (always)
-     2. `audit-blueprint-implementation` (if contracts)
-     3. `audit-test-coverage` (if contracts)
+2. PHASE 2 (Leaf Execution): Run available leaves in order as `[Handoff: Clean]` spawns — `audit-security-and-governance` always; `audit-blueprint-implementation` and `audit-test-coverage` only when contracts are present.
+   - **Handoff:** `[Handoff: Clean]` → `audit-security-and-governance`
+     Passed: platform resolution.
+   - **Handoff:** `[Handoff: Clean]` → `audit-blueprint-implementation`
+     Passed: platform resolution, contract paths (`docs/architecture/system-blueprint.md`, `docs/requirements/functional-requirements.md`).
+   - **Handoff:** `[Handoff: Clean]` → `audit-test-coverage`
+     Passed: platform resolution, contract paths (`docs/architecture/system-blueprint.md`, `docs/requirements/functional-requirements.md`).
 3. PHASE 3 (Cross-Cutting Synthesis): Correlate findings ACROSS leaves — e.g. bypassed Seam that is simultaneously a security exposure, or untested deep Interface that is also a PII data flow. Each correlated finding inherits highest `[Risk: Level]` of constituents.
 4. PHASE 4 (Two-Register Report): Assemble versioned Application Health Audit per schema — plain-language executive layer over technical appendices. Write to non-overwriting versioned path.
 

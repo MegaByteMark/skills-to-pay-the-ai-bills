@@ -4,13 +4,16 @@ description: Ingest a repository, identify architecture drift, evaluate technica
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.1.0
+  version: 1.1.1
 dependencies:
   - design-vocab
   - agent-markup
   - gather-requirements
 user-invocable: true
 ---
+**Accepts:** `[Handoff: Clean]` from `architect` PHASE 2
+Accepted: repository root, FDS path (`docs/requirements/functional-requirements.md`), directive "produce system blueprint in memory".
+
 1. PHASE 1 (Contract Gate): Check `docs/requirements/functional-requirements.md`.
    - Missing/empty → hand off to `gather-requirements` to generate FDS.
    - ELSE: proceed, using FDS as behavioral baseline.
