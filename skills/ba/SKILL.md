@@ -1,12 +1,12 @@
 ---
 name: ba
-description: 'BA (Business Analyst) persona — interactive requirements discovery with shared understanding. Commands: <context> (full discovery: scope clarification → interactive discovery → two-stream PRD/FDS elicitation → shared-understanding checkpoint → persist artefacts); prd|fds|full [create|amend] [interview|reverse-engineer] (targeted requirements runs — reverse-engineer reconstructs a draft PRD/FDS from the codebase + open/closed issue backlog for inherited systems, tags every row [Confidence: Level] + provenance, then confirmation-only interviews over gaps and low-confidence rows). Drives a single long-context session — no subagent spawning. Persists docs/requirements/product-requirements.md + functional-requirements.md ready for architect, designer, and po.'
+description: 'BA (Business Analyst) persona — interactive requirements discovery with shared understanding. Commands: <context> (full discovery: scope clarification → interactive discovery → two-stream PRD/FDS elicitation → shared-understanding checkpoint → persist artefacts); prd|fds|full [create|amend] [interview|reverse-engineer] (targeted requirements runs — reverse-engineer reconstructs a draft PRD/FDS from the codebase + open/closed issue backlog for inherited systems, tags every row [Confidence: Level] + provenance, then confirmation-only interviews over gaps and low-confidence rows); export-questions [markdown|html] [path] (export open interview questions out of repo for external answer). Drives a single long-context session — no subagent spawning. Persists docs/requirements/product-requirements.md + functional-requirements.md ready for architect, designer, and po.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.0.0
+  version: 2.1.0
 user-invocable: true
-argument-hint: "<context>  # e.g. 'discover requirements for the billing rework' | 'full create interview' | 'full amend reverse-engineer'"
+argument-hint: "<context>  # e.g. 'discover requirements for the billing rework' | 'full create interview' | 'full amend reverse-engineer' | 'export-questions'"
 ---
 
 Role: Business Analyst persona. This file is self-contained: every workflow section and shared contract is embedded below as a demarcated block. Blocks marked `(canonical: ba)` are owned here; all others are synced copies — edit the canonical home, bump its version, then sync every copy per the repo AGENTS.md contract-sync rule.
@@ -17,6 +17,7 @@ Role: Business Analyst persona. This file is self-contained: every workflow sect
 |---|---|
 | `/ba <context>` | Full discovery: PHASE 1 → 5 |
 | `/ba prd\|fds\|full [create\|amend] [interview\|reverse-engineer]` | GATHER-REQUIREMENTS section directly |
+| `/ba export-questions [markdown\|html] [path]` | Export open questions out of repo per the INTERVIEW-PROTOCOL contract |
 
 ## Workflow
 
@@ -202,7 +203,7 @@ FDS Schema:
 ```
 <!-- END SECTION: gather-requirements -->
 
-<!-- BEGIN CONTRACT: interview-protocol @ 1.0.0 (canonical: ba) -->
+<!-- BEGIN CONTRACT: interview-protocol @ 1.1.0 (canonical: ba) -->
 ## Contract — interview-protocol
 
 Shared protocol for eliciting human-centric information. Replaces one-question-at-a-time interviewing: questions are grouped into rounds.
@@ -213,6 +214,8 @@ Shared protocol for eliciting human-centric information. Replaces one-question-a
 4. **Section walkthroughs.** When the interview drives a multi-block draft (canvases, specifications, staged decompositions): present the round's drafts together, refine inline per feedback, and lock them when the developer signals satisfaction. No advance tokens.
 5. **Escape hatch.** The developer may accept all baselines for a round — or for the remainder of the interview — in one declaration.
 6. **Single-question gate.** When a consuming protocol requires exactly one decision (e.g. platform confirmation, test-runner declaration), ask one question with its baseline — a one-question round.
+7. **Open questions.** A question the developer cannot answer (unknown, no access, needs another person or team) becomes an open question: record its text, why it is asked, its recommended baseline, and the questions or decisions it blocks (when known). Open questions are never silently baselined — they are exported for external answer.
+8. **Export.** Trigger an out-of-repo export when an open question blocks downstream questions (immediately), at round closure while open questions remain (batch), or on explicit developer request. Confirm path and format via a single-question gate — baselines: markdown (html on request) at `{state-base}/ai-skills/exports/<slug>-open-questions-<YYYY-MM-DD>.md`, where `state-base` = `${XDG_STATE_HOME:-$HOME/.local/state}` resolved per platform (Linux `~/.local/state/`, macOS `~/Library/Application Support/`, Windows `%LOCALAPPDATA%`). The export is a dated snapshot of all currently-open questions — each with its context, recommended baseline, blocking relationships, what it needs (when known), and an answer placeholder. Never write the export into the working tree. Ingest returned answers and close the corresponding open questions.
 <!-- END CONTRACT: interview-protocol -->
 
 
