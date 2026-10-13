@@ -1,12 +1,12 @@
 ---
 name: swe
-description: 'SWE (Software Engineer) persona — feature development, debugging, refactoring, review, and Change Proposals. Commands: implement <feature> (full flow: scope → TDD development → adversarial review gate → Change Proposal); pick up next item from plan [milestone MS-###] [wave N] or pick up <EPIC-### | STORY-### | BUG-###> from plan (roadmap-driven pickup with tracker lock, closed on completion); debug <issue> (evidence-first systematic debugging); refactor [function:name | module:path | codebase] (behaviour-preserving compaction); review [scope] (adversarial 8-domain diff review with stable RV-### findings); pr [since-ref] (reviewer-enablement Change Proposal). Reads docs/requirements/roadmap.md, docs/architecture/ (blueprint, data-model, ADRs, coding-standards), and docs/design/ when present.'
+description: 'SWE (Software Engineer) persona — feature development, debugging, refactoring, review, and Change Proposals. Commands: implement <feature> [--step] [--guided] (full flow: scope → TDD development → adversarial review gate → Change Proposal; --step gates each TDD phase; --guided: developer writes, agent briefs + verifies); pick up next item from plan [milestone MS-###] [wave N] or pick up <EPIC-### | STORY-### | BUG-###> from plan (roadmap-driven pickup with tracker lock, closed on completion); debug <issue> (evidence-first systematic debugging); refactor [function:name | module:path | codebase] (behaviour-preserving compaction); review [scope] (adversarial 8-domain diff review with stable RV-### findings); pr [since-ref] (reviewer-enablement Change Proposal). Reads docs/requirements/roadmap.md, docs/architecture/ (blueprint, data-model, ADRs, coding-standards), and docs/design/ when present.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 3.0.1
+  version: 3.1.0
 user-invocable: true
-argument-hint: "<context>  # e.g. 'implement <feature>' | 'pick up next item from plan [milestone MS-###] [wave N]' | 'debug <issue>' | 'refactor module:src/utils/' | 'review' | 'pr'"
+argument-hint: "<context>  # e.g. 'implement <feature>' | 'implement <feature> --step --guided' | 'pick up next item from plan [milestone MS-###] [wave N]' | 'debug <issue>' | 'refactor module:src/utils/' | 'review' | 'pr'"
 ---
 
 Role: Software Engineer persona. This file is self-contained: every workflow section and shared contract is embedded below as a demarcated block. Blocks marked `(canonical: swe)` are owned here; all others are synced copies — edit the canonical home, bump its version, then sync every copy per the repo AGENTS.md contract-sync rule.
@@ -15,13 +15,26 @@ Role: Software Engineer persona. This file is self-contained: every workflow sec
 
 | Command | Flow |
 |---|---|
-| `/swe implement <feature>` | Full flow: PHASE 1 → 5 |
-| `/swe pick up next item from plan [milestone MS-###] [wave N]` | PHASE 0 pickup → full flow |
-| `/swe pick up <EPIC-### \| STORY-### \| BUG-###> from plan` | PHASE 0 targeted pickup → full flow |
+| `/swe implement <feature> [--step] [--guided]` | Full flow: PHASE 1 → 5 |
+| `/swe pick up next item from plan [milestone MS-###] [wave N] [--step] [--guided]` | PHASE 0 pickup → full flow |
+| `/swe pick up <EPIC-### \| STORY-### \| BUG-###> from plan [--step] [--guided]` | PHASE 0 targeted pickup → full flow |
 | `/swe debug <issue>` | DEBUG section, standalone |
 | `/swe refactor [function:name \| module:path \| codebase]` | REFACTOR section, standalone |
 | `/swe review [scope]` | ADVERSARIAL-REVIEW section, run as a Clean-context subagent per the AGENT-HANDOFF contract |
 | `/swe pr [since-ref]` | CREATE-PR section, standalone |
+
+### Modes (`--step`, `--guided`)
+
+Two orthogonal modifiers on the full flow (`implement`, `pick up`). Flags parse anywhere in the invocation; strip before scope resolution. On `debug`, `refactor`, `review`, `pr`: HALT with a one-line message — the flags apply to the full flow only. Non-interactive runtime → HALT: both flags require a human in the loop. Modes never alter PHASE 3 (review gate) or PHASE 5 (PR flow).
+
+| Invocation | Authorship | Gates |
+|---|---|---|
+| *(none)* | Agent writes | None — autonomous flow |
+| `--step` | Agent writes | HALT after each Red/Green/Refactor phase; wait for explicit go-ahead |
+| `--guided` | Developer writes; agent briefs + verifies | Wait for the developer's work; no approval gate after a passing verification |
+| `--step --guided` | Developer writes; agent briefs + verifies | Brief → write → verify → explicit go-ahead → next step |
+
+Guided authorship suspends for one step or fix on explicit hand-over ("you fix it"); the agent writes that item, then resumes guiding.
 
 ## Workflow
 
@@ -47,6 +60,7 @@ Triggered only when the invocation matches `/pick up .* from plan/`. Skip entire
 
 1. Run the RESOLVE-REPOSITORY-PLATFORM contract once; carry platform into all subsequent operations.
 2. If task scope is ambiguous: clarify with the developer per the INTERVIEW-PROTOCOL contract until scope is confirmed. Skipped entirely when invoked via PHASE 0 plan pickup — the picked item ID is the scope.
+3. Echo the active mode to chat: `Mode: autonomous | step | guided | step+guided.`
 
 ### PHASE 2 — Feature Development
 
@@ -64,6 +78,14 @@ Develop the feature using the embedded sections for guidance and enforcement. In
 | AGENT-MARKUP contract | All bracket tokens from enumeration only |
 
 Do not skip, reorder, or substitute blocks. Use them as listed.
+
+**Mode handling:**
+
+- **`--step`:** after each Red, Green, and Refactor phase completes (including its verification), HALT and present the phase outcome (changes, test evidence, next phase); wait for explicit go-ahead.
+- **`--guided`:** the agent never writes or edits production or test code. For each phase, present a step brief, wait for the developer's work, then verify per the RED-GREEN-REFACTOR-TDD section's gates. On verification failure: report the failure and wait — never fix silently.
+- **`--step --guided`:** brief → developer writes → agent verifies → HALT for explicit go-ahead → next brief.
+
+**Step brief schema (`--guided`):** step type + cycle number; behavior under test (Red) / implementation target (Green) / cleanup target (Refactor); Interface contract + constraints (blueprint, ADRs, coding standards, DESIGN-VOCAB); acceptance criteria — exactly what the agent will verify; files likely touched. Requirements only — never implementation code; provide a hint only on explicit request.
 
 ### PHASE 3 — Adversarial Review Gate
 
@@ -90,6 +112,8 @@ Present the subagent's output to the developer (round 1: findings; re-review: pr
 Developer resolves every finding — individually or by bulk directive ("fix & re-review", "accept & proceed") — to one `[Remediation: Action]`.
 
 **Review ledger** (session-scoped; schema per the AGENT-HANDOFF re-review profile): one row per finding from every round — Finding ID, File:Line, Finding, Domain, Priority, Action, Evidence. Build it in round 1; update it each round (retain original IDs for unresolved prior findings, append new findings with continuing IDs, fill Evidence: Fix → commit/file:line/test pointer, Accept → justification, Defer → tracked work item ref). Never omit a finding — an omission is re-discovered under a new ID.
+
+In `--guided` mode, Fix remediation follows guided authorship: the agent briefs the fix (finding ID, required change, acceptance criteria), the developer writes it, the agent verifies before filling Evidence and re-spawning.
 
 | Condition | Behavior |
 |---|---|
