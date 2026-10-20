@@ -15,7 +15,7 @@ Compatible with **opencode**, **Claude**, and any `.agents`-compatible runtime.
 | UI/UX prototypes, versioned design system, accessibility audit & gate | `designer` |
 | Turn requirements into a backlog: epics, stories, milestones, execution-order roadmap | `po` |
 | Implement a feature, pick up the next planned item, debug, refactor, review, raise a PR | `swe` |
-| Audit test coverage + security on a change; release-gate regression sweep; close coverage gaps | `qa` |
+| Audit test coverage + security on a change; mutation adequacy gate; release-gate regression sweep; close coverage gaps | `qa` |
 | Independent one-shot audits: security & governance, test coverage, blueprint drift | `auditor` |
 | Cut a release, ship a hotfix, scaffold CI/CD, generate release notes | `devops` |
 | Learn a language or technology; teach the agent a new skill | `teacher` |

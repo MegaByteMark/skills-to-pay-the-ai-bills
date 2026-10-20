@@ -4,7 +4,7 @@ description: 'SWE (Software Engineer) persona — feature development, debugging
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 3.1.0
+  version: 3.1.1
 user-invocable: true
 argument-hint: "<context>  # e.g. 'implement <feature>' | 'implement <feature> --step --guided' | 'pick up next item from plan [milestone MS-###] [wave N]' | 'debug <issue>' | 'refactor module:src/utils/' | 'review' | 'pr'"
 ---
@@ -864,7 +864,7 @@ Directives:
 - Cleanup: screenshots are transient evidence, never repo artefacts.
 <!-- END CONTRACT: browser-verification -->
 
-<!-- BEGIN CONTRACT: agent-handoff @ 2.0.0 (canonical: swe) -->
+<!-- BEGIN CONTRACT: agent-handoff @ 2.1.0 (canonical: swe) -->
 ## Contract — agent-handoff
 
 Every persona→subagent spawn passes context. Two modes exist, serving opposite purposes. The choice is principled, not arbitrary.
@@ -979,7 +979,7 @@ The following persona→section spawns carry formal `[Handoff: Mode]` declaratio
 - `swe` → `adversarial-review` (PHASE 3; initial Clean + re-review profile)
 - `po` → `create-epic`, `create-user-story`, `create-bug-report`, `create-milestone` sections
 - `architect` → `analyze-a-codebase`, `audit-blueprint-implementation` sections
-- `qa` → `audit-test-coverage`, `audit-security-and-governance`, `remediate-test-coverage`, `create-bug-report` sections
+- `qa` → `audit-test-coverage`, `audit-security-and-governance`, `audit-mutation-testing`, `remediate-test-coverage`, `create-bug-report` sections
 - `devops` → `create-release`, `create-hotfix`, `scaffold-ci-cd` sections
 - `auditor` → `audit-security-and-governance`, `audit-blueprint-implementation`, `audit-test-coverage` sections
 
