@@ -4,7 +4,7 @@ description: 'Auditor persona — independent application health audits. Command
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 1.0.0
+  version: 1.0.2
 user-invocable: true
 argument-hint: "<action>  # e.g. 'health' | 'security' | 'drift' | 'coverage'"
 ---
@@ -214,7 +214,7 @@ Output Schema:
 - Security & Multi-Tenancy Gaps: data isolation rules or `[Auth: Scope]` missing/incorrectly applied.
 <!-- END SECTION: audit-blueprint-implementation -->
 
-<!-- BEGIN SECTION: audit-test-coverage @ 1.1.0 (canonical: auditor) -->
+<!-- BEGIN SECTION: audit-test-coverage @ 1.2.0 (canonical: auditor) -->
 ## Section — audit-test-coverage
 
 **Accepts:** `[Handoff: Clean]` from `qa` PHASE 3
@@ -251,6 +251,8 @@ Conditional Surfaces (ONLY when trigger fires; else "Excluded — trigger absent
 - C5 — Malformed-Input/Fuzz Verification: public-facing parse/deserialization Seam. Deep security fuzzing → the AUDIT-SECURITY-AND-GOVERNANCE section.
 - C6 — Snapshot/Visual/Accessibility Verification: presentation-tier Modules emitting user-facing output.
 
+Mutation Adequacy is assessed by the `qa` persona's `audit-mutation-testing` section (`/qa mutation-gate`), not by this section. Record it as `Not assessed — run /qa mutation-gate` in the compliance matrix.
+
 Directives:
 - Strict DESIGN-VOCAB: Interface verification vs. Implementation coupling. Avoid unit/component test unless naming a physical folder path.
 - Table-First. Tag every finding `[Confidence: Level]`.
@@ -270,6 +272,8 @@ Schema:
 ### 3. Minimum Verification Surface Compliance Matrix
 | Baseline Tier | Trigger Status (Conditional) | Target Interface / Seam / Flow | Coverage (Met/Partial/Absent) | Enforcement (`[Policy]`) | Confidence (`[Confidence: Level]`) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+
+*Mutation Adequacy is out of scope for this section; record `Not assessed — run /qa mutation-gate`.*
 
 ### 4. Implementation Coupling & Structural Deficits
 - **Untested Deep Interfaces:** core Modules with high behavioral complexity lacking Interface-level verification.
@@ -455,7 +459,7 @@ Resolution Record:
 * **Layout & conventions:** [paths + naming observed]
 <!-- END CONTRACT: detect-test-harness -->
 
-<!-- BEGIN CONTRACT: agent-handoff @ 2.0.0 (canonical: swe) -->
+<!-- BEGIN CONTRACT: agent-handoff @ 2.1.0 (canonical: swe) -->
 ## Contract — agent-handoff
 
 Every persona→subagent spawn passes context. Two modes exist, serving opposite purposes. The choice is principled, not arbitrary.
@@ -570,7 +574,7 @@ The following persona→section spawns carry formal `[Handoff: Mode]` declaratio
 - `swe` → `adversarial-review` (PHASE 3; initial Clean + re-review profile)
 - `po` → `create-epic`, `create-user-story`, `create-bug-report`, `create-milestone` sections
 - `architect` → `analyze-a-codebase`, `audit-blueprint-implementation` sections
-- `qa` → `audit-test-coverage`, `audit-security-and-governance`, `remediate-test-coverage`, `create-bug-report` sections
+- `qa` → `audit-test-coverage`, `audit-security-and-governance`, `audit-mutation-testing`, `remediate-test-coverage`, `create-bug-report` sections
 - `devops` → `create-release`, `create-hotfix`, `scaffold-ci-cd` sections
 - `auditor` → `audit-security-and-governance`, `audit-blueprint-implementation`, `audit-test-coverage` sections
 

@@ -1,12 +1,12 @@
 ---
 name: qa
-description: 'QA (Quality Assurance) persona — isolated-worktree audits, adversarial hunting, and coverage remediation. Commands: <context> (Delta mode, default: audit the change + its Seams, adversarial edge-case and unhappy-path hunting on the change surface); release-gate (full-surface regression sweep anchored to the resolved minimum verification surface — regression verdicts carry [Confidence: Level], never assert "no regression" without a baseline). Runs coverage + security/governance audits in parallel inside an isolated git worktree, synthesises findings tagged [Confidence: Level] / [Risk: Level], then spawns remediation or bug-report subagents with clean context in a developer decision loop. Working tree never touched.'
+description: 'QA (Quality Assurance) persona — isolated-worktree audits, adversarial hunting, coverage remediation, and mutation adequacy gating. Commands: <context> (Delta mode, default: audit the change + its Seams, adversarial edge-case and unhappy-path hunting on the change surface); release-gate (full-surface regression sweep anchored to the resolved minimum verification surface — regression verdicts carry [Confidence: Level], never assert "no regression" without a baseline); mutation-gate (mutation adequacy sweep on the changed surface or risk-prioritised release surface). Runs coverage + security/governance + mutation audits in parallel inside an isolated git worktree, synthesises findings tagged [Confidence: Level] / [Risk: Level], then spawns remediation or bug-report subagents with clean context in a developer decision loop. Working tree never touched.'
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.0.0
+  version: 2.1.1
 user-invocable: true
-argument-hint: "<context>  # e.g. 'audit this change for coverage + security gaps' | 'release-gate regression sweep'"
+argument-hint: "<context>  # e.g. 'audit this change for coverage + security gaps' | 'release-gate regression sweep' | 'mutation-gate'"
 ---
 
 Role: Quality Assurance persona. This file is self-contained: every workflow section and shared contract is embedded below as a demarcated block. Blocks marked `(canonical: qa)` are owned here; all others are synced copies — edit the canonical home, bump its version, then sync every copy per the repo AGENTS.md contract-sync rule.
@@ -17,6 +17,7 @@ Role: Quality Assurance persona. This file is self-contained: every workflow sec
 |---|---|
 | `/qa <context>` | Delta mode (default): PHASE 1 → 7 |
 | `/qa release-gate` | Release-gate mode: PHASE 1 → 7 |
+| `/qa mutation-gate` | Mutation adequacy gate only: PHASE 1 → 2 → mutation section → 5 → 7 |
 
 ## Workflow
 
@@ -26,6 +27,8 @@ Role: Quality Assurance persona. This file is self-contained: every workflow sec
 2. Determine scope mode from invocation context:
    - **Delta mode** (default): audit the change and its Seams — diff, its Interfaces, and tests touching them. Adversarial edge-case and unhappy-path hunting on the change surface.
    - **Release-gate mode** (explicit "release-gate" / "regression" / "/qa before release"): full-surface sweep. Regression statements MUST anchor to the resolved target test surface (Minimum Verification Surface Baseline from the coverage audit) and carry `[Confidence: Level]`. No baseline → say so explicitly; never assert "no regression".
+   - **Mutation-gate mode** (explicit "mutation-gate" / "mutation testing"): run only the AUDIT-MUTATION-TESTING section, then synthesis and the developer decision loop.
+   - Mutation scope follows the mode: Delta = changed Modules/Interfaces + their Seams; Release-gate = risk-prioritised Critical/High surface.
 3. If mode is ambiguous: single-question round per the INTERVIEW-PROTOCOL contract (baseline: Delta). Then proceed.
 
 ### PHASE 2 — Isolation (Worktree)
@@ -38,7 +41,7 @@ Role: Quality Assurance persona. This file is self-contained: every workflow sec
 
 ### PHASE 3 — Parallel Audits
 
-Run the AUDIT-TEST-COVERAGE and AUDIT-SECURITY-AND-GOVERNANCE sections in parallel (sequential if resource-constrained) as Clean-context subagents per the AGENT-HANDOFF contract — each spawn prompt contains the section pasted verbatim plus the declared items, nothing else. Consume each section's output as-is; do not re-run or summarise away section analysis.
+Run the AUDIT-TEST-COVERAGE, AUDIT-SECURITY-AND-GOVERNANCE, and AUDIT-MUTATION-TESTING sections in parallel (sequential if resource-constrained) as Clean-context subagents per the AGENT-HANDOFF contract — each spawn prompt contains the section pasted verbatim plus the declared items, nothing else. In Mutation-gate mode, run only AUDIT-MUTATION-TESTING. Consume each section's output as-is; do not re-run or summarise away section analysis.
 
 **Handoff:** `[Handoff: Clean]` → section `audit-test-coverage`
 Passed: literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands).
@@ -46,7 +49,10 @@ Passed: literal worktree path, terminal-access constraint (file tools are projec
 **Handoff:** `[Handoff: Clean]` → section `audit-security-and-governance`
 Passed: literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands).
 
-- Missing contracts: do NOT generate or pull in blueprints. The AUDIT-TEST-COVERAGE section's equivalent gate resolves to **EPHEMERAL** (in-context minimalist FDS, `[Inferred: Unverified]`, down-weighted `[Confidence: Level]`). AUDIT-SECURITY-AND-GOVERNANCE runs standalone with a "no contract baseline" notice.
+**Handoff:** `[Handoff: Clean]` → section `audit-mutation-testing`
+Passed: literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands), harness Resolution Record, mutation scope (changed Modules/Interfaces in Delta mode; risk-prioritised Critical/High surface in Release-gate mode), mutation baseline (project config, prior report, or developer declaration).
+
+- Missing contracts: do NOT generate or pull in blueprints. The AUDIT-TEST-COVERAGE section's equivalent gate resolves to **EPHEMERAL** (in-context minimalist FDS, `[Inferred: Unverified]`, down-weighted `[Confidence: Level]`). AUDIT-SECURITY-AND-GOVERNANCE runs standalone with a "no contract baseline" notice. AUDIT-MUTATION-TESTING runs standalone; absent a mutation baseline and threshold policy it reports `INCONCLUSIVE`.
 - When `docs/architecture/system-blueprint.md` is present: consume its Seam test topologies (§2.3.2) and data isolation models (§5.2) to inform high-leverage verification surfaces without regenerating the blueprint.
 - QA operates independently on current code state only.
 
@@ -60,7 +66,7 @@ Assume the current state is vulnerable. After validating that the existing suite
 
 ### PHASE 5 — Synthesis
 
-1. Correlate findings across sections (e.g. a bypassed Seam that is also a coverage gap). Inherit the highest `[Risk: Level]` per correlated finding.
+1. Correlate findings across sections (e.g. a bypassed Seam that is also a coverage gap, or a surviving mutant that confirms a missing edge-case assertion). Inherit the highest `[Risk: Level]` per correlated finding.
 2. Every finding carries `[Risk: Level]` + `[Confidence: Level]` (+ `[Remediation: Effort]` on the roadmap). Untagged findings are not presented.
 3. In Release-gate mode, state regression verdict vs the resolved baseline with `[Confidence: Level]`; absent baseline → explicit "no baseline, regression unverified".
 
@@ -70,7 +76,7 @@ Present findings. Developer chooses:
 
 | Choice | Behavior |
 |---|---|
-| **Remediate coverage** | Spawn the REMEDIATE-TEST-COVERAGE section `[Handoff: Clean]`: coverage gap set + harness Resolution Record + literal worktree path + terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands) + directive "close the coverage gaps per your phased approval workflow, inside the worktree". Output consumed as-is. Re-evaluate at the issues gate. |
+| **Remediate coverage** | Spawn the REMEDIATE-TEST-COVERAGE section `[Handoff: Clean]`: coverage gap set + mutation survivor set + harness Resolution Record + literal worktree path + terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands) + directive "close the coverage gaps per your phased approval workflow, inside the worktree". Output consumed as-is. Re-evaluate at the issues gate. |
 | **File bug report** | Spawn the CREATE-BUG-REPORT section `[Handoff: Clean]`: security/governance / logic findings + reproduction steps from PHASE 4 + directive "render a bug report per your schema and file it via the resolved platform". Output consumed as-is. Re-evaluate at the issues gate. |
 | **Deepen investigation** | Re-run PHASE 3–4 with expanded scope and re-enter the loop. |
 | **Accept & proceed** | Exit the loop; proceed to PHASE 7. |
@@ -80,7 +86,7 @@ Present findings. Developer chooses:
 ### PHASE 7 — Clean Shutdown
 
 1. Always remove the worktree — on completion, on error, or on early termination: `git worktree remove <path> --force`. Failure to remove: record it and delete the directory as a fallback.
-2. Zero artefacts left behind in the developer's working tree. Any report lives in the worktree or as a versioned out-of-tree artefact approved by the developer.
+2. Zero artefacts left behind in the developer's working tree. Any report lives in the worktree or as a versioned out-of-tree artefact approved by the developer. Remove mutation artefacts (e.g. `.stryker-tmp/`, `mutants/`, tool report directories) with the worktree.
 3. If architectural decisions surfaced during the run, flag to the developer to run `/architect adr`.
 
 ## Directives
@@ -93,20 +99,21 @@ Present findings. Developer chooses:
 - All bracket tokens: AGENT-MARKUP contract enumeration only.
 - All architectural terminology: DESIGN-VOCAB contract taxonomy only. Prohibited: component, service, unit, API, boundary (except naming literal paths).
 - Test harness resolved upfront via the DETECT-TEST-HARNESS contract; never assume a runner or introduce a new one.
+- Mutation tooling must already be a project dependency/config; never install or introduce one silently. Budgets are hard ceilings (Delta 2 min, Release-gate 5 min); a partial run is `INCONCLUSIVE`, never `FAIL`.
 
-<!-- BEGIN SECTION: remediate-test-coverage @ 1.1.0 (canonical: qa) -->
+<!-- BEGIN SECTION: remediate-test-coverage @ 1.2.0 (canonical: qa) -->
 ## Section — remediate-test-coverage
 
 Remediation counterpart to the AUDIT-TEST-COVERAGE section. Runs the audit to obtain an authoritative gap set, reconciles it against the Minimum Verification Surface Baseline, presents a risk-vs-effort remediation plan for per-tier developer approval, then writes Interface-verifying tests with fake/mock Adapters at Seams, executes them, iterates to green, escalates any production defects it uncovers, and emits a versioned closure report. Builds the minimum sufficient verification surface — never gold-plates.
 
 **Accepts:** `[Handoff: Clean]` from `qa` PHASE 6
-Accepted: coverage gap set, harness Resolution Record, literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands), directive ("close the coverage gaps per your phased approval workflow, inside the worktree").
+Accepted: coverage gap set, mutation survivor set (optional), harness Resolution Record, literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands), directive ("close the coverage gaps per your phased approval workflow, inside the worktree").
 
 1. PHASE 1 (Gap Acquisition): Spawn the AUDIT-TEST-COVERAGE section `[Handoff: Clean]` per the AGENT-HANDOFF contract; consume full output as single source of truth. Inherit audit's tiered missing-contract gate verbatim. Carry forward audit's fidelity marking into every artefact.
 
    **Handoff:** `[Handoff: Clean]` → section `audit-test-coverage`
    Passed: literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands).
-2. PHASE 2 (Minimum-Surface Reconciliation): Classify every gap into Minimum Verification Surface Baseline tier (M1–M5, C1–C6). Prune:
+2. PHASE 2 (Minimum-Surface Reconciliation): Classify every gap into Minimum Verification Surface Baseline tier (M1–M5, C1–C6). Fold in the mutation survivor set: a survivor classified Missing/Weak assertion or Untested branch/boundary is a coverage gap at its target Interface/Seam; Equivalent and Dead-code survivors are excluded with rationale. Prune:
    - KEEP: absent Mandatory Floor + absent Conditional with fired trigger.
    - DROP: Conditional with absent trigger → "Excluded — trigger absent" + rationale.
    - DROP: proposed test coupling to volatile Implementation rather than stable Interface.
@@ -118,10 +125,13 @@ Accepted: coverage gap set, harness Resolution Record, literal worktree path, te
    c. Execute & iterate: run authored tests, then full suite. Fix flaky/incorrect tests YOU authored. Re-run until pass or genuine production defect isolated.
    d. Escalate: test cannot pass without production change → STOP. Record as discovered defect. Offer fix as separate approved action.
    Return to Phase 3 for next tier.
-5. PHASE 5 (Closure & Report): Re-run the AUDIT-TEST-COVERAGE section to prove gap closure as before/after delta. Write versioned report (schema below). Deferred/excluded gaps listed with rationale.
+5. PHASE 5 (Closure & Report): Re-run the AUDIT-TEST-COVERAGE section to prove gap closure as before/after delta. When the mutation survivor set was non-empty, re-run the AUDIT-MUTATION-TESTING section with the same scope and baseline to prove mutation closure; report the score delta. Write versioned report (schema below). Deferred/excluded gaps listed with rationale.
+
+   **Handoff:** `[Handoff: Clean]` → section `audit-mutation-testing`
+   Passed: literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands), harness Resolution Record, mutation scope, mutation baseline.
 
 Directives:
-- Minimum-Sufficient: smallest verification surface covering high-Depth Interfaces + mandatory floor. Every kept item traces to Mandatory Floor or fired Conditional. When in doubt, exclude + record.
+- Minimum-Sufficient: smallest verification surface covering high-Depth Interfaces + mandatory floor. Every kept item traces to Mandatory Floor, fired Conditional, or a triaged mutation survivor. When in doubt, exclude + record.
 - Verify-at-Interface, Fake-at-Seam: verification on stable Interfaces, never volatile Impls. Test doubles only at defined Seams. Prefer fakes over mocks. Do not mock what you don't own — wrap behind Seam, fake wrapper.
 - No Green-Washing: never weaken/skip/delete assertions to pass; never delete/disable failing test; never relax production to satisfy test. Test that cannot pass without production change = discovered defect to escalate.
 - Don't-Break-Reality: existing passing tests are protected. De-brittling audit-flagged test allowed only with approval. Full suite before + after; must end green or every residual failure explained.
@@ -157,10 +167,11 @@ Schema:
 * **Gaps remaining (deferred/excluded):** [count + §3 ref]
 * **Suite status:** [green | residual failures explained]
 * **Net minimum-floor compliance:** [M1–M5 / C-triggered status before→after]
+* **Mutation score delta:** [before → after, or "not run — no survivor set"]
 ```
 <!-- END SECTION: remediate-test-coverage -->
 
-<!-- BEGIN SECTION: audit-test-coverage @ 1.1.0 (canonical: auditor) -->
+<!-- BEGIN SECTION: audit-test-coverage @ 1.2.0 (canonical: auditor) -->
 ## Section — audit-test-coverage
 
 **Accepts:** `[Handoff: Clean]` from `qa` PHASE 3
@@ -197,6 +208,8 @@ Conditional Surfaces (ONLY when trigger fires; else "Excluded — trigger absent
 - C5 — Malformed-Input/Fuzz Verification: public-facing parse/deserialization Seam. Deep security fuzzing → the AUDIT-SECURITY-AND-GOVERNANCE section.
 - C6 — Snapshot/Visual/Accessibility Verification: presentation-tier Modules emitting user-facing output.
 
+Mutation Adequacy is assessed by the `qa` persona's `audit-mutation-testing` section (`/qa mutation-gate`), not by this section. Record it as `Not assessed — run /qa mutation-gate` in the compliance matrix.
+
 Directives:
 - Strict DESIGN-VOCAB: Interface verification vs. Implementation coupling. Avoid unit/component test unless naming a physical folder path.
 - Table-First. Tag every finding `[Confidence: Level]`.
@@ -217,11 +230,99 @@ Schema:
 | Baseline Tier | Trigger Status (Conditional) | Target Interface / Seam / Flow | Coverage (Met/Partial/Absent) | Enforcement (`[Policy]`) | Confidence (`[Confidence: Level]`) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
+*Mutation Adequacy is out of scope for this section; record `Not assessed — run /qa mutation-gate`.*
+
 ### 4. Implementation Coupling & Structural Deficits
 - **Untested Deep Interfaces:** core Modules with high behavioral complexity lacking Interface-level verification.
 - **Shallow / Brittle Test Coverage:** tests coupled to volatile Impls rather than stable Interfaces.
 - **Adapter / Mock Deficiencies:** missing or incorrect fake Adapters at defined Seams.
 <!-- END SECTION: audit-test-coverage -->
+
+
+<!-- BEGIN SECTION: audit-mutation-testing @ 1.0.0 (canonical: qa) -->
+## Section — audit-mutation-testing
+
+Mutation Adequacy Gate. Verifies that the existing suite detects behavioural change, not merely executes lines. Surviving mutants are triaged into equivalent mutants, missing/weak assertions, untested boundaries, dead code, and production defects, then handed to remediation. Runs inside the isolated worktree only.
+
+**Accepts:** `[Handoff: Clean]` from `qa` PHASE 3
+Accepted: literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands), harness Resolution Record, mutation scope (changed Modules/Interfaces in Delta mode; risk-prioritised Critical/High surface in Release-gate mode), mutation baseline (project config, prior report, developer declaration, or default policy).
+
+**Accepts:** `[Handoff: Clean]` from the `qa` persona's `remediate-test-coverage` section (PHASE 5)
+Accepted: literal worktree path, terminal-access constraint (file tools are project-scoped; worktree reads/writes via terminal commands), harness Resolution Record, mutation scope, mutation baseline.
+
+1. PHASE 1 (Scope & Baseline Gate):
+   - Delta mode: scope = changed Modules/Interfaces + their Seams. Release-gate mode: scope = Critical/High-`[Risk: Level]` Modules + highest-risk Seams, ordered by risk.
+   - Resolve baseline in precedence order: project mutation config → prior mutation report → developer declaration → Threshold Policy defaults. A default baseline is tagged `[Confidence: Possible]` and stated as "default baseline, not project-calibrated". No threshold policy and no other baseline → verdict `INCONCLUSIVE`; report only, never assert PASS/FAIL.
+   - Record the tool's mutation-score definition; if it differs from `killed / (killed + survived)` excluding equivalent/invalid mutants, use the tool's definition and state it.
+2. PHASE 2 (Tool Resolution): Match the stack via the Mutation Tooling Map below. The tool MUST already be a project dependency or config. Absent → do NOT install; emit `INCONCLUSIVE — mutation tool not configured` + recommendation. Never introduce a tool silently.
+3. PHASE 3 (Execution): Run inside the worktree with the mode's hard runtime budget. Use tool-native incremental mode where supported. Set a per-mutant timeout. Exclude generated, vendored, and migration code. Stop at the budget.
+   - Delta budget: 2 minutes. No incremental mode → skip execution, emit `INCONCLUSIVE — no incremental mode`.
+   - Release-gate budget: 5 minutes. Full-surface mutation is not attempted; run the risk-ordered subset.
+   - Budget reached → partial run: report executed vs skipped mutants, tag `[Confidence: Possible]`, verdict `INCONCLUSIVE`. Never `FAIL` on an incomplete run.
+   - Developer may override the budget per run; record the override in the gate context.
+4. PHASE 4 (Survivor Triage): Classify every surviving mutant:
+   - Equivalent — behaviour-preserving; exclude from score, document rationale.
+   - Missing assertion — test executes the line but asserts nothing relevant.
+   - Weak assertion — assertion exists but does not discriminate the mutation.
+   - Untested branch / boundary — prioritise boundary operators (`<`↔`<=`, `+`↔`-`, return-value replacement) because they expose missing edge-case assertions.
+   - Dead code / unreachable branch — structural finding.
+   - Production defect — mutant survival exposes an untested error path that is itself wrong; escalate.
+   Map each survivor to its target Interface/Seam and FDS requirement.
+5. PHASE 5 (Gate Verdict): Compare score against baseline/threshold per Module and overall. Verdicts: `PASS`, `FAIL`, `INCONCLUSIVE`. `FAIL` only when an in-scope Critical/High Module or the overall in-scope score misses threshold. Medium/Low misses are advisory findings. Tag `[Confidence: Level]`.
+6. PHASE 6 (Output): Render the schema below. Hand the survivor set to the REMEDIATE-TEST-COVERAGE section when the developer chooses remediation.
+
+Mutation Tooling Map:
+| Stack | Tool | Config signal | Illustrative Run Command | Report |
+| :--- | :--- | :--- | :--- | :--- |
+| Go | Gremlins | `.gremlins.yaml`, `gremlins` on PATH | `gremlins unleash ./...` | JSON |
+| TypeScript/Node.js | StrykerJS | `stryker.conf.*`, `@stryker-mutator/core` | `npx stryker run` | JSON / HTML |
+| .NET | Stryker.NET | `dotnet-stryker` tool manifest | `dotnet stryker` | JSON / HTML |
+| JVM | PIT (pitest) | `pitest` plugin in `pom.xml` / `build.gradle` | `mvn ...:mutationCoverage`, `gradle pitest` | XML / HTML |
+| Python | mutmut / cosmic-ray | `[mutmut]` config / `cosmic-ray.toml` | `mutmut run`, `cosmic-ray run` | text / JSON |
+| Rust | cargo-mutants | `cargo-mutants` installed | `cargo mutants` | text / JSON |
+| Flutter/Dart | none standard | — | — | `INCONCLUSIVE` |
+*(Commands illustrative — verify at runtime.)*
+
+Threshold Policy (project config overrides):
+| Risk Tier | Mutation Score Threshold |
+| :--- | :--- |
+| Critical | ≥ 80% |
+| High | ≥ 70% |
+| Medium | ≥ 60% |
+| Low | advisory only |
+Overall in-scope score: ≥ 70%.
+
+Directives:
+- Evidence-Bound: every survivor anchored to a real mutant location + operator. Suspicion without a report entry = DROPPED.
+- Budget-Honest: a partial run is `INCONCLUSIVE`, never `FAIL`; state executed vs skipped.
+- No-Silent-Introduction: mutation tool must pre-exist. New tool = mutation requiring developer approval.
+- Equivalent-Mutant Discipline: exclude only with recorded rationale; never silently drop survivors.
+- Strict DESIGN-VOCAB: survivors map to Interfaces/Seams, not units/components.
+- Table-First. Tag every finding `[Confidence: Level]` + `[Risk: Level]`.
+- Worktree-Only: mutation runs, reports, and temporary artefacts stay inside the worktree; PHASE 7 removes them.
+
+Schema:
+
+### 1. Mutation Gate Context
+* **Mode:** [Delta | Release-gate] * **Scope:** [changed Modules/Interfaces | risk-prioritised Critical/High surface]
+* **Tool:** [resolved tool] (`[Confidence: Level]`) * **Baseline:** [config | prior report | developer-declared | default policy | absent]
+* **Budget:** [2 min Delta | 5 min Release-gate | developer override] * **Executed / Skipped:** [counts]
+* **Verdict:** [PASS | FAIL | INCONCLUSIVE]
+
+### 2. Mutation Score Matrix
+| Module / Interface | Mutants | Killed | Survived | Timeout | No Coverage | Score | Threshold | Verdict | Confidence (`[Confidence: Level]`) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+
+### 3. Surviving Mutant Triage
+| Mutant ID | Location (file:line) | Operator | Classification | Target Interface / Seam | FDS Requirement | Recommended Action | Risk (`[Risk: Level]`) | Confidence (`[Confidence: Level]`) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+
+### 4. Gate Verdict & Remediation Handoff
+* **Gate:** [PASS | FAIL | INCONCLUSIVE] — [one-line rationale]
+* **Survivors for remediation:** [count + triage refs]
+* **Excluded equivalents:** [count + rationale refs]
+* **Structural findings:** [dead code / unreachable branches]
+<!-- END SECTION: audit-mutation-testing -->
 
 
 <!-- BEGIN SECTION: audit-security-and-governance @ 1.1.0 (canonical: auditor) -->
@@ -584,7 +685,7 @@ Deliver extreme conciseness in chat. Follow ISO 24495-1:2023 plain-language prin
 <!-- END CONTRACT: brevity -->
 
 
-<!-- BEGIN CONTRACT: agent-handoff @ 2.0.0 (canonical: swe) -->
+<!-- BEGIN CONTRACT: agent-handoff @ 2.1.0 (canonical: swe) -->
 ## Contract — agent-handoff
 
 Every persona→subagent spawn passes context. Two modes exist, serving opposite purposes. The choice is principled, not arbitrary.
@@ -699,7 +800,7 @@ The following persona→section spawns carry formal `[Handoff: Mode]` declaratio
 - `swe` → `adversarial-review` (PHASE 3; initial Clean + re-review profile)
 - `po` → `create-epic`, `create-user-story`, `create-bug-report`, `create-milestone` sections
 - `architect` → `analyze-a-codebase`, `audit-blueprint-implementation` sections
-- `qa` → `audit-test-coverage`, `audit-security-and-governance`, `remediate-test-coverage`, `create-bug-report` sections
+- `qa` → `audit-test-coverage`, `audit-security-and-governance`, `audit-mutation-testing`, `remediate-test-coverage`, `create-bug-report` sections
 - `devops` → `create-release`, `create-hotfix`, `scaffold-ci-cd` sections
 - `auditor` → `audit-security-and-governance`, `audit-blueprint-implementation`, `audit-test-coverage` sections
 
