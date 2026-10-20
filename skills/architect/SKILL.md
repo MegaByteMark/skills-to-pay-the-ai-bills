@@ -4,7 +4,7 @@ description: 'Architect persona — system blueprinting, data modelling, ADR gov
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 2.0.0
+  version: 2.0.1
 user-invocable: true
 argument-hint: "<context>  # e.g. 'blueprint' | 'analyze' | 'design EPIC-###' | 'audit' | 'data-model existing-db' | 'standards go python' | 'document' | 'glossary'"
 ---
@@ -731,7 +731,7 @@ All machine-readable tokens MUST be in square brackets `[...]`.
 Output Portability: All client-facing artefacts (FDS, blueprint, audits, docs) as export-clean Markdown — standard heading hierarchy, no renderer-fragile constructs, tables degrade gracefully. PDF/branding mechanism is separate.
 <!-- END CONTRACT: agent-markup -->
 
-<!-- BEGIN CONTRACT: agent-handoff @ 2.0.0 (canonical: swe) -->
+<!-- BEGIN CONTRACT: agent-handoff @ 2.1.0 (canonical: swe) -->
 ## Contract — agent-handoff
 
 Every persona→subagent spawn passes context. Two modes exist, serving opposite purposes. The choice is principled, not arbitrary.
@@ -846,7 +846,7 @@ The following persona→section spawns carry formal `[Handoff: Mode]` declaratio
 - `swe` → `adversarial-review` (PHASE 3; initial Clean + re-review profile)
 - `po` → `create-epic`, `create-user-story`, `create-bug-report`, `create-milestone` sections
 - `architect` → `analyze-a-codebase`, `audit-blueprint-implementation` sections
-- `qa` → `audit-test-coverage`, `audit-security-and-governance`, `remediate-test-coverage`, `create-bug-report` sections
+- `qa` → `audit-test-coverage`, `audit-security-and-governance`, `audit-mutation-testing`, `remediate-test-coverage`, `create-bug-report` sections
 - `devops` → `create-release`, `create-hotfix`, `scaffold-ci-cd` sections
 - `auditor` → `audit-security-and-governance`, `audit-blueprint-implementation`, `audit-test-coverage` sections
 

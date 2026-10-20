@@ -4,7 +4,7 @@ description: 'PO (Product Owner) persona — requirements-to-backlog orchestrati
 license: MIT
 metadata:
   author: MegaByteMark
-  version: 4.0.0
+  version: 4.0.1
 user-invocable: true
 argument-hint: "<context>  # e.g. 'seed backlog from PRD' | 'plan release milestones' | 'plan execution order' | 'review backlog coherence' | 'file a bug for X' | 'create epic EPIC-###' | 'amend requirements'"
 ---
@@ -590,7 +590,7 @@ Deliver extreme conciseness in chat. Follow ISO 24495-1:2023 plain-language prin
 | How do I deploy and verify? | Deploying the app requires running the build step and then checking the health endpoint to make sure it works. | 1. Run the build command.<br>2. Check the health endpoint for a `200` status. |
 <!-- END CONTRACT: brevity -->
 
-<!-- BEGIN CONTRACT: agent-handoff @ 2.0.0 (canonical: swe) -->
+<!-- BEGIN CONTRACT: agent-handoff @ 2.1.0 (canonical: swe) -->
 ## Contract — agent-handoff
 
 Every persona→subagent spawn passes context. Two modes exist, serving opposite purposes. The choice is principled, not arbitrary.
@@ -705,7 +705,7 @@ The following persona→section spawns carry formal `[Handoff: Mode]` declaratio
 - `swe` → `adversarial-review` (PHASE 3; initial Clean + re-review profile)
 - `po` → `create-epic`, `create-user-story`, `create-bug-report`, `create-milestone` sections
 - `architect` → `analyze-a-codebase`, `audit-blueprint-implementation` sections
-- `qa` → `audit-test-coverage`, `audit-security-and-governance`, `remediate-test-coverage`, `create-bug-report` sections
+- `qa` → `audit-test-coverage`, `audit-security-and-governance`, `audit-mutation-testing`, `remediate-test-coverage`, `create-bug-report` sections
 - `devops` → `create-release`, `create-hotfix`, `scaffold-ci-cd` sections
 - `auditor` → `audit-security-and-governance`, `audit-blueprint-implementation`, `audit-test-coverage` sections
 
